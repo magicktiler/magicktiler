@@ -1,0 +1,4 @@
+- Check for ImageMagick-compatibility
+- Add a simple Swing GUI (drag an image file inside, get thumbnail preview, 
+  information about generated tileset - and generate it)
+- Support for KML superoverlay and Microsoft Deep Zoom would be nice 
