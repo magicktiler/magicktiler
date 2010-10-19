@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+App-Version: 0.1-beta
+URL: http://code.google.com/p/magicktiler
+One-Jar-Main-Class: at.ait.dme.magicktiler.MagickTilerCLI
