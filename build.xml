@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="magicktiler" default="info" basedir=".">
+
+	<!-- App version and Website -->
+	<property name="app.version" value="0.1-SNAPSHOT" />
+	<property name="app.website" value="http://code.google.com/p/magicktiler" />
+	
+	<!-- Source directory paths -->
+	<property name="src.dir" value="src/main/java" />
+	<property name="src.resources" value="src/main/resources" />
+	<property name="test.dir" value="src/test/java" />
+	<property name="test.resources" value="src/test/resources" />
+	<property name="lib.dir" value="lib" />
+	
+	<!-- Build directory paths -->
+	<property name="build.dir" value="build" />
+	<property name="test.result.dir" value="test" />
+	<property name="doc.dir" value="doc" />
+		
+	<!-- one-jar task import -->
+	<import file="one-jar/one-jar-ant-task.xml" optional="true" /> 
+	
+	<target name="info" description="Displays help text">
+		<echo message="Available build targets (run with 'ant [target]'):" />
+		<echo message="  test ......... runs JUnit tests" />
+		<echo message="  build:lib .... creates embeddable magicktiler library jar" />
+		<echo message="  build:dist ... creates standalone executable release package" />
+		<echo message="  javadoc ...... generates JavaDoc" />
+	</target>
+
+	<target name="clean" description="Deletes the target directory">
+		<delete dir="${build.dir}"/>
+	</target>
+	
+	<target name="add-license" depends="clean" description="Adds license text to source files if missing">
+		<loadfile property="license" srcFile="LICENSE.txt"/>
+		<replace dir="${src.dir}" includes="**/*.java" summary="true">
+			<not>
+				<contains text="* Copyright" />
+			</not>
+			<replacefilter 
+			    token="package at.ait.dme" 
+			    value="${license}&#xa;&#xa;package at.ait.dme" />
+		</replace>
+	</target>
+	
+	<target name="replace-tokens" 
+	        depends="clean"
+			description="Replaces the app-version and website tokens in the CLI helptext">
+		
+		<replaceregexp 
+			file="${src.dir}/at/ait/dme/magicktiler/MagickTilerCLI.java"
+			match="VERSION = &quot;.*" 
+			replace="VERSION = &quot;Version ${app.version}&quot;;" />
+		
+		<replaceregexp 
+			file="${src.dir}/at/ait/dme/magicktiler/MagickTilerCLI.java"
+			match="WEBSITE = &quot;.*" 
+			replace="WEBSITE = &quot;${app.website}&quot;;" />		
+	</target>
+
+	<target name="compile" depends="replace-tokens">
+		<mkdir dir="${build.dir}"/>
+
+		<javac destdir="${build.dir}" includes="**/*.*" fork="true" source="1.6">
+			<src path="${src.dir}" />
+			<src path="${test.dir}" />
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="test" depends="compile">
+		<junit printsummary="yes" haltonfailure="yes" fork="true" showoutput="true">					
+			<classpath>
+				<pathelement location="${build.dir}" />												
+				<pathelement location="${src.resources}" />
+				<pathelement location="${test.resources}" />
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+			<batchtest todir="${test.result.dir}">
+				<formatter type="xml" />
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="build:lib"
+			depends="compile"
+			description="Creates the magicktiler lib jar (for use in other Java projects)">
+		
+		<jar destfile="magicktiler-lib-${app.version}.jar">
+			<fileset dir="${build.dir}">
+				<exclude name="**/*Test*.class" />
+			</fileset>
+			<fileset dir="${src.resources}" />
+		</jar>
+	</target>
+	
+	<target name="one-jar"
+	        depends="compile"
+			description="Creates a single, command-line-executable jar with all dependencies included">
+        
+		<one-jar destfile="magicktiler.jar" manifest="one-jar/manifest.txt">
+            <main>
+				<fileset dir="${build.dir}">
+					<exclude name="**/*Test*.class" />
+				</fileset>
+				<fileset dir="${src.resources}" />
+            </main>
+            <lib>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+					<exclude name="junit*.jar" />
+				</fileset>
+            </lib>
+        </one-jar>
+	</target>
+	
+	<target name="build:dist"
+			depends="one-jar"
+			description="Creates release ZIP consisting of executable jar, readme and Zoomify viewer">
+		<zip destfile="magicktiler-${app.version}-bin.zip"
+			 basedir="."
+			 includes="zoomify/* LICENSE.txt README.txt magicktiler.jar" />
+	</target>
+
+	<target name="javadoc" description="Generates the JavaDoc">
+		<delete dir="${doc.dir}"/>
+		<javadoc destdir="${doc.dir}">
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+			<fileset dir="${src.dir}" />
+		</javadoc>
+		<echo message="Generated JavaDoc in folder /doc" />
+	</target>
+</project>

@@ -1,0 +1,117 @@
+NOTE TO DEVELOPERS: TO SUPPORT DEVELOPER CUSTOMIZATION AND ENHANCEMENT OF THE ZOOMIFY VIEWER THE EDITABLE VIEWER SOURCE CODE ('.FLA' AND '.AS' FILES RATHER THAN COMPILED '.SWF' FILE) IS AVAILABLE AS PART OF ZOOMIFY'S ZOOMIFY DESIGN AND ZOOMIFY FLASH PRODUCTS.  THE ZOOMIFY LICENSE AGREEMENT ALLOWS MODIFICATION OF THESE FILES AND REDISTRIBUTION IN SWF (NON-SOURCE) FORM. 
+
+
+
+ZOOMIFY LICENSE AGREEMENT
+
+ 
+
+Zoomify products enable image content creators to easily author and publish high-quality images for fast, intuitive viewing over networks such as the Internet and on distributable media such as CDs and DVDs. Accordingly, the Zoomify License Agreement provides the greatest possible flexibility for Zoomify's customers.
+
+ 
+
+ALLOWED USES
+
+AUTHORING PROGRAMS
+
+The Zoomify Converter is used to prepare images for zoom-and-pan viewing. The Converter is licensed per user, and may not be redistributed without a written reseller agreement with Zoomify.
+
+The Zoomify Enterprise Converter is likewise used to prepare images for zoom-and-pan viewing, however, its functionality can be automated via scripting. This allows image conversion as part of server-side system. The Enterprise Converter is therefore licensed per server. The Enterprise Converter may not be used on more than one server without the purchase of a multi-server license or site license. The Enterprise Converter may not be redistributed without a written reseller agreement with Zoomify.
+
+The Zoomify Converter may not be used to create an image conversion or 'zoomification' service. That is, images may be converted and distributed, however, they should not be converted solely for the purpose of distribution. Where converted for distribution, they should accompany content, software, or other added value. Individuals with a need for à la carte or on-going image conversion should acquire a license for a Zoomify product that includes the Zoomify Converter.
+
+The Zoomifyer Enterprise Converter may be operated via command line only for internal use. You may not resell access to the Zoomifyer Enterprise Converter on a fee basis, whether a perimage fee or a time-based access fee. In other words, you may create images for your clients and customers, but you may not run an image-encoding service. If your clients or customers wish to convert images for their own use, they must purchase a license appropriate for their use.
+
+IMAGE CONTENT
+
+Zoomify images, the content authored and viewed with Zoomify products, is the property of the content creator and may be published, distributed, and viewed without royalty. Zoomify does not charge any fees for use of the images whether based on image volume, viewing traffic, time period, or other criteria. Zoomify images do not require any 'broadcast key' or other licensing technology.
+
+As noted above, images should not be converted solely for the purpose of distribution as in the case of a conversion or 'zoomification' service. This is a limitation on the use of the Zoomify Converter, not a restriction on the image content of the customer.
+
+VIEWERS
+
+The Zoomify Viewers are used to view images that have been converted for zoom-and-pan viewing. The Viewers are used in published form as Flash movie 'SWF' files. In this form the Viewers may be redistributed on networks and distributable media. This includes the standard Zoomify Express Viewer (formerly EZ Viewer), Design Viewer, Slideshow Viewer, Gallery Viewer, Hotspot Viewer, Watermark Viewer, Comparison Viewer, Tour Viewer, Rotation Viewer, Geo Viewer, and such other viewers as Zoomify provides with the exception of the Zoomify Annotation Viewer (see below).
+
+Viewers on distributable media must be accompanied by this License Agreement. Viewers distributed for commercial purposes must clearly include modifications and works within the scope of which the Zoomify Viewer is not the primary source of value - that is, the Viewer 'SWF' files should not be redistributed without accompanying content, software, or other added value.
+
+The Zoomify Annotation Viewer is also used to view images that have been converted for zoom-and-pan viewing, however, its functionality depends on additional server-side data and it is typically used as part of a server-side system. The Annotation Viewer is therefore licensed per server. The Annotation Viewer may not be used on more than one server without the purchase of a multi-server license or site license. The Annotation Viewer may not be redistributed without a written reseller agreement with Zoomify.
+
+No Zoomify Viewer shall be redistributed as part of a paid or free product with zoomable image content created by any means other than a Zoomify converter obtained with a licensed copy of a Zoomify product unless specifically permitted by a written reseller agreement with Zoomify.
+
+SOURCE CODE
+
+The Zoomify Viewers are created using Adobe Flash. They are used in published form as Flash movie 'SWF' files. The Viewers are authored in editable form as Flash movie 'FLA' and 'AS' source code files. Zoomify Viewer source code files and source code may not be redistributed without a written reseller agreement with Zoomify.
+
+Zoomify products include editable source code files to enable Zoomify customers to modify the look and functionality of the Viewers as well as to allow the addition of zoom-and-pan functionality to customer Flash projects. Such use results in the creation of new publishable 'SWF' files. Such 'SWF' files may be redistributed under the following requirements:
+
+1. The 'SWF' files must include the Zoomify copyright information, unmodified, from the original Zoomify source files. 'SWF' files on distributable media must be accompanied by this License Agreement.
+
+2. The 'SWF' files must be created using the Publish setting 'Protect From Import' of the Adobe Flash editing software.
+
+3. Where modifications are made to the Zoomify Viewers the modified 'SWF' files must include user-viewable information stating that the Viewers have been modified and including support contact information for the author of the modifications.
+
+HACKING
+
+Note that Zoomifyer EZ and Zoomify Express as well as other Zoomify products may not include Zoomify Viewer source code files. Where the source code is not provided, customization is limited to that possible with the features of the product. Specifically, Zoomifyer EZ and Zoomify Express, products typically provided by Zoomify for no charge, include splash screen logos and other branding that must not be removed. Decompilation, disassembly, or reverse engineering of Viewers provided without source code is prohibited.
+
+The Zoomify Converter and other elements of Zoomify products are also provided without source code. Decompilation, disassembly, or reverse engineering of these products is prohibited.
+
+ 
+
+SPECIFIC TERMS
+
+SOFTWARE, including, but not limited to: Zoomifyer EZ, Zoomify Express, Zoomify Design, Zoomify Flash, Zoomifyer for Flash, Zoomify Enterprise, Zoomifyer Enterprise, Zoomify Converter, Zoomify Enterprise Converter, Zoomify Viewers, Zoomify Viewer SWF, Zoomify HTML Maker SWF, Zoomify Test Server, Zoomify Annotation System SWF, Zoomify Servlet and CGI.
+
+SOURCE CODE, including, but not limited to: Zoomify FLA (.fla) files, Zoomify ActionScript (.as) files, Zoomify Servlet Java Source Code Class Files, Zoomify CGI Source Code (.c) file.
+
+1. GRANT OF LICENSE. Zoomify grants to you a nonexclusive, royalty-free, right to use the SOFTWARE. You may only install or otherwise use the SOFTWARE on one computer. If you use the SOFTWARE on additional computers, additional licenses must be obtained from Zoomify, Inc.
+
+The following Zoomify viewing software may be freely distributed in non-source (compiled or published) form: Zoomify Viewers, Zoomify Viewer SWF (with import protection enabled).
+
+The Zoomify Annotation System SWF file(s) may not be redistributed, but may reside on one (1) server per license purchased.
+
+2. COPYRIGHT. The SOFTWARE is owned by Zoomify or its suppliers and is protected by United States copyright laws and international treaty provisions. Therefore, you must treat the SOFTWARE like any other copyrighted material (e.g., a book or musical recording) except that you may either (a) make one copy of the SOFTWARE solely for backup or archival purposes, or (b) transfer the SOFTWARE to a single hard disk provided you keep the original solely for backup or archival purposes.
+
+3. OTHER RESTRICTIONS. This License is your proof of license to exercise the rights granted herein and must be retained by you. You may not reverse engineer, decompile, or disassemble the SOFTWARE, except to the extent the foregoing restriction is expressly prohibited by applicable law.
+
+This License Agreement restricts certain product uses subject to possession of a written reseller agreement. Zoomify reserves the right to designate resellers at Zoomify's sole discretion. Zoomify has selected Aperio Technologies, Inc. as Zoomify's exclusive reseller for Zoomify's products in the digital pathology market. Zoomify's customers retain the rights granted in this License Agreement to create, sell, and distribute products based on Zoomify technology, whether to the digital pathology market or other markets, with restrictions as noted, including but not limited to, prohibition of redistribution of the Zoomify Converter, Zoomify Enterprise Converter, Zoomify Annotation Viewer, and Zoomify source code. Zoomify retains the right to sell directly to customers in the digital pathology market, to transfer this right in the event of acquisition, and to designate resellers who may sell to customers in this market so long as their sales activities are not specifically and only addressed to the market, but rather, are horizontal in nature, encompassing multiple application areas.
+
+4. USE OF SOURCE CODE. You may redistribute the following Zoomify source code files, if provided, in source or compiled form for non-commercial or commercial purposes: "ZoomifyCGI.c", "ZoomifyServlet.java", and "ZoomifyHTTPRequestHandler.java."
+
+You may modify but not redistribute Zoomify FLA files including, but not limited to, "Zoomify Components.FLA" and "Zoomify Components 2.FLA". In addition, you may not redistribute FLA files wherein Zoomify code resides. These files may only be redistributed as compiled SWF files with import protection enabled (see Adobe Flash documentation).
+
+In all cases, modifications must be clearly called-out. This license agreement must be redistributed with the files whether modified or not, regardless of the purpose of redistribution. Works distributed for commercial purposes must clearly include modifications and works within the scope of which the Zoomify technology is not the primary source of value.
+
+Regarding other uses, or if you are unsure of your rights under this license, please contact Zoomify at business@zoomify.com the address listed below.
+
+
+LIMITED WARRANTY
+
+NO WARRANTIES. ZOOMIFY EXPRESSLY DISCLAIMS ANY WARRANTY FOR THE SOFTWARE. THE SOFTWARE AND ANY RELATED DOCUMENTATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OR MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NONINFRINGEMENT. THE ENTIRE RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE REMAINS WITH YOU.
+
+NO LIABILITY FOR CONSEQUENTIAL DAMAGES. IN NO EVENT SHALL ZOOMIFY OR ITS SUPPLIERS BE LIABLE FOR ANY DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFIT, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OR INABILITY TO USE THIS ZOOMIFY PRODUCT, EVEN IF ZOOMIFY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. BECAUSE SOME STATES/JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATION MAY NOT APPLY TO YOU.
+
+U.S. GOVERNMENT RESTRICTED RIGHTS
+
+The SOFTWARE and documentation are provided with RESTRICTED RIGHTS. Use, duplication, or disclosure by the Government is subject to restrictions as set forth in subparagraph (c)(1)(ii) of The Right in Technical Data and Computer Software clause at DFARS 252.227-7013 or subparagraph (c)(1) and (2) of the Commercial Computer Software--Restricted Rights 48 CFR 52.227-19, as applicable. Manufacturer is Zoomify Inc./Box 8008/Santa Cruz, CA 95061.
+
+This Agreement is governed by the laws of the State of California and of the United States of America.
+
+Should you have any questions concerning this Agreement please write:
+
+Zoomify, Inc.
+Customer Service
+Box 8008
+Santa Cruz, CA 95061
+
+The Zoomify technology provided may make use of SGI U.S. Patent No. 5,760,783, MGI SOFTWARE U.S. Patent No. 5,968,120, and Zoomify's own copyrighted or patent pending intellectual property. For more information contact Zoomify at business@zoomify.com.
+
+"Zoomify", "Zoomifyer", "Zoomify Converter", "Zoomify Viewer", "Zoomify EZ", "Zoomifyer EZ", "Zoomify Extension", "Zoomifyer Extension", "Zoomify Express", "Zoomify Design", "Zoomify Flash", "Zoomify for Flash", "Zoomifyer for Flash", "Zoomify Pro", "Zoomifyer Pro", "Zoomify VR", "Zoomifyer VR", "Zoomify Enterprise", and "Zoomifyer Enterprise" are trademarks of Zoomify, Inc.
+
+Zoomifyer Software License Agreement (r2008-11-10)
+
+If you have questions regarding this agreement, please contact us:
+
+Copyright © 1999-2008 Zoomify, Inc. 
+All Rights Reserved
+
