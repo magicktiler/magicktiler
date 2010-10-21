@@ -2,22 +2,23 @@ package at.ait.dme.magicktiler;
 
 import java.io.File;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class TMSTest extends TestCase {
+public class TMSTest extends BaseTest {
 	
 	/**
 	 * Define a custom working dir for this test
 	 */
 	private File workingDir = new File("test/tms");
 	
-	@Test 
-	public void testTMSTiling() throws TilingException {
-		// Delete the working dir
+	@Before
+	public void setUp() {
 		deleteDir(workingDir);
-		
+	}
+	
+	@Test 
+	public void testTMSTiling() throws TilingException {	
 		// Generate a TMS tileset from the test image
 		MagickTiler t = new TMSTiler();
 		t.setWorkingDirectory(workingDir);
@@ -72,19 +73,4 @@ public class TMSTest extends TestCase {
 		}
 		return true;
 	}
-	
-	private void deleteDir(File path) {
-	    if(path.exists()) {
-	      File[] files = path.listFiles();
-	      for (int i=0; i<files.length; i++) {
-	         if(files[i].isDirectory()) {
-	        	 deleteDir(files[i]);
-	         } else {
-	           files[i].delete();
-	         }
-	      }
-	    }
-	    path.delete();
-	}
-
 }
