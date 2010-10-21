@@ -53,7 +53,7 @@ import org.im4java.core.IMOperation;
  * <li>Temporary files are deleted.</li>
  * </ol>
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 public class PTIFConverter extends MagickTiler {
 	

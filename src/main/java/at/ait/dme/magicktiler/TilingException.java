@@ -25,7 +25,7 @@ package at.ait.dme.magicktiler;
  * An all-purpose exception that is thrown when something goes wrong
  * during the tile-generation process.
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 public class TilingException extends Exception {
 

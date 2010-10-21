@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * The base class for all supported tile scheme implementations.
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 public abstract class MagickTiler {
 	

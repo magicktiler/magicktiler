@@ -25,7 +25,7 @@ package at.ait.dme.magicktiler;
  * Supported tile file formats. Please note that not all tiling schemes
  * may support all tile file formats!
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 public class TileFormat {
 	

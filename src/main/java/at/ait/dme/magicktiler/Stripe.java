@@ -35,7 +35,7 @@ import org.im4java.core.MontageCmd;
  * is done either vertically or horizontally. This class is a utility class for handling
  * and manipulating image stripes.
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 class Stripe {
 	

@@ -48,7 +48,7 @@ import org.im4java.core.IMOperation;
  * <br><br>
  * TODO finish this implementation!
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 public class KMLSuperOverlayTiler extends TMSTiler {
 

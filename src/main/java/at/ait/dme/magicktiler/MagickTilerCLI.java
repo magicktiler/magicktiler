@@ -39,7 +39,7 @@ import java.util.HashMap;
  * -o   output directory (for tilesets) or file (for PTIF)<br>
  * -p   generate an HTML preview file
  * 
- * @author Rainer Simon
+ * @author aboutgeo@no5.at
  */
 public class MagickTilerCLI {
 	
