@@ -4,12 +4,15 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
+
 /**
  * Base class for our tests
  * 
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
-public class BaseTest extends TestCase {
+@Ignore
+public abstract class BaseTest extends TestCase {
 
 	protected void deleteDir(File path) {
 	    if(path.exists()) {
