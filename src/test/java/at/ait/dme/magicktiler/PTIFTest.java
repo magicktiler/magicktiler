@@ -6,10 +6,16 @@ import org.junit.Test;
 
 import junit.framework.TestCase;
 
+/**
+ * PTIF tiling tests
+ * 
+ * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
+ */
 public class PTIFTest extends TestCase {
 
 	@Test 
-	public void testTMSTiling() throws TilingException {		
+	public void testPTIFTiling() throws TilingException {		
 		// Generate a Pyramid TIF from the test imag
 		File result = new File("test/pyramid-tif.ptif");
 		

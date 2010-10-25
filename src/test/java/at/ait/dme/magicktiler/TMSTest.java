@@ -5,6 +5,12 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * TMS tiling tests
+ * 
+ * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
+ */
 public class TMSTest extends BaseTest {
 	
 	/**
@@ -23,8 +29,8 @@ public class TMSTest extends BaseTest {
 		MagickTiler t = new TMSTiler();
 		t.setWorkingDirectory(workingDir);
 		t.setGeneratePreviewHTML(true);
-		// TilesetInfo info = t.convert(new File("src/test/resources/Hong_Kong_Night_Skyline.jpg"));
-		TilesetInfo info = t.convert(new File("map.png"));
+		TilesetInfo info = t.convert(new File("src/test/resources/Hong_Kong_Night_Skyline.jpg"));
+		//TilesetInfo info = t.convert(new File("map.png"));
 
 		// Check if image metadata was read correctly
 		assertEquals("Wrong width calculated for the TMS tileset!", 4670, info.getWidth());

@@ -5,6 +5,12 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Zoomify tiling tests
+ * 
+ * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
+ */
 public class ZoomifyTest extends BaseTest {
 	
 	/**

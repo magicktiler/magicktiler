@@ -5,6 +5,12 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * KML tiling tests
+ * 
+ * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
+ */
 public class KMLTest extends BaseTest {
 	
 	/**
@@ -18,8 +24,8 @@ public class KMLTest extends BaseTest {
 	}
 	
 	@Test 
-	public void testTMSTiling() throws TilingException {
-		// Generate a TMS tileset from the test image
+	public void testKMLTiling() throws TilingException {
+		// Generate a KML tileset from the test image
 		KMLSuperOverlayTiler t = new KMLSuperOverlayTiler();
 		t.setWorkingDirectory(workingDir);
 		t.setBoundingBox(new BoundingBox(48, 38, 20, 0));
