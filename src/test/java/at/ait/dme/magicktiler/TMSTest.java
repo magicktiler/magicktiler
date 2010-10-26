@@ -1,6 +1,8 @@
 package at.ait.dme.magicktiler;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,13 +26,15 @@ public class TMSTest extends BaseTest {
 	}
 	
 	@Test 
-	public void testTMSTiling() throws TilingException {	
+	public void testTMSTiling() throws TilingException {
+		Collection<String> expectedTopLevel = 
+			Arrays.asList(new String[]{"0","1","2","3","4","5","preview.html","tilemapresource.xml"});
+		
 		// Generate a TMS tileset from the test image
 		MagickTiler t = new TMSTiler();
 		t.setWorkingDirectory(workingDir);
 		t.setGeneratePreviewHTML(true);
 		TilesetInfo info = t.convert(new File("src/test/resources/Hong_Kong_Night_Skyline.jpg"));
-		//TilesetInfo info = t.convert(new File("map.png"));
 
 		// Check if image metadata was read correctly
 		assertEquals("Wrong width calculated for the TMS tileset!", 4670, info.getWidth());
@@ -45,27 +49,15 @@ public class TMSTest extends BaseTest {
 		// Check if tileset files were generated correctly
 		File tilesetRoot = new File(workingDir, "Hong_Kong_Night_Skyline");
 		assertTrue("Tileset root directory not found!", tilesetRoot.exists());
-		String[] files = tilesetRoot.list();
-		assertTrue("TMS tileset seems to be missing files!", files.length > 7);
-		assertTrue("Wrong directory structure at top level!", checkTopLevel(files));
+		Collection<String> files = Arrays.asList(tilesetRoot.list());
+		assertEquals("TMS tileset seems to be missing files!", files.size(), expectedTopLevel.size());
+		assertTrue("Wrong directory structure at top level!", files.containsAll(expectedTopLevel));
 		assertTrue("Wrong directory structure in zoom level 0", checkZoomLevel(new File(tilesetRoot, "0"), 1, 1));
 		assertTrue("Wrong directory structure in zoom level 1", checkZoomLevel(new File(tilesetRoot, "1"), 2, 1));
 		assertTrue("Wrong directory structure in zoom level 2", checkZoomLevel(new File(tilesetRoot, "2"), 3, 1));
 		assertTrue("Wrong directory structure in zoom level 3", checkZoomLevel(new File(tilesetRoot, "3"), 5, 2));
 		assertTrue("Wrong directory structure in zoom level 4", checkZoomLevel(new File(tilesetRoot, "4"), 10, 4));
 		assertTrue("Wrong directory structure in zoom level 5", checkZoomLevel(new File(tilesetRoot, "5"), 19, 8));
-	}
-	
-	private boolean checkTopLevel(String[] files) {
-		if (!files[0].equals("0")) return false;
-		if (!files[1].equals("1")) return false;
-		if (!files[2].equals("2")) return false;
-		if (!files[3].equals("3")) return false;
-		if (!files[4].equals("4")) return false;
-		if (!files[5].equals("5")) return false;
-		if (!files[6].equals("preview.html")) return false;
-		if (!files[7].equals("tilemapresource.xml")) return false;
-		return true;
 	}
 	
 	private boolean checkZoomLevel(File zoomlevelRoot, int xTiles, int yTiles) {

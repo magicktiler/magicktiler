@@ -74,13 +74,15 @@ import org.im4java.core.IMOperation;
  * </ol>
  * 
  * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ZoomifyTiler extends MagickTiler {
-	
+	protected static final int MAX_TILES_PER_GROUP = 256;
+
 	/**
 	 * TileGroup string constant
 	 */
-	private static final String TILEGROUP = "TileGroup";
+	protected static final String TILEGROUP = "TileGroup";
 	
 	/**
 	 * XML descriptor file template 
@@ -242,7 +244,7 @@ public class ZoomifyTiler extends MagickTiler {
 
 		// Rename result files (not nice, but seems to be the fastest way to do it)
 		for (int idx=0; idx<xTiles; idx++) {
-			int tileGroup = (startIdx + idx) / 256;
+			int tileGroup = (startIdx + idx) / MAX_TILES_PER_GROUP;
 			File tileGroupDir = new File(targetDirectory.getAbsolutePath() + File.separator + TILEGROUP + tileGroup);
 			if (!tileGroupDir.exists()) tileGroupDir.mkdir();
 			
