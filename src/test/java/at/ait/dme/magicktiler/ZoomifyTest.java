@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,14 +59,15 @@ public class ZoomifyTest extends BaseTest {
 		File tilesetRoot = new File(workingDir, "OrteliusWorldMap1570");
 		assertTrue("Tileset root directory not found!", tilesetRoot.exists());
 		Collection<String> files = Arrays.asList(tilesetRoot.list());
-		assertEquals("TMS tileset seems to be missing files!", files.size(), expectedTopLevel.size());
 		assertTrue("Wrong directory structure at top level!", files.containsAll(expectedTopLevel));
 		
 		// Check tilegroup directories
+		Map<Integer, Collection<String>> allTiles = new HashMap<Integer, Collection<String>>();
 		for(String tileGroupDir : files) {
 			if(tileGroupDir.contains(ZoomifyTiler.TILEGROUP)) {
 				String[] tiles = new File(tilesetRoot+"/"+tileGroupDir).list();
-				if(!tileGroupDir.equals(ZoomifyTiler.TILEGROUP+(expectedNumberOfTileGroups-1))) {
+				int tileGroup = Integer.parseInt(tileGroupDir.substring(tileGroupDir.length()-1));
+				if(tileGroup<(expectedNumberOfTileGroups-1)) {
 					// check for max tiles per group
 					assertEquals("Wrong number of tiles in directory:" + tileGroupDir, 
 							tiles.length, ZoomifyTiler.MAX_TILES_PER_GROUP);
@@ -73,8 +76,35 @@ public class ZoomifyTest extends BaseTest {
 					assertEquals("Wrong number of tiles in directory:" + tileGroupDir, 
 							tiles.length, info.getTotalNumberOfTiles() % ZoomifyTiler.MAX_TILES_PER_GROUP);
 				}
+				allTiles.put(tileGroup, Arrays.asList(tiles));
 			}
 		}
+		// check if the tilegroup directories contain the correct tiles
+		assertTrue("Missing tiles", checkTiles(allTiles, info));
+	}
+	
+	private boolean checkTiles(Map<Integer, Collection<String>> allTiles, TilesetInfo info) {
+		if(!info.getImageFile().getName().contains(".")) fail("can't determine file extension of source image");
+		String fileExtension = info.getImageFile().getName().split("\\.")[1];
+		
+		int startIdx = info.getTotalNumberOfTiles();
+		for(int zoomLevel=0; zoomLevel < info.getZoomLevels(); zoomLevel++) {
+			startIdx -= info.getNumberOfXTiles(zoomLevel) * info.getNumberOfYTiles(zoomLevel);
+			
+			int offset = startIdx;
+			for(int row=0;row<info.getNumberOfYTiles(zoomLevel); row++) {
+				for(int column=0;column<info.getNumberOfXTiles(zoomLevel);column++) {
+					String tileName = (info.getZoomLevels()-1-zoomLevel) + "-" + column + "-" + row + "." + fileExtension;
+					Collection<String> tiles = allTiles.get((offset + column) / ZoomifyTiler.MAX_TILES_PER_GROUP);
+					if(!tiles.contains(tileName)) {
+						fail("missing tile:"+tileName);
+						return false;
+					}
+				}
+				offset+=info.getNumberOfXTiles(zoomLevel);
+			}
+		}
+		return true;
 	}
 	
 	private int calculateExpectedNumberOfTileGroups(int totalNumberOfTiles) {
