@@ -60,7 +60,7 @@ import org.im4java.core.IMOperation;
  * contains the 'first' 256 tiles, starting with tile 0-0-0 (the lowest-resolution
  * zoom level). TileSet1 contains the 'next' 256, and so on. Counting is done starting
  * from the lowest-resolution zoom level, and inside the zoom level tiles are counted
- * from right to left (and top to bottom - i.e. reading direction).
+ * from left to right (and top to bottom - i.e. reading direction).
  * <br><br>
  * The implemented tiling algorithm works as follows:
  * <ol>
