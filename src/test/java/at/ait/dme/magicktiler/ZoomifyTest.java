@@ -87,21 +87,17 @@ public class ZoomifyTest extends BaseTest {
 		if(!info.getImageFile().getName().contains(".")) fail("can't determine file extension of source image");
 		String fileExtension = info.getImageFile().getName().split("\\.")[1];
 		
-		int startIdx = info.getTotalNumberOfTiles();
-		for(int zoomLevel=0; zoomLevel < info.getZoomLevels(); zoomLevel++) {
-			startIdx -= info.getNumberOfXTiles(zoomLevel) * info.getNumberOfYTiles(zoomLevel);
-			
-			int offset = startIdx;
+		int tile = 0;
+		for(int zoomLevel=info.getZoomLevels()-1; zoomLevel>=0; zoomLevel--) {
 			for(int row=0;row<info.getNumberOfYTiles(zoomLevel); row++) {
-				for(int column=0;column<info.getNumberOfXTiles(zoomLevel);column++) {
+				for(int column=0;column<info.getNumberOfXTiles(zoomLevel);column++,tile++) {
 					String tileName = (info.getZoomLevels()-1-zoomLevel) + "-" + column + "-" + row + "." + fileExtension;
-					Collection<String> tiles = allTiles.get((offset + column) / ZoomifyTiler.MAX_TILES_PER_GROUP);
+					Collection<String> tiles = allTiles.get(tile / ZoomifyTiler.MAX_TILES_PER_GROUP);
 					if(!tiles.contains(tileName)) {
 						fail("missing tile:"+tileName);
 						return false;
 					}
 				}
-				offset+=info.getNumberOfXTiles(zoomLevel);
 			}
 		}
 		return true;
