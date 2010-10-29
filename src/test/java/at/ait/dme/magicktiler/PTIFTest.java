@@ -16,7 +16,7 @@ public class PTIFTest extends TestCase {
 
 	@Test 
 	public void testPTIFTiling() throws TilingException {		
-		// Generate a Pyramid TIF from the test imag
+		// Generate a Pyramid TIF from the test image
 		File result = new File("test/pyramid-tif.ptif");
 		
 		PTIFConverter ptiffer = new PTIFConverter();
@@ -26,14 +26,13 @@ public class PTIFTest extends TestCase {
 		);
 		
 		// Check if image metadata was read correctly
-		assertEquals("Wrong width calculated for the Zoomify tileset!", 4670, info.getWidth());
-		assertEquals("Wrong height calculated for the Zoomify tileset!", 2000, info.getHeight());
+		assertEquals("Wrong width calculated for the PTIF tileset!", 4670, info.getWidth());
+		assertEquals("Wrong height calculated for the PTIF tileset!", 2000, info.getHeight());
 		
 		// Check if tileset properties were computed correctly
-		assertEquals("Wrong number of zoom levels calculated for the Zoomify tileset!", 6, info.getZoomLevels());
+		assertEquals("Wrong number of zoom levels calculated for the PTIF tileset!", 6, info.getZoomLevels());
 		
 		// Check if the file was created
 		assertTrue(result.exists());
 	}
-
 }

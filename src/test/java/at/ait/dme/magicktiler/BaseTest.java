@@ -14,6 +14,11 @@ import org.junit.Ignore;
 @Ignore
 public abstract class BaseTest extends TestCase {
 
+	protected String getFileExtension(TilesetInfo info) {
+		if(!info.getImageFile().getName().contains(".")) fail("can't determine file extension of source image");
+		return info.getImageFile().getName().split("\\.")[1];
+		
+	}
 	protected void deleteDir(File path) {
 	    if(path.exists()) {
 	      File[] files = path.listFiles();

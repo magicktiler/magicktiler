@@ -48,7 +48,7 @@ import org.im4java.core.IMOperation;
  * /tileset-root/[zoomlevel]/[column]/[row].jpg (or .png)
  * <br><br>
  * The highest-resolution zoom level has the highest number. Column/row
- * numbering of tiles starts top/left, counting direction is right/downwards.
+ * numbering of tiles starts left/bottom, counting direction is upwards/right.
  * <br><br>
  * TMS does NOT allow irregularly sized tiles on the border! Each tile must
  * be rectangular. If the image width/height are not integer multiples of 
@@ -67,6 +67,7 @@ import org.im4java.core.IMOperation;
  * </ol>
  * 
  * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TMSTiler extends MagickTiler {
 	
@@ -331,5 +332,4 @@ public class TMSTiler extends MagickTiler {
 			log.error("Error writing openlayers preview HTML file: " + e.getMessage());
 		}
 	}
-	
 }

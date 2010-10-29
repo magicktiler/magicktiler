@@ -52,22 +52,30 @@ public class TMSTest extends BaseTest {
 		Collection<String> files = Arrays.asList(tilesetRoot.list());
 		assertEquals("TMS tileset seems to be missing files!", files.size(), expectedTopLevel.size());
 		assertTrue("Wrong directory structure at top level!", files.containsAll(expectedTopLevel));
-		assertTrue("Wrong directory structure in zoom level 0", checkZoomLevel(new File(tilesetRoot, "0"), 1, 1));
-		assertTrue("Wrong directory structure in zoom level 1", checkZoomLevel(new File(tilesetRoot, "1"), 2, 1));
-		assertTrue("Wrong directory structure in zoom level 2", checkZoomLevel(new File(tilesetRoot, "2"), 3, 1));
-		assertTrue("Wrong directory structure in zoom level 3", checkZoomLevel(new File(tilesetRoot, "3"), 5, 2));
-		assertTrue("Wrong directory structure in zoom level 4", checkZoomLevel(new File(tilesetRoot, "4"), 10, 4));
-		assertTrue("Wrong directory structure in zoom level 5", checkZoomLevel(new File(tilesetRoot, "5"), 19, 8));
+		
+		for(int i=0; i<info.getZoomLevels(); i++) {
+			assertTrue("Wrong directory structure in zoom level "+i, 
+					checkZoomLevel(info,
+							new File(tilesetRoot, new Integer(i).toString()), 
+							info.getNumberOfXTiles(info.getZoomLevels()-1-i), 
+							info.getNumberOfYTiles(info.getZoomLevels()-1-i)));
+		}
 	}
 	
-	private boolean checkZoomLevel(File zoomlevelRoot, int xTiles, int yTiles) {
+	private boolean checkZoomLevel(TilesetInfo info, File zoomlevelRoot, int xTiles, int yTiles) {
+		String ext = getFileExtension(info);
+		
 		String files[] = zoomlevelRoot.list();
 		if (files.length != xTiles) return false;
-		for (int i=0; i<files.length; i++) {
-			File colDir = new File(zoomlevelRoot, Integer.toString(i));
+		for (int col=0; col<xTiles; col++) {
+			File colDir = new File(zoomlevelRoot, Integer.toString(col));
 			if (!colDir.exists()) return false;
 			String[] tiles = colDir.list();
 			if (tiles.length != yTiles) return false;
+			for (int row=0; row<yTiles; row++) {
+				File tile = new File(colDir, Integer.toString(row)+"."+ext);
+				if (!tile.exists()) return false;
+			}
 		}
 		return true;
 	}
