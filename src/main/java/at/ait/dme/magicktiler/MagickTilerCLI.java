@@ -18,11 +18,15 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-
 package at.ait.dme.magicktiler;
 
 import java.io.File;
-import java.util.HashMap;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * MagickTiler Command-line interface.
@@ -36,121 +40,126 @@ import java.util.HashMap;
  * -s   tiling scheme ('tms', 'zoomify' or 'ptif')<br>
  * -f   tile format ('jpeg' or 'png')<br>
  * -b   background color<bt>
+ * -i	input file or directory
  * -o   output directory (for tilesets) or file (for PTIF)<br>
  * -p   generate an HTML preview file
  * 
  * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
-public class MagickTilerCLI {
-	
-	/**
-	 * Console output constants
-	 */
+public class MagickTilerCLI {	
 	private static final String TARGET_SCHEME_TMS = "TMS tileset";
 	private static final String TARGET_SCHEME_ZOOMIFY = "Zoomify tileset";
 	private static final String TARGET_SCHEME_PTIF = "Pyramid TIFF";
-	
 	private static final String TARGET_FMT_JPEG = "(JPEG tiles)";
 	private static final String TARGET_FMT_PNG = "(PNG tiles)";
-	
 	private static final String VERSION = "Version 0.1-SNAPSHOT";
 	private static final String WEBSITE = "http://code.google.com/p/magicktiler";
-	
-	private static final String HELP =
+	private static final String USAGE_HEADER =
 		"MagickTiler " + VERSION + "\n" + 
 		"Copyright (C) 2010 AIT Austrian Institute of Technology.\n" +
 		"Additional licences apply to this software.\n" +
-		"See " + WEBSITE + " for details.\n\n" +
-		"  Example usage: java -jar magicktiler.jar -s tms -f jpeg -p image.tif\n\n" +
-		"  Available options:\n" +
-		"  -h   displays this help text\n" +
-		"  -s   tiling scheme ('tms', 'zoomify' or 'ptif')\n" +
-		"  -f   tile format ('jpeg' or 'png')\n" +
-		"  -b   background color\n" +
-		"  -o   output directory (for tilesets) or file (for PTIF)\n" +
-		"  -p   generate an HTML preview file\n";
-		
+		"See " + WEBSITE + " for details.\n";
+	private static final String USAGE_FOOTER = 
+		"Example: java -jar magicktiler.jar -s tms -f jpeg -i image.tif -p";
+	
 	/**
 	 * @param args
 	 * @throws TilingException 
 	 */
 	public static void main(String[] args) throws TilingException {
-		if (args.length < 2) {
-			System.out.println(HELP);
-			return;
-		}
-	
-		HashMap<String, String> argMap = parseArguments(args);
-
-		// Tiling scheme (mandatory)
-		String scheme = argMap.get("-s");
-		if (scheme == null) {
-			System.out.println("Please specify a tiling scheme using the -s option.");
-			return;
-		}
-		
+		MagickTiler tiler = null;
 		String consoleOutScheme = null;
 		String consoleOutFormat = "";
-		MagickTiler tiler = null;
-		if (scheme.equalsIgnoreCase("tms")) {
-			tiler = new TMSTiler();
-			consoleOutScheme = TARGET_SCHEME_TMS;
-			consoleOutFormat = TARGET_FMT_JPEG;
-		} else if (scheme.equalsIgnoreCase("zoomify")) {
-			tiler = new ZoomifyTiler();
-			consoleOutScheme = TARGET_SCHEME_ZOOMIFY;
-			consoleOutFormat = TARGET_FMT_JPEG;
-		} else if (scheme.equalsIgnoreCase("ptif")) {
-			tiler = new PTIFConverter();
-			consoleOutScheme = TARGET_SCHEME_PTIF;
+		
+		Options options = new Options();
+		options.addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify' or 'ptif')", true));
+		options.addOption(new Option("i", "input", "mandatory input file or directory", true));
+		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF)" ,false));
+		options.addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
+		options.addOption(new Option("b", "color", "background color (e.g \"white\")", false));
+		options.addOption(new Option("p", null, "generate an HTML preview file", false));
+		options.addOption(new Option("h", null, "displays this help text", false));
+
+		try {
+			CommandLine cmd = new BasicParser().parse(options, args);
+			if(cmd.hasOption("h")) {
+				printUsage(options);
+				return;
+			}
+			
+			String scheme = cmd.getOptionValue("s");
+			if (scheme.equalsIgnoreCase("tms")) {
+				tiler = new TMSTiler();
+				consoleOutScheme = TARGET_SCHEME_TMS;
+				consoleOutFormat = TARGET_FMT_JPEG;
+			} else if (scheme.equalsIgnoreCase("zoomify")) {
+				tiler = new ZoomifyTiler();
+				consoleOutScheme = TARGET_SCHEME_ZOOMIFY;
+				consoleOutFormat = TARGET_FMT_JPEG;
+			} else if (scheme.equalsIgnoreCase("ptif")) {
+				tiler = new PTIFConverter();
+				consoleOutScheme = TARGET_SCHEME_PTIF;
+			}
+			
+			if (tiler == null) {
+				System.out.println("Unsupported tiling scheme: " + scheme);
+				return;
+			}
+			
+			// Tile format
+			String format = cmd.getOptionValue("f");
+			if (format != null && format.equalsIgnoreCase("png")) {
+				tiler.setTileFormat(TileFormat.PNG); 
+				consoleOutFormat = TARGET_FMT_PNG;
+			}
+			
+			// Background color
+			String background = cmd.getOptionValue("b");
+			if (background != null) tiler.setBackgroundColor(background);
+			
+			// Destination
+			File destination = null;
+			if (cmd.hasOption("o")) {
+				destination = new File(cmd.getOptionValue("o"));
+			}
+			
+			// HTML Preview
+			tiler.setGeneratePreviewHTML(cmd.hasOption("p"));
+			
+			// input filename
+			File file = new File(cmd.getOptionValue("i"));
+			if (!file.exists()) {
+				System.out.println("File not found: " + file.getName());
+				return;
+			}
+			
+			generateTiles(tiler, file, destination, consoleOutScheme, consoleOutFormat);
+		} catch (ParseException exp) {
+			System.err.println("Failed to parse command line arguments: " + exp.getMessage());
+			printUsage(options);
 		}
+	}
 		
-		if (tiler == null) {
-			System.out.println("Unsupported tiling scheme: " + scheme);
-			return;
-		}
+	private static void generateTiles(MagickTiler tiler, File input, File destination, 
+			String consoleOutScheme, String consoleOutFormat) throws TilingException {
 		
-		// Tile format
-		String format = argMap.get("-f");
-		if (format != null && format.equalsIgnoreCase("png")) {
-			tiler.setTileFormat(TileFormat.PNG); 
-			consoleOutFormat = TARGET_FMT_PNG;
-		}
-		
-		// Background color
-		String background = argMap.get("-b");
-		if (background != null) tiler.setBackgroundColor(background);
-		
-		// Destination
-		File destination = null;
-		if (argMap.containsKey("-o")) {
-			destination = new File(argMap.get("-o"));
-		}
-		
-		// HTML Preview
-		tiler.setGeneratePreviewHTML(argMap.containsKey("-p"));
-		
-		// Filename
-		File file = new File(args[args.length - 1]);
-		if (!file.exists()) {
-			System.out.println("File not found: " + file.getName());
-			return;
-		}
-		
-		// Generate tiles!
 		long startTime = System.currentTimeMillis();
-		System.out.println("Generating " + consoleOutScheme + " from file " + file.getAbsolutePath()+ " " + consoleOutFormat);
-		if (destination != null) System.out.println("Destination: " + destination.getAbsolutePath());
+		System.out.println("Generating " + consoleOutScheme + " from file " + 
+				input.getAbsolutePath() + " " + consoleOutFormat);
+		if (destination != null) {
+			System.out.println("Destination: " + destination.getAbsolutePath());
+		}
 		
-		if (file.isFile()) {
+		if (input.isFile()) {
 			// Tile single file
-			tiler.convert(file, destination);
+			tiler.convert(input, destination);
 		} else {
 			// Tile folder full of files
-			tiler.setWorkingDirectory(file);
-			String files[] = file.list();
+			tiler.setWorkingDirectory(input);
+			String files[] = input.list();
 			for (int i=0; i<files.length; i++) {
-				File child = new File(file, files[i]);
+				File child = new File(input, files[i]);
 				if (child.isFile()) tiler.convert(child, destination);
 			}
 		}
@@ -158,30 +167,16 @@ public class MagickTilerCLI {
 		System.out.println("Done. Took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 	
-	private static HashMap<String, String> parseArguments(String[] args) {
-		HashMap<String, String> argMap = new HashMap<String, String>();
-		
-		String key;
-		String val = null;
-		int ctr = 0;
-		
-		while (ctr < args.length) {
-			if (args[ctr].startsWith("-")) {
-				// Command parameter name
-				key = args[ctr];
-				if (ctr + 1 < args.length && !args[ctr + 1].startsWith("-")) {
-					// Command parameter value (optional)
-					val = args[ctr + 1];
-					ctr ++;
-				} else {
-					val = null;
-				}
-				argMap.put(key, val);
-			}
-			ctr++;
-		}
-		
-		return argMap;
+	private static void printUsage(Options options) {
+		System.out.println(USAGE_HEADER);
+		new HelpFormatter().printHelp("java -jar magicktiler", "", options, USAGE_FOOTER, true);
 	}
-
+	
+	private static class Option extends org.apache.commons.cli.Option {
+		public Option(String opt, String argName, String description, boolean required) {
+			super(opt, (argName!=null), description);
+			this.setRequired(required);
+			this.setArgName(argName);
+		}
+	}
 }
