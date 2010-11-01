@@ -27,18 +27,19 @@ import java.io.File;
  * The base class for all supported tile scheme implementations.
  * 
  * @author aboutgeo@no5.at
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public abstract class MagickTiler {
 	
 	/**
 	 * Gravity constant for WEST gravity orientation
 	 */
-	public static final String GRAVITY_WEST = "West";
+	protected static final String GRAVITY_WEST = "West";
 	
 	/**
 	 * Gravity constant for SOUTHWEST gravity orientation
 	 */
-	public static final String GRAVITY_SOUTH_WEST = "SouthWest";
+	protected static final String GRAVITY_SOUTH_WEST = "SouthWest";
 	
 	/**
 	 * Working directory (default: app root)
