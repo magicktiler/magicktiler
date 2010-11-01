@@ -31,7 +31,7 @@ import org.apache.commons.cli.ParseException;
 /**
  * MagickTiler Command-line interface.
  * <br><br>
- * Example usage: <em>java -jar magicktiler.jar -s tms -f jpeg -p images</em><br><br>
+ * Example usage: <em>java -jar magicktiler.jar -s tms -f jpeg -p -i images</em><br><br>
  * The command will create TMS tilesets (with JPEG tiles) for each file in the
  * folder /images. A preview HTML file will be added to each tileset. 
  * <br><br>
@@ -39,8 +39,8 @@ import org.apache.commons.cli.ParseException;
  * -h   displays this help text<br>
  * -s   tiling scheme ('tms', 'zoomify' or 'ptif')<br>
  * -f   tile format ('jpeg' or 'png')<br>
- * -b   background color<bt>
- * -i	input file or directory
+ * -b   background color<br>
+ * -i	input file or directory<br>
  * -o   output directory (for tilesets) or file (for PTIF)<br>
  * -p   generate an HTML preview file
  * 
@@ -53,8 +53,10 @@ public class MagickTilerCLI {
 	private static final String TARGET_SCHEME_PTIF = "Pyramid TIFF";
 	private static final String TARGET_FMT_JPEG = "(JPEG tiles)";
 	private static final String TARGET_FMT_PNG = "(PNG tiles)";
+	
 	private static final String VERSION = "Version 0.1-SNAPSHOT";
 	private static final String WEBSITE = "http://code.google.com/p/magicktiler";
+	
 	private static final String USAGE_HEADER =
 		"MagickTiler " + VERSION + "\n" + 
 		"Copyright (C) 2010 AIT Austrian Institute of Technology.\n" +
@@ -75,7 +77,7 @@ public class MagickTilerCLI {
 		Options options = new Options();
 		options.addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify' or 'ptif')", true));
 		options.addOption(new Option("i", "input", "mandatory input file or directory", true));
-		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF)" ,false));
+		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF)", false));
 		options.addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
 		options.addOption(new Option("b", "color", "background color (e.g \"white\")", false));
 		options.addOption(new Option("p", null, "generate an HTML preview file", false));
