@@ -175,6 +175,9 @@ public class MagickTilerCLI {
 	}
 	
 	private static class Option extends org.apache.commons.cli.Option {
+
+		private static final long serialVersionUID = 2457352966511905835L;
+
 		public Option(String opt, String argName, String description, boolean required) {
 			super(opt, (argName!=null), description);
 			this.setRequired(required);
