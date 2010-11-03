@@ -30,7 +30,7 @@
 		<echo message="  build:lib .... creates embeddable magicktiler library jar" />
 		<echo message="  build:dist ... creates standalone executable release package" />
 		<echo message="  javadoc ...... generates JavaDoc" />
-		<echo message="Use -Dinclude.gui=false to exclude the scala-swing based GUI components" />
+		<echo message="Use -Dinclude.gui=false to exclude the scala-swing based GUI components (and the scala dependecies consequently)" />
 	</target>
 
 	<target name="clean" description="Deletes the target directory">
