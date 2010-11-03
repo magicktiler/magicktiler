@@ -79,7 +79,7 @@ public class MagickTilerCLI {
 		options.addOption(new Option("i", "input", "mandatory input file or directory", true));
 		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF)", false));
 		options.addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
-		options.addOption(new Option("b", "color", "background color (e.g \"white\")", false));
+		options.addOption(new Option("b", "color", "background color, default=white", false));
 		options.addOption(new Option("p", null, "generate an HTML preview file", false));
 		options.addOption(new Option("h", null, "displays this help text", false));
 
@@ -165,7 +165,6 @@ public class MagickTilerCLI {
 				if (child.isFile()) tiler.convert(child, destination);
 			}
 		}
-		
 		System.out.println("Done. Took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 	
@@ -175,7 +174,6 @@ public class MagickTilerCLI {
 	}
 	
 	private static class Option extends org.apache.commons.cli.Option {
-
 		private static final long serialVersionUID = 2457352966511905835L;
 
 		public Option(String opt, String argName, String description, boolean required) {
