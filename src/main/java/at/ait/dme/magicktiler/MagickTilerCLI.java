@@ -21,12 +21,15 @@
 package at.ait.dme.magicktiler;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import scala.actors.threadpool.Arrays;
 
 /**
  * MagickTiler Command-line interface.
@@ -37,6 +40,7 @@ import org.apache.commons.cli.ParseException;
  * <br><br>
  * Command options:<br>
  * -h   displays this help text<br>
+ * -g   displays the GUI<br>
  * -s   tiling scheme ('tms', 'zoomify' or 'ptif')<br>
  * -f   tile format ('jpeg' or 'png')<br>
  * -b   background color<br>
@@ -69,7 +73,9 @@ public class MagickTilerCLI {
 	 * @param args
 	 * @throws TilingException 
 	 */
-	public static void main(String[] args) throws TilingException {
+	public static void main(String... args) throws TilingException {
+		if(showGui(args)) return;
+		
 		MagickTiler tiler = null;
 		String consoleOutScheme = null;
 		String consoleOutFormat = "";
@@ -77,12 +83,12 @@ public class MagickTilerCLI {
 		Options options = new Options();
 		options.addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify' or 'ptif')", true));
 		options.addOption(new Option("i", "input", "mandatory input file or directory", true));
-		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF)", false));
+		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF), default=.", false));
 		options.addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
 		options.addOption(new Option("b", "color", "background color, default=white", false));
 		options.addOption(new Option("p", null, "generate an HTML preview file", false));
+		options.addOption(new Option("g", null, "displays the GUI (ignores all other parameters)", false));
 		options.addOption(new Option("h", null, "displays this help text", false));
-
 		try {
 			CommandLine cmd = new BasicParser().parse(options, args);
 			if(cmd.hasOption("h")) {
@@ -137,8 +143,8 @@ public class MagickTilerCLI {
 			}
 			
 			generateTiles(tiler, file, destination, consoleOutScheme, consoleOutFormat);
-		} catch (ParseException exp) {
-			System.err.println("Failed to parse command line arguments: " + exp.getMessage());
+		} catch (ParseException e) {
+			System.err.println("Failed to parse command line arguments: " + e.getMessage());
 			printUsage(options);
 		}
 	}
@@ -168,11 +174,29 @@ public class MagickTilerCLI {
 		System.out.println("Done. Took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 	
+	private static boolean showGui(String... args) {
+		boolean displayGui=false;
+		try {
+			if (displayGui=Arrays.asList(args).contains("-g")) {
+				// the gui can be removed from the build, which is why 
+				// we try to load it dynamically here.
+				Class<?> gui = Class.forName("at.ait.dme.magicktiler.gui.MagickTilerGUI");
+				Method startup = gui.getMethod("startup", new Class[] {String[].class});
+				startup.invoke(gui.newInstance(), new Object[] {args});
+			}
+		} catch (Exception e) {
+			System.err.println("Failed to start GUI (did you exclude it from the build?): " + e);
+		}
+		return displayGui;
+	}
+	
+
 	private static void printUsage(Options options) {
 		System.out.println(USAGE_HEADER);
 		new HelpFormatter().printHelp("java -jar magicktiler", "", options, USAGE_FOOTER, true);
 	}
 	
+
 	private static class Option extends org.apache.commons.cli.Option {
 		private static final long serialVersionUID = 2457352966511905835L;
 
