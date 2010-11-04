@@ -1,9 +1,7 @@
 package at.ait.dme.magicktiler.gui
 
-import scala.swing.Button
-import scala.swing.MainFrame
-import scala.swing.Frame
-import scala.swing.SimpleSwingApplication
+import scala.swing._
+import scala.swing.event._
 
 /**
  * MagickTiler graphical user interface.
@@ -14,6 +12,10 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
   def top = new MainFrame {
     title = "MagickTiler GUI"
-    contents = new Button { text = "Click me"}
+
+    contents = new BoxPanel(Orientation.Vertical) {
+    	contents+=new FileSelector("Input File or Directory:")
+    	contents+=new FileSelector("Output File or Directory:");
+    }
   }
 }
