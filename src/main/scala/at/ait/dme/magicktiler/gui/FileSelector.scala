@@ -8,20 +8,15 @@ import scala.swing.event._
  * 
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
-class FileSelector(labelText:String, buttonText:String, selectionMode:FileChooser.SelectionMode.Value) extends FlowPanel {
+class FileSelector(cols:Int, buttonText:String, selectionMode:FileChooser.SelectionMode.Value) extends FlowPanel {
 	
-	def this(labelText:String) = this(labelText, "Browse", FileChooser.SelectionMode.FilesAndDirectories)
-	
-	private val label = new Label {
-    	text = labelText
-    	preferredSize = new Dimension(170,15)
-    }
+	def this(cols:Int) = this(cols, "Browse", FileChooser.SelectionMode.FilesAndDirectories)
     
-	private val selection = new TextField {
-    	columns = 25
-    }
+	val selection = new TextField {
+		columns = cols;
+	}
     
-    private val button = new Button {
+    val button = new Button {
     	text = buttonText
     	reactions+= {
     		case ButtonClicked(inputButton) => 
@@ -34,7 +29,6 @@ class FileSelector(labelText:String, buttonText:String, selectionMode:FileChoose
     	}
     }
     
-    contents+=label
-    contents+=selection
-    contents+=button 
+   contents+=selection
+   contents+=button
 }
