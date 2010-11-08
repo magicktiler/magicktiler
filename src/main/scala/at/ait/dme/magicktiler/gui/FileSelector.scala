@@ -19,7 +19,7 @@ class FileSelector(cols:Int, buttonText:String, selectionMode:FileChooser.Select
     val button = new Button {
     	text = buttonText
     	reactions+= {
-    		case ButtonClicked(inputButton) => 
+    		case ButtonClicked(b) => 
     			val input = new FileChooser
     			input.fileSelectionMode = selectionMode
     			if(input.showDialog(this,"")==FileChooser.Result.Approve)

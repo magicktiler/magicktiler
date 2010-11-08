@@ -10,5 +10,6 @@ import scala.swing._
 class RadioButtonGroup(options:String*) extends FlowPanel {
 	val initialButtons = for(o<-options) yield new RadioButton(o)
 	val group = new ButtonGroup(initialButtons : _*)
+	group.select(initialButtons.first);
 	group.buttons.foreach((b) => contents+=b)
 }
