@@ -68,9 +68,7 @@
 		 <equals arg1="${include.gui}" arg2="true" />
 	</condition>
 
-	<target name="compile-scala" if="scala.required" depends="replace-tokens">
-		<mkdir dir="${build.dir}"/>
-		
+	<target name="compile-scala" if="scala.required" depends="compile-java">		
 		<taskdef resource="scala/tools/ant/antlib.xml">
 			<classpath>
 				<pathelement location="${lib.dir}/scala-compiler.jar" />
@@ -83,12 +81,13 @@
 		 	    <fileset dir="${lib.dir}">
      					<include name="**/*.jar" />
    				</fileset>
+				<pathelement path="${build.dir}" />
 		 	</classpath>
 			<include name="**/*.scala" />
 		</scalac>
 	</target>
 	
-	<target name="compile-java" depends="compile-scala">
+	<target name="compile-java" depends="replace-tokens">
 		<mkdir dir="${build.dir}"/>
 
 		<javac destdir="${build.dir}" includes="**/*.*" fork="true" source="1.6">
@@ -122,7 +121,7 @@
 	</target>
 
 	<target name="build:lib"
-			depends="compile-java"
+			depends="compile-scala"
 			description="Creates the magicktiler lib jar (for use in other Java projects)">
 		
 		<jar destfile="magicktiler-lib-${app.version}.jar">
@@ -134,7 +133,7 @@
 	</target>
 	
 	<target name="one-jar"
-	        depends="compile-java"
+	        depends="compile-scala"
 			description="Creates a single, command-line-executable jar with all dependencies included">
         
 		<one-jar destfile="magicktiler.jar" manifest="one-jar/manifest.txt">
