@@ -74,6 +74,11 @@ public abstract class MagickTiler {
 	protected String backgroundColor = "white";
 	
 	/**
+	 * JPEG compression quality (range 0 - 100, default: 75)
+	 */
+	protected int jpegQuality = 75;
+	
+	/**
 	 * Flag indicating whether a HTML preview should be generated (default: false)
 	 */
 	protected boolean generatePreview = false;
@@ -167,6 +172,19 @@ public abstract class MagickTiler {
 		this.backgroundColor = color;
 	}
 
+	/**
+	 * Sets the compression quality for JPEG tile format. Compression
+	 * quality must be in the range from 0 (bad quality) to 100 (maximum
+	 * quality). 
+	 * 
+	 * @param quality the JPEG compression quality
+	 */
+	public void setJPEGCompressionQuality(int quality) {
+		if (quality < 0) throw new IllegalArgumentException();
+		if (quality > 100) throw new IllegalArgumentException();
+		this.jpegQuality = quality;
+	}
+	
 	/**
 	 * If set to true, an HTML file will be generated which
 	 * displays the rendered tileset in an OpenLayers map. 
