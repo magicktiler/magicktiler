@@ -13,24 +13,28 @@ import java.io.File
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 class MagickTilerGUI extends SimpleSwingApplication {
-  val tilingActor: TilingActor = new TilingActor
-  tilingActor.start
-
-  val input: FileSelector = new FileSelector(25)
-  val output: FileSelector = new FileSelector(25)
-  val tilingSchemes: RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "PTIF")
-  val tileFormats: RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
-  val backgroundColor: TextField = new TextField("white", 10)
-  val generatePreview: CheckBox = new CheckBox("");
+  val input:FileSelector = new FileSelector(25)
+  val output:FileSelector = new FileSelector(25)
+ 
+  val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "PTIF")
+  val tileFormats:RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
+  
+  val backgroundColor:TextField = new TextField("white", 10)
+ 
+  val generatePreview:CheckBox = new CheckBox("")
+  
+  val progressBar:ProgressBar = new ProgressBar() 
+  	{indeterminate=true;visible=false;preferredSize=new Dimension(300,20)}
+  
   val startButton: Button = new Button("Create those tiles, dude!") {
     reactions += {
-      case ButtonClicked(b) => tilingActor ! "start"
+      case ButtonClicked(b) => TilingActor ! "start"
     }
   }
 
   def top = new MainFrame {
     title = "MagickTiler GUI"
-    minimumSize = new Dimension(620, 230)
+    minimumSize = new Dimension(630, 300)
 
     var x = 0; var y = 0;
     val gridPanel = new GridBagPanel {
@@ -39,12 +43,14 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
       add(new Label("Output File or Directory:"))
       add(output)
+      addSeparator();
 
       add(new Label("Tiling Scheme:"))
       add(tilingSchemes)
 
       add(new Label("Tile format:"))
       add(tileFormats)
+      addSeparator();
 
       add(new Label("Background color:"))
       add(new FlowPanel { contents += backgroundColor; contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')") })
@@ -52,18 +58,29 @@ class MagickTilerGUI extends SimpleSwingApplication {
       add(new Label("Generate HTML preview:"))
       add(generatePreview)
 
-      add(new Label(""))
+      addSeparator();
       add(startButton)
+      add(progressBar)
 
       def add(component: Component, anc: GridBagPanel.Anchor.Value = GridBagPanel.Anchor.West) {
         var constraints = new this.Constraints
         constraints.anchor = anc
         constraints.gridx = x % 2
-        constraints.gridy = y % 8
+        constraints.gridy = y % 11
 
         add(component, constraints)
-
         x += 1; if (x % 2 == 0) y += 1
+      }
+     
+      def addSeparator() {
+    	var constraints = new this.Constraints
+    	constraints.gridx = 0
+        constraints.gridy = y
+    	constraints.fill = GridBagPanel.Fill.Horizontal
+    	constraints.gridwidth=2;
+
+    	add(new Separator(), constraints)
+        y=y+1
       }
     }
     contents = gridPanel
@@ -71,6 +88,8 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
   def startTiler() {
     startButton.enabled = false;
+    progressBar.visible = true;
+    
     var tiler: MagickTiler = null
     var inputFile: File = null
     var outputFile: File = null
@@ -93,19 +112,25 @@ class MagickTilerGUI extends SimpleSwingApplication {
       inputFile = new File(input.selection.text)
 
     tiler.setGeneratePreviewHTML(generatePreview.selected);
-
     tiler.convert(inputFile, outputFile)
-
+  
+    progressBar.visible = false;
     startButton.enabled = true;
   }
 
-  class TilingActor extends Actor {
+  object TilingActor extends Actor {
     def act() {
       loop {
         react {
           case "start" => startTiler()
+          case "stop" => exit()
         }
       }
     }
+    start()
+  }
+  
+  override def shutdown() { 
+	  TilingActor ! "stop"
   }
 }
