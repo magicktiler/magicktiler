@@ -159,7 +159,7 @@
 			description="Creates release ZIP consisting of executable jar, readme and Zoomify viewer">
 		<zip destfile="magicktiler-${app.version}-bin.zip"
 			 basedir="."
-			 includes="zoomify/* LICENSE.txt README.txt magicktiler.jar" />
+			 includes="zoomify/* LICENSE.txt README.txt magicktiler.bat magicktiler.jar" />
 	</target>
 
 	<target name="javadoc" description="Generates the JavaDoc">
