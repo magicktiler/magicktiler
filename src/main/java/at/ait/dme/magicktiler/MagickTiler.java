@@ -22,6 +22,12 @@
 package at.ait.dme.magicktiler;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.im4java.core.ConvertCmd;
+import org.im4java.core.IM4JavaException;
+import org.im4java.core.IMOperation;
 
 /**
  * The base class for all supported tile scheme implementations.
@@ -71,6 +77,11 @@ public abstract class MagickTiler {
 	 * Flag indicating whether a HTML preview should be generated (default: false)
 	 */
 	protected boolean generatePreview = false;
+	
+	/**
+	 * Log4j logger
+	 */
+	private Logger log = Logger.getLogger(MagickTiler.class);
 		
 	/**
 	 * Generate a new tile set from the specified image file.
@@ -93,8 +104,27 @@ public abstract class MagickTiler {
 	 * @throws TilingException if anything goes wrong
 	 */
 	public TilesetInfo convert(File image, File target) throws TilingException {
-		TilesetInfo info = new TilesetInfo(image, tileWidth, tileHeight, format, useGraphicsMagick);
-		convert(image, info, target);
+		TilesetInfo info;
+		
+		if (image.getAbsolutePath().endsWith("jp2")) {
+			try {
+				long startTime = System.currentTimeMillis();
+				log.info("JPEG 2000 - Converting to intermediate TIF for faster processing");
+				File tif = convertToTIF(image); 
+				log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+				
+				info = new TilesetInfo(tif, tileWidth, tileHeight, format, useGraphicsMagick);
+				convert(tif, info, target);
+				
+				tif.delete();
+			} catch (Exception e) {
+				throw new TilingException(e.getMessage());
+			}
+		} else {
+			info = new TilesetInfo(image, tileWidth, tileHeight, format, useGraphicsMagick);	
+			convert(image, info, target);
+		}
+		
 		return info;
 	}
 	
@@ -136,7 +166,7 @@ public abstract class MagickTiler {
 	public void setBackgroundColor(String color) {
 		this.backgroundColor = color;
 	}
-	
+
 	/**
 	 * If set to true, an HTML file will be generated which
 	 * displays the rendered tileset in an OpenLayers map. 
@@ -144,6 +174,37 @@ public abstract class MagickTiler {
 	 */
 	public void setGeneratePreviewHTML(boolean generatePreview) {
 		this.generatePreview = generatePreview;
+	}
+	
+	/**
+	 * Utility method that converts any supported input
+	 * file to TIF. This makes sense e.g. for JPEG 2000, since
+	 * handling of JP2 in GraphicsMagick is so incredibly slow
+	 * that converting first and then tiling the TIF is faster
+	 * overall.
+	 * @param file the input file
+	 * @return the TIF result file
+	 * @throws IM4JavaException 
+	 * @throws InterruptedException 
+	 * @throws IOException 
+	 */
+	private File convertToTIF(File file) throws IOException, InterruptedException, IM4JavaException {
+		String inFile = file.getAbsolutePath();
+		String outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".tif";
+	
+		IMOperation convert = new IMOperation();
+    	convert.addImage(inFile);
+    	convert.addImage(outFile);
+		
+		ConvertCmd convertCmd = new ConvertCmd(useGraphicsMagick);
+		convertCmd.run(convert);
+		
+		File out = new File(outFile);
+		if (out.exists()) 
+			return out;
+			
+		// No file created without Exception raised by IM4Java - should never happen
+		throw new RuntimeException("Panic! Could not generate temporary TIF file.");
 	}
 	
 }
