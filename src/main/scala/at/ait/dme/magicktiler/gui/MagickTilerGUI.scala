@@ -1,5 +1,6 @@
 package at.ait.dme.magicktiler.gui
 
+import javax.swing.JOptionPane
 import scala.swing._
 import scala.swing.event._
 import scala.actors.Actor
@@ -119,10 +120,16 @@ class MagickTilerGUI extends SimpleSwingApplication {
       inputFile = new File(input.selection.text)
 
     tiler.setGeneratePreviewHTML(generatePreview.selected);
-    tiler.convert(inputFile, outputFile)
-  
-    progressBar.visible = false;
-    startButton.enabled = true;
+    try {
+    	tiler.convert(inputFile, outputFile)
+    } catch {
+    	case e => JOptionPane.showMessageDialog(null, "Sorry, something went wrong here. " +
+    			"For now we only have these details:\n" + e.getMessage, 
+    			"Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        progressBar.visible = false;
+        startButton.enabled = true;
+    }
   }
 
   object TilingActor extends Actor {
