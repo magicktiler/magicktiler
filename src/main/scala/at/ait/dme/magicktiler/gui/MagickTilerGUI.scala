@@ -13,8 +13,8 @@ import java.io.File
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 class MagickTilerGUI extends SimpleSwingApplication {
-  val input:FileSelector = new FileSelector(25)
-  val output:FileSelector = new FileSelector(25)
+  val input:FileSelector = new FileSelector(25, true)
+  val output:FileSelector = new FileSelector(25, false)
  
   val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "PTIF")
   val tileFormats:RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
@@ -26,9 +26,9 @@ class MagickTilerGUI extends SimpleSwingApplication {
   val progressBar:ProgressBar = new ProgressBar() 
   	{indeterminate=true;visible=false;preferredSize=new Dimension(300,20)}
   
-  val startButton: Button = new Button("Create those tiles, dude!") {
+  val startButton:Button = new Button("Create those tiles, dude!") {
     reactions += {
-      case ButtonClicked(b) => TilingActor ! "start"
+      case ButtonClicked(b) => if(input.validate) TilingActor ! "start"
     }
   }
 
