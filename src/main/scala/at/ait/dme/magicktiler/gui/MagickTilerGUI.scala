@@ -11,6 +11,7 @@ import java.io.File
  * MagickTiler graphical user interface.
  * 
  * @author Christian Sadilek <christian.sadilek@gmail.com>
+ * @author aboutgeo@gmail.com
  */
 class MagickTilerGUI extends SimpleSwingApplication {
   val input:FileSelector = new FileSelector(25, true)
@@ -18,6 +19,8 @@ class MagickTilerGUI extends SimpleSwingApplication {
  
   val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "PTIF")
   val tileFormats:RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
+  val jpegQuality:Slider = new Slider()
+  	{min=0;max=100;value=75}
   
   val backgroundColor:TextField = new TextField("white", 10)
  
@@ -50,6 +53,9 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
       add(new Label("Tile format:"))
       add(tileFormats)
+      
+      add(new Label("JPEG Quality:"))
+      add(jpegQuality)
       addSeparator();
 
       add(new Label("Background color:"))
@@ -103,6 +109,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
       case "jpeg" => tiler.setTileFormat(TileFormat.JPEG)
       case "png" => tiler.setTileFormat(TileFormat.PNG)
     }
+    tiler.setJPEGCompressionQuality(jpegQuality.value)
     tiler.setBackgroundColor(backgroundColor.text)
 
     if (output.selection.text != null)
