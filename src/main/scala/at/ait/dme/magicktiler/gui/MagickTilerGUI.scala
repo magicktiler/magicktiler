@@ -11,7 +11,7 @@ import java.io.File
  * MagickTiler graphical user interface.
  * 
  * @author Christian Sadilek <christian.sadilek@gmail.com>
- * @author aboutgeo@gmail.com
+ * @author magicktiler@gmail.com
  */
 class MagickTilerGUI extends SimpleSwingApplication {
   val input:FileSelector = new FileSelector(25, true)

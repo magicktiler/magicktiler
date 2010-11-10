@@ -48,7 +48,7 @@ import scala.actors.threadpool.Arrays;
  * -o   output directory (for tilesets) or file (for PTIF)<br>
  * -p   generate an HTML preview file
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class MagickTilerCLI {	

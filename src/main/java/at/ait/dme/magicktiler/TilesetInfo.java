@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * TODO add methods that provide information about 
  * individual zoom levels (xTiles, yTiles)
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  */
 public class TilesetInfo {
 	
@@ -131,7 +131,7 @@ public class TilesetInfo {
 	 * Simple wrapper for the 'dimension' of a zoomlevel (i.e. number of
 	 * tiles in X/Y directions)
 	 * 
-	 * @author aboutgeo@no5.at
+	 * @author magicktiler@gmail.com
 	 */
 	private class Dimension {
 	

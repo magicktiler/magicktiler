@@ -66,7 +66,7 @@ import org.im4java.core.IMOperation;
  * <li>HTML preview file is generated (if requested).</li>
  * </ol>
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TMSTiler extends MagickTiler {

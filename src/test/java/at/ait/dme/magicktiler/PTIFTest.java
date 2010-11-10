@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 /**
  * PTIF tiling tests
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class PTIFTest extends TestCase {

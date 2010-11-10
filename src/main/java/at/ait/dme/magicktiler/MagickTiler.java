@@ -32,7 +32,7 @@ import org.im4java.core.IMOperation;
 /**
  * The base class for all supported tile scheme implementations.
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public abstract class MagickTiler {

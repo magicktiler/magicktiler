@@ -26,7 +26,7 @@ package at.ait.dme.magicktiler;
  * Please note that there are currently some issues with ImageMagick though.
  * It is highly recommended to use this software with GraphicsMagick!
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  *
  */
 public enum ImageProcessingSystem {	GRAPHICSMAGICK,	IMAGEMAGICK }

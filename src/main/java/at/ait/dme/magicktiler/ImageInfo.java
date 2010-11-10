@@ -34,7 +34,7 @@ import org.im4java.process.OutputConsumer;
 /**
  * Image information for a specified file. (Currently width and height only.)
  * 
- * @author aboutgeo@no5.at
+ * @author magicktiler@gmail.com
  */
 public class ImageInfo {
 	
