@@ -237,6 +237,8 @@ public class TMSTiler extends MagickTiler {
 		IMOperation op = new IMOperation();
 		op.addImage(stripe.getImageFile().getAbsolutePath());
 		op.crop(tileWidth, tileHeight);
+		if (info.getTileFormat() == TileFormat.JPEG)
+			op.quality(new Double(jpegQuality));
 		op.p_adjoin();
 		op.addImage(filenamePattern);
 		

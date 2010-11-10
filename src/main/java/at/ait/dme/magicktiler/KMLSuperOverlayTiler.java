@@ -297,6 +297,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		IMOperation op = new IMOperation();
 		op.addImage(stripe.getImageFile().getAbsolutePath());
 		op.crop(tileWidth, tileHeight);
+		op.quality(new Double(jpegQuality));
 		op.p_adjoin();
 		op.addImage(filenamePattern);
 		

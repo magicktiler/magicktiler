@@ -237,6 +237,7 @@ public class ZoomifyTiler extends MagickTiler {
 		op.addImage(stripe.getImageFile().getAbsolutePath());
 		op.crop(tileWidth, tileHeight);
 		op.p_adjoin();
+		op.quality(new Double(jpegQuality));
 		op.addImage(filenamePattern);
 		
 		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);

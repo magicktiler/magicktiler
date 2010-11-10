@@ -85,6 +85,7 @@ public class MagickTilerCLI {
 		options.addOption(new Option("i", "input", "mandatory input file or directory", true));
 		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF), default=.", false));
 		options.addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
+		options.addOption(new Option("q", "quality", "JPEG compression quality (0 - 100), default=75", false));
 		options.addOption(new Option("b", "color", "background color, default=white", false));
 		options.addOption(new Option("p", null, "generate an HTML preview file", false));
 		options.addOption(new Option("g", null, "displays the GUI (ignores all other parameters)", false));
@@ -120,6 +121,22 @@ public class MagickTilerCLI {
 			if (format != null && format.equalsIgnoreCase("png")) {
 				tiler.setTileFormat(TileFormat.PNG); 
 				consoleOutFormat = TARGET_FMT_PNG;
+			}
+			
+			// JPEG compression quality
+			String quality = cmd.getOptionValue("q");
+			if (quality != null) {
+				try {
+					int q = Integer.parseInt(cmd.getOptionValue("q"));
+					if ((q<0) || (q>100)) {
+						System.out.println("Invalid JPEG compression setting: " + q + " (must be in the range 0 - 100)");
+						return;
+					}
+					tiler.setJPEGCompressionQuality(q);
+				} catch (NumberFormatException e) {
+					System.out.println("Invalid JPEG compression setting: " + cmd.getOptionValue("q"));
+					return;
+				}
 			}
 			
 			// Background color
