@@ -35,10 +35,14 @@ class FileSelector(cols:Int, buttonText:String, selectionMode:FileChooser.Select
     text = buttonText
     reactions += {
       case ButtonClicked(b) =>
+      	errorPopup.setVisible(false)
+        selection.background = Color.WHITE
+        
         val input = new FileChooser
         input.fileSelectionMode = selectionMode
         if (input.showDialog(this, "") == FileChooser.Result.Approve) {
           selection.text = input.selectedFile.toString
+          selection.requestFocusInWindow
         } else {
           selection.text = ""
         }
