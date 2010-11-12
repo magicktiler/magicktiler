@@ -126,7 +126,8 @@ public class TMSTiler extends MagickTiler {
 		// Create tileset root dir (unless provided)
 		if (tilesetRoot == null) { 
 			tilesetRoot = new File(workingDirectory, baseName);
-			if (tilesetRoot.exists()) throw new TilingException("There is already a directory named " + baseName + "!");
+			if (tilesetRoot.exists()) 
+				throw new TilingException("There is already a directory named " + baseName + "!");
 			tilesetRoot.mkdir();
 		} else {
 			if (!tilesetRoot.exists()) tilesetRoot.mkdir();
@@ -185,7 +186,6 @@ public class TMSTiler extends MagickTiler {
 			levelBeneath = thisLevel;
 			thisLevel = new ArrayList<Stripe>();
 		}
-		
 		for (Stripe s : levelBeneath) s.delete();
 		
 		// Step 4 - generate tilemapresource.xml
@@ -203,7 +203,9 @@ public class TMSTiler extends MagickTiler {
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 	
-	protected List<Stripe> stripeVertically(File image, TilesetInfo info, String outfilePrefix) throws IOException, InterruptedException, IM4JavaException {
+	protected List<Stripe> stripeVertically(File image, TilesetInfo info, String outfilePrefix)
+			throws IOException, InterruptedException, IM4JavaException {
+	
 		int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
 		
 		IMOperation op = new IMOperation();
@@ -230,10 +232,13 @@ public class TMSTiler extends MagickTiler {
 		return stripes;
 	}
 	
-	private void generateTMSTiles(Stripe stripe, TilesetInfo info, File targetDirectory) throws IOException, InterruptedException, IM4JavaException {
+	private void generateTMSTiles(Stripe stripe, TilesetInfo info, File targetDirectory)
+			throws IOException, InterruptedException, IM4JavaException {
+
 		// Tile the stripe
-		String filenamePattern = targetDirectory.getAbsolutePath() + File.separator + "tmp-%d." + info.getTileFormat().getExtension();
-		
+		String filenamePattern = targetDirectory.getAbsolutePath() + File.separator + "tmp-%d." + 
+			info.getTileFormat().getExtension();
+
 		IMOperation op = new IMOperation();
 		op.addImage(stripe.getImageFile().getAbsolutePath());
 		op.crop(tileWidth, tileHeight);
@@ -248,12 +253,15 @@ public class TMSTiler extends MagickTiler {
 		// Rename result files (not nice, but seems to be the fastest way to do it)
 		for (int i=0; i<(stripe.getHeight() / tileHeight); i++) {
 			File fOld = new File(filenamePattern.replace("%d", Integer.toString(i)));
-			File fNew = new File(filenamePattern.replace("tmp-%d", Integer.toString((stripe.getHeight() / tileHeight) - i - 1)));
+			File fNew = new File(filenamePattern.replace("tmp-%d", 
+					Integer.toString((stripe.getHeight() / tileHeight) - i - 1)));
 			fOld.renameTo(fNew);
 		}
 	}
 	
-	protected Stripe mergeStripes(Stripe stripe1, Stripe stripe2, String targetFile) throws IOException, InterruptedException, IM4JavaException {
+	protected Stripe mergeStripes(Stripe stripe1, Stripe stripe2, String targetFile) 
+			throws IOException, InterruptedException, IM4JavaException {
+		
 		int height = stripe1.getHeight() / 2;
 		if ((stripe1.getHeight() / tileHeight) % 2 != 0) height += tileHeight / 2;
 		
@@ -307,8 +315,9 @@ public class TMSTiler extends MagickTiler {
 	}
 	
 	private void generatePreview(TilesetInfo info, File basedir) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("tms-template.html")));
-	
+		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
+				.getResourceAsStream("tms-template.html")));
+
 		StringBuffer sb = new StringBuffer();
 		String line;
 		while ((line = reader.readLine()) != null) {

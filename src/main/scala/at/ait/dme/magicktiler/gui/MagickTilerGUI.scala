@@ -20,8 +20,8 @@ class MagickTilerGUI extends SimpleSwingApplication {
  
   val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "PTIF")
   val tileFormats:RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
-  val jpegQuality:Slider = new Slider()
-  	{min=0;max=100;value=75}
+  
+  val jpegQuality:Slider = new Slider() {min=0;max=100;value=75}
   
   val backgroundColor:TextField = new TextField("white", 10)
  
@@ -38,7 +38,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
   def top = new MainFrame {
     title = "MagickTiler GUI"
-    minimumSize = new Dimension(630, 300)
+    minimumSize = new Dimension(630, 330)
 
     var x = 0; var y = 0;
     val gridPanel = new GridBagPanel {
@@ -60,7 +60,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
       addSeparator();
 
       add(new Label("Background color:"))
-      add(new FlowPanel { contents += backgroundColor; contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')") })
+      add(new FlowPanel {contents += backgroundColor; contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')") })
 
       add(new Label("Generate HTML preview:"))
       add(generatePreview)

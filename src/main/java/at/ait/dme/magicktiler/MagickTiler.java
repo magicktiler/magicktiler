@@ -92,6 +92,7 @@ public abstract class MagickTiler {
 	 * Generate a new tile set from the specified image file.
 	 * The tileset will be produced in the same directory as the
 	 * image, in a folder named the same as the image.
+	 * 
 	 * @param image the image file
 	 * @return some information about the generated tileset
 	 * @throws TilingException if anything goes wrong
@@ -103,6 +104,7 @@ public abstract class MagickTiler {
 	/**
 	 * Generate a new tile set from the specified image file.
 	 * The tileset will be produced into the specified directory. 
+	 * 
 	 * @param image the image file
 	 * @param target the target directory for the tileset
 	 * @return some information about the generated tileset
@@ -148,6 +150,7 @@ public abstract class MagickTiler {
 	
 	/**
 	 * Sets the image processing system for this tiler implementation.
+	 * 
 	 * @param system the image processing system to use
 	 */
 	public void setImageProcessingSystem(ImageProcessingSystem system) {
@@ -157,6 +160,7 @@ public abstract class MagickTiler {
 	/**
 	 * Sets the tile file format for this tiler. Please note that
 	 * not all tilers may support all file formats!
+	 * 
 	 * @param format the tile format
 	 */
 	public void setTileFormat(TileFormat format) {
@@ -166,6 +170,7 @@ public abstract class MagickTiler {
 	/**
 	 * Sets the background (i.e. 'transparency') color for this tiler
 	 * implementation.
+	 * 
 	 * @param color the background color
 	 */
 	public void setBackgroundColor(String color) {
@@ -180,8 +185,8 @@ public abstract class MagickTiler {
 	 * @param quality the JPEG compression quality
 	 */
 	public void setJPEGCompressionQuality(int quality) {
-		if (quality < 0) throw new IllegalArgumentException();
-		if (quality > 100) throw new IllegalArgumentException();
+		if (quality < 0) throw new IllegalArgumentException("quality below 0");
+		if (quality > 100) throw new IllegalArgumentException("quality above 100");
 		this.jpegQuality = quality;
 	}
 	
@@ -200,6 +205,7 @@ public abstract class MagickTiler {
 	 * handling of JP2 in GraphicsMagick is so incredibly slow
 	 * that converting first and then tiling the TIF is faster
 	 * overall.
+	 * 
 	 * @param file the input file
 	 * @return the TIF result file
 	 * @throws IM4JavaException 

@@ -32,9 +32,10 @@ import org.im4java.core.IdentifyCmd;
 import org.im4java.process.OutputConsumer;
 
 /**
- * Image information for a specified file. (Currently width and height only.)
+ * Image information for a specified file (currently width and height only).
  * 
  * @author magicktiler@gmail.com
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ImageInfo {
 	
@@ -49,9 +50,13 @@ public class ImageInfo {
 	private File file;
 	
 	/**
-	 * Image width and height
+	 * Image width
 	 */
 	private int width;
+	
+	/**
+	 * Image height
+	 */
 	private int height;
 	
 	public ImageInfo(File image, boolean useGraphicsMagick) throws TilingException {
@@ -87,7 +92,7 @@ public class ImageInfo {
 		height = Integer.parseInt(size.substring(size.indexOf('x') + 1));
 	}
 	
-	public File getImageFile() {
+	public File getFile() {
 		return file;
 	}
 	

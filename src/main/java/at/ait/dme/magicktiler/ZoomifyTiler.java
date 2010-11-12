@@ -203,7 +203,9 @@ public class ZoomifyTiler extends MagickTiler {
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 	
-	private List<Stripe> stripeHorizontally(File image, TilesetInfo info, String outfilePrefix) throws IOException, InterruptedException, IM4JavaException, TilingException {
+	private List<Stripe> stripeHorizontally(File image, TilesetInfo info, String outfilePrefix) 
+		throws IOException, InterruptedException, IM4JavaException, TilingException {
+		
 		// Generate stripes
 		IMOperation op = new IMOperation();
 		op.crop(info.getWidth(), tileHeight);
@@ -230,7 +232,10 @@ public class ZoomifyTiler extends MagickTiler {
 		return stripes;
 	}
 	
-	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber, File targetDirectory) throws IOException, InterruptedException, IM4JavaException {
+	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber, 
+			File targetDirectory) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
 		String filenamePattern = targetDirectory + File.separator + "tmp-%d.jpg";
 		
 		IMOperation op = new IMOperation();
@@ -260,7 +265,9 @@ public class ZoomifyTiler extends MagickTiler {
 		}
 	}
 	
-	private Stripe mergeStripes(Stripe stripe1, Stripe stripe2, String targetFile) throws IOException, InterruptedException, IM4JavaException {
+	private Stripe mergeStripes(Stripe stripe1, Stripe stripe2, String targetFile) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
 		if (stripe2 == null) {
 			return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), useGraphicsMagick);
 		} else {
@@ -287,8 +294,9 @@ public class ZoomifyTiler extends MagickTiler {
 	}
 	
 	private void generatePreview(TilesetInfo info, File basedir) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("zoomify-template.html")));
-		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
+				.getResourceAsStream("zoomify-template.html")));
+	
 		StringBuffer sb = new StringBuffer();
 		String line;
 		while ((line = reader.readLine()) != null) {

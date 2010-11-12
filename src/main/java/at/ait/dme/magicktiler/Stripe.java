@@ -36,13 +36,15 @@ import org.im4java.core.MontageCmd;
  * and manipulating image stripes.
  * 
  * @author magicktiler@gmail.com
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
-class Stripe {
+public class Stripe {
 	
 	/**
 	 * Merge error message
 	 */
-	private static final String DIFFERENT_ORIENTATION_ERROR = "Cannot merge. Stripes have different orientation";
+	private static final String DIFFERENT_ORIENTATION_ERROR =
+		"Cannot merge. Stripes have different orientation";
 	
 	/**
 	 * Enum: possible stripe orientations
@@ -97,6 +99,7 @@ class Stripe {
 	 * the resolution of the next pyramid zoom layer. (I.e. the two original stripes
 	 * will be joined next to each other, and the resulting image will be down-scaled
 	 * by 50%).
+	 * 
 	 * @param stripe the stripe to join with this stripe
 	 * @param targetFile the file which will hold the result stripe image
 	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
@@ -105,7 +108,9 @@ class Stripe {
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
-	public Stripe merge(Stripe stripe, File targetFile, boolean useGraphicsMagick) throws IOException, InterruptedException, IM4JavaException {
+	public Stripe merge(Stripe stripe, File targetFile, boolean useGraphicsMagick)
+			throws IOException, InterruptedException, IM4JavaException {
+	
 		return merge(stripe, null, -1, -1, null, targetFile, useGraphicsMagick);
 	}
 	
@@ -117,6 +122,7 @@ class Stripe {
 	 * This method allows to create a background color buffer around the stripe, in case
 	 * the employed tiling scheme mandates certain image resolution constraints (e.g.
 	 * width/height must be integer multiples of the tile-size). 
+	 * 
 	 * @param stripe the stripe to join with this stripe
 	 * @param gravity the gravity to use when compositing the images on the background canvas
 	 * @param xExtent the width of the result stripe canvas
@@ -129,7 +135,10 @@ class Stripe {
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
-	public Stripe merge(Stripe stripe, String gravity, int xExtent, int yExtent, String backgroundColor, File targetFile, boolean useGraphicsMagick) throws IOException, InterruptedException, IM4JavaException {		
+	public Stripe merge(Stripe stripe, String gravity, int xExtent, int yExtent,
+			String backgroundColor, File targetFile, boolean useGraphicsMagick) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
 		if (stripe.orientation != orientation) throw new IllegalArgumentException(DIFFERENT_ORIENTATION_ERROR);
 
 		IMOperation op = new IMOperation();
@@ -167,6 +176,7 @@ class Stripe {
 	
 	/**
 	 * Shrinks this stripe 50% to the resolution of the next zoom level.
+	 * 
 	 * @param targetFile the file which will hold the result stripe image
 	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
 	 * @return the result stripe
@@ -174,7 +184,9 @@ class Stripe {
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
-	public Stripe shrink(File targetFile, boolean useGraphicsMagick) throws IOException, InterruptedException, IM4JavaException {
+	public Stripe shrink(File targetFile, boolean useGraphicsMagick) throws IOException,
+			InterruptedException, IM4JavaException {
+		
 		return shrink(null, -1, -1, null, targetFile, useGraphicsMagick);
 	}
 	
@@ -183,6 +195,7 @@ class Stripe {
 	 * This method allows to create a background color buffer around the stripe, in case
 	 * the employed tiling scheme mandates certain image resolution constraints (e.g.
 	 * width/height must be integer multiples of the tile-size). 
+	 * 
 	 * @param gravity the gravity to use when compositing the images on the background canvas
 	 * @param xExtent the width of the result stripe canvas
 	 * @param yExtent the height of the resul stripe canvas
@@ -194,7 +207,10 @@ class Stripe {
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
-	public Stripe shrink(String gravity, int xExtent, int yExtent, String backgroundColor, File targetFile, boolean useGraphicsMagick) throws IOException, InterruptedException, IM4JavaException {
+	public Stripe shrink(String gravity, int xExtent, int yExtent, String backgroundColor,
+			File targetFile, boolean useGraphicsMagick) 
+		throws IOException, InterruptedException, IM4JavaException {
+	
 		IMOperation op = new IMOperation();
 		if (xExtent > -1 && yExtent > -1){
 			op.gravity(gravity);

@@ -69,6 +69,20 @@ public class MagickTilerCLI {
 	private static final String USAGE_FOOTER = 
 		"Example: java -jar magicktiler.jar -s tms -f jpeg -i image.tif -p";
 	
+	private static final Options options = new Options(){
+		private static final long serialVersionUID = 8442627813822171704L;
+	{
+		addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify' or 'ptif')", true));
+		addOption(new Option("i", "input", "mandatory input file or directory", true));
+		addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF), default=.", false));
+		addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
+		addOption(new Option("q", "quality", "JPEG compression quality (0 - 100), default=75", false));
+		addOption(new Option("b", "color", "background color, default=white", false));
+		addOption(new Option("p", null, "generate an HTML preview file", false));
+		addOption(new Option("g", null, "displays the GUI (ignores all other parameters)", false));
+		addOption(new Option("h", null, "displays this help text", false));
+	}};
+	
 	/**
 	 * @param args
 	 * @throws TilingException 
@@ -80,23 +94,15 @@ public class MagickTilerCLI {
 		String consoleOutScheme = null;
 		String consoleOutFormat = "";
 		
-		Options options = new Options();
-		options.addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify' or 'ptif')", true));
-		options.addOption(new Option("i", "input", "mandatory input file or directory", true));
-		options.addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF), default=.", false));
-		options.addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
-		options.addOption(new Option("q", "quality", "JPEG compression quality (0 - 100), default=75", false));
-		options.addOption(new Option("b", "color", "background color, default=white", false));
-		options.addOption(new Option("p", null, "generate an HTML preview file", false));
-		options.addOption(new Option("g", null, "displays the GUI (ignores all other parameters)", false));
-		options.addOption(new Option("h", null, "displays this help text", false));
 		try {
 			CommandLine cmd = new BasicParser().parse(options, args);
+			// Help
 			if(cmd.hasOption("h")) {
 				printUsage(options);
 				return;
 			}
 			
+			// Tiling scheme
 			String scheme = cmd.getOptionValue("s");
 			if (scheme.equalsIgnoreCase("tms")) {
 				tiler = new TMSTiler();
@@ -110,7 +116,6 @@ public class MagickTilerCLI {
 				tiler = new PTIFConverter();
 				consoleOutScheme = TARGET_SCHEME_PTIF;
 			}
-			
 			if (tiler == null) {
 				System.out.println("Unsupported tiling scheme: " + scheme);
 				return;
@@ -127,14 +132,14 @@ public class MagickTilerCLI {
 			String quality = cmd.getOptionValue("q");
 			if (quality != null) {
 				try {
-					int q = Integer.parseInt(cmd.getOptionValue("q"));
+					int q = Integer.parseInt(quality);
 					if ((q<0) || (q>100)) {
 						System.out.println("Invalid JPEG compression setting: " + q + " (must be in the range 0 - 100)");
 						return;
 					}
 					tiler.setJPEGCompressionQuality(q);
 				} catch (NumberFormatException e) {
-					System.out.println("Invalid JPEG compression setting: " + cmd.getOptionValue("q"));
+					System.out.println("Invalid JPEG compression setting: " + quality);
 					return;
 				}
 			}

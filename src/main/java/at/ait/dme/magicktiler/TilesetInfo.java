@@ -31,13 +31,18 @@ import java.util.ArrayList;
  * individual zoom levels (xTiles, yTiles)
  * 
  * @author magicktiler@gmail.com
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TilesetInfo {
 	
 	/**
-	 * Tile width and height for this tileset
+	 * Tile width for this tileset
 	 */
 	private int tileWidth;
+	
+	/**
+	 * Tile height for this tileset
+	 */
 	private int tileHeight;
 	
 	/**
@@ -60,7 +65,9 @@ public class TilesetInfo {
 	 */
 	private int tilesTotal;
 	
-	public TilesetInfo(File image, int tileWidth, int tileHeight, TileFormat format, boolean useGraphicsMagick) throws TilingException {
+	public TilesetInfo(File image, int tileWidth, int tileHeight, TileFormat format, 
+			boolean useGraphicsMagick) throws TilingException {
+		
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
 		this.format = format;
@@ -88,7 +95,7 @@ public class TilesetInfo {
 	}
 		
 	public File getImageFile() {
-		return imgInfo.getImageFile();
+		return imgInfo.getFile();
 	}
 	
 	public int getTileWidth() {
