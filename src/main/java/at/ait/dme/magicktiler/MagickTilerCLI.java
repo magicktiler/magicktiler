@@ -46,6 +46,7 @@ import scala.actors.threadpool.Arrays;
  * -b   background color<br>
  * -i	input file or directory<br>
  * -o   output directory (for tilesets) or file (for PTIF)<br>
+ * -q   JPEG compression quality (0 - 100)
  * -p   generate an HTML preview file
  * 
  * @author magicktiler@gmail.com
