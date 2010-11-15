@@ -49,6 +49,7 @@ import org.im4java.core.IMOperation;
  * TODO finish this implementation!
  * 
  * @author magicktiler@gmail.com
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class KMLSuperOverlayTiler extends TMSTiler {
 
@@ -122,7 +123,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 	private BoundingBox bbox = null;
 	
 	@Override
-	protected void convert(File image, TilesetInfo info, File tilesetRoot) throws TilingException {
+	protected void convert(File image, TilesetInfo info) throws TilingException {
 		if (bbox == null) throw new TilingException("No bounding box set!");
 		
 		long startTime = System.currentTimeMillis();
@@ -139,15 +140,8 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
 		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		
 		// Create tileset root dir (unless provided)
-		if (tilesetRoot == null) { 
-			tilesetRoot = new File(workingDirectory, baseName);
-			if (tilesetRoot.exists()) throw new TilingException("There is already a directory named " + baseName + "!");
-			tilesetRoot.mkdir();
-		} else {
-			if (!tilesetRoot.exists()) tilesetRoot.mkdir();
-		}
+		createTargetDir(baseName);
 		
 		// Step 1 - stripe the base image
 		log.debug("Striping base image");
@@ -161,7 +155,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		
 		// Step 2 - tile base image stripes
 		log.debug("Tiling level 1");
-		File baselayerDir = new File(tilesetRoot, Integer.toString(info.getZoomLevels() - 1));
+		File baselayerDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - 1));
 		baselayerDir.mkdir();
 		for (int i=0; i<baseStripes.size(); i++) {
 			File targetDir = new File(baselayerDir, Integer.toString(i));
@@ -170,8 +164,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 				generateLOD(
 						baseStripes.get(i), 
 						info.getZoomLevels() - 1,
-						i,
-						targetDir);
+						i);
 			} catch (Exception e) {
 				throw new TilingException(e.getMessage());
 			}
@@ -182,7 +175,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		List<Stripe> thisLevel = new ArrayList<Stripe>();
 		for (int i=1; i<info.getZoomLevels(); i++) {
 			log.debug("Tiling level " + (i + 1));
-			File zoomLevelDir = new File(tilesetRoot, Integer.toString(info.getZoomLevels() - i - 1));
+			File zoomLevelDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - i - 1));
 			zoomLevelDir.mkdir();
 			
 			for(int j=0; j<Math.ceil((double)levelBeneath.size() / 2); j++) {
@@ -199,8 +192,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 					generateLOD(
 							result,
 							info.getZoomLevels() - i - 1,
-							j,
-							targetDir);
+							j);
 				} catch (Exception e) {
 					throw new TilingException(e.getMessage());
 				} 
@@ -215,7 +207,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		
 		// Step 4 - generate the root KML file
 		try {
-			generateRootKMLFile(tilesetRoot, info);
+			generateRootKMLFile(info);
 		} catch (IOException e) {
 			throw new TilingException(e.getMessage());
 		}
@@ -290,9 +282,9 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		this.bbox = bbox;
 	}
 	
-	private void generateLOD(Stripe stripe, int zoomlevel, int col, File targetDirectory) throws IOException, InterruptedException, IM4JavaException {
+	private void generateLOD(Stripe stripe, int zoomlevel, int col) throws IOException, InterruptedException, IM4JavaException {
 		// Tile the stripe
-		String filenamePattern = targetDirectory.getAbsolutePath() + File.separator + "tmp-%d.jpg";
+		String filenamePattern = tilesetRootDir.getAbsolutePath() + File.separator + "tmp-%d.jpg";
 		
 		IMOperation op = new IMOperation();
 		op.addImage(stripe.getImageFile().getAbsolutePath());
@@ -435,7 +427,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 	}
 	*/
 	
-	private void generateRootKMLFile(File directory, TilesetInfo info) throws IOException {
+	private void generateRootKMLFile(TilesetInfo info) throws IOException {
 		String name = info.getImageFile().getName();
 		name = name.substring(0, name.lastIndexOf('.'));
 		
@@ -447,7 +439,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 			.replace("@west@", Double.toString(bbox.getWest()))
 			.replace("@href@", "0/0/0.kml");
 
-		writeToFile(new File(directory, name + ".kml"), ROOT_KML_TEMPLATE.replace("@network.link@", networkLink));
+		writeToFile(new File(tilesetRootDir, name + ".kml"), ROOT_KML_TEMPLATE.replace("@network.link@", networkLink));
 	}
 	
 	private void writeToFile(File f, String s) throws IOException {

@@ -140,7 +140,7 @@ public class TilesetInfo {
 	 * 
 	 * @author magicktiler@gmail.com
 	 */
-	private class Dimension {
+	private static class Dimension {
 	
 		int x,y;
 		

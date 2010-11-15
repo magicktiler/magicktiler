@@ -107,7 +107,7 @@ public class TMSTiler extends MagickTiler {
 	}
 	
 	@Override
-	protected void convert(File image, TilesetInfo info, File tilesetRoot) throws TilingException {
+	protected void convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
         log.info(
                 "Generating TMS tiles for file " + image.getName() + ": " +
@@ -122,16 +122,8 @@ public class TMSTiler extends MagickTiler {
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
 		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		
 		// Create tileset root dir (unless provided)
-		if (tilesetRoot == null) { 
-			tilesetRoot = new File(workingDirectory, baseName);
-			if (tilesetRoot.exists()) 
-				throw new TilingException("There is already a directory named " + baseName + "!");
-			tilesetRoot.mkdir();
-		} else {
-			if (!tilesetRoot.exists()) tilesetRoot.mkdir();
-		}
+		createTargetDir(baseName);
 		
 		// Step 1 - stripe the base image
 		log.debug("Striping base image");
@@ -145,7 +137,7 @@ public class TMSTiler extends MagickTiler {
 		
 		// Step 2 - tile base image stripes
 		log.debug("Tiling level 1");
-		File baselayerDir = new File(tilesetRoot, Integer.toString(info.getZoomLevels() - 1));
+		File baselayerDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - 1));
 		baselayerDir.mkdir();
 		for (int i=0; i<baseStripes.size(); i++) {
 			File targetDir = new File(baselayerDir, Integer.toString(i));
@@ -162,7 +154,7 @@ public class TMSTiler extends MagickTiler {
 		List<Stripe> thisLevel = new ArrayList<Stripe>();
 		for (int i=1; i<info.getZoomLevels(); i++) {
 			log.debug("Tiling level " + (i + 1));
-			File zoomLevelDir = new File(tilesetRoot, Integer.toString(info.getZoomLevels() - i - 1));
+			File zoomLevelDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - i - 1));
 			zoomLevelDir.mkdir();
 			
 			for(int j=0; j<Math.ceil((double)levelBeneath.size() / 2); j++) {
@@ -189,12 +181,12 @@ public class TMSTiler extends MagickTiler {
 		for (Stripe s : levelBeneath) s.delete();
 		
 		// Step 4 - generate tilemapresource.xml
-		generateTilemapresourceXML(tilesetRoot, info);
+		generateTilemapresourceXML(info);
 		
 		// Step 5 (optional) - generate OpenLayers preview
 		if (generatePreview) {
 			try {
-				generatePreview(info, tilesetRoot);
+				generatePreview(info);
 			} catch (IOException e) {
 				throw new TilingException("Error writing preview HTML: " + e.getMessage());
 			}
@@ -232,11 +224,11 @@ public class TMSTiler extends MagickTiler {
 		return stripes;
 	}
 	
-	private void generateTMSTiles(Stripe stripe, TilesetInfo info, File targetDirectory)
+	private void generateTMSTiles(Stripe stripe, TilesetInfo info, File targetDir)
 			throws IOException, InterruptedException, IM4JavaException {
 
 		// Tile the stripe
-		String filenamePattern = targetDirectory.getAbsolutePath() + File.separator + "tmp-%d." + 
+		String filenamePattern = targetDir.getAbsolutePath() + File.separator + "tmp-%d." + 
 			info.getTileFormat().getExtension();
 
 		IMOperation op = new IMOperation();
@@ -285,7 +277,7 @@ public class TMSTiler extends MagickTiler {
 		}
 	}
 	
-	private void generateTilemapresourceXML(File directory, TilesetInfo info) {
+	private void generateTilemapresourceXML(TilesetInfo info) {
 		StringBuffer tilesets = new StringBuffer();
 		for (int i=0; i<info.getZoomLevels(); i++) {
 			tilesets.append(TILESET_TEMPLATE
@@ -304,43 +296,47 @@ public class TMSTiler extends MagickTiler {
 			.replace("@ext@", info.getTileFormat().getExtension())
 			.replace("@tilesets@", tilesets.toString());
 		
-        BufferedWriter out;
+        BufferedWriter out = null;
 		try {
-			out = new BufferedWriter(new FileWriter(new File(directory, "tilemapresource.xml")));
+			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "tilemapresource.xml")));
 		    out.write(metadata);
-		    out.close();
 		} catch (IOException e) {
 			log.error("Error writing metadata XML: " + e.getMessage());
+		} finally {
+			if(out!=null)
+				try {
+					out.close();
+				} catch (IOException e) {
+					log.error("Error closing stream: " + e.getMessage());
+				}
 		}
 	}
 	
-	private void generatePreview(TilesetInfo info, File basedir) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
-				.getResourceAsStream("tms-template.html")));
-
-		StringBuffer sb = new StringBuffer();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			sb.append(line + "\n");
-		}
-		
-		String html = sb.toString()
-			.replace("@title@", info.getImageFile().getName())
-			.replace("@width@", Integer.toString(info.getWidth()))
-			.replace("@height@", Integer.toString(info.getHeight()))
-			.replace("@maxZoom@", Integer.toString(info.getZoomLevels() - 1))
-			.replace("@maxResolution@", Integer.toString((int) Math.pow(2, info.getZoomLevels() - 1)))
-			.replace("@numZoomLevels@", Integer.toString(info.getZoomLevels()))
-			.replace("@tilesetpath@", basedir.getAbsolutePath().replace("\\", "/"))
-			.replace("@ext@", info.getTileFormat().getExtension());
-		
-        BufferedWriter out;
+	private void generatePreview(TilesetInfo info) throws IOException {
+		BufferedReader reader = null;
 		try {
-			out = new BufferedWriter(new FileWriter(new File(basedir, "preview.html")));
-		    out.write(html);
-		    out.close();
-		} catch (IOException e) {
-			log.error("Error writing openlayers preview HTML file: " + e.getMessage());
+			reader = new BufferedReader(new InputStreamReader(this.getClass()
+					.getResourceAsStream("tms-template.html")));
+	
+			StringBuffer sb = new StringBuffer();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+			
+			String html = sb.toString()
+				.replace("@title@", info.getImageFile().getName())
+				.replace("@width@", Integer.toString(info.getWidth()))
+				.replace("@height@", Integer.toString(info.getHeight()))
+				.replace("@maxZoom@", Integer.toString(info.getZoomLevels() - 1))
+				.replace("@maxResolution@", Integer.toString((int) Math.pow(2, info.getZoomLevels() - 1)))
+				.replace("@numZoomLevels@", Integer.toString(info.getZoomLevels()))
+				.replace("@tilesetpath@", tilesetRootDir.getAbsolutePath().replace("\\", "/"))
+				.replace("@ext@", info.getTileFormat().getExtension());
+			
+		writeHtmlPreview(html);
+		} finally {
+			if(reader!=null) reader.close();
 		}
 	}
 }

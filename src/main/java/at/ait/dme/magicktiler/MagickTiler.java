@@ -21,7 +21,9 @@
 
 package at.ait.dme.magicktiler;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -51,6 +53,11 @@ public abstract class MagickTiler {
 	 * Working directory (default: app root)
 	 */
 	protected File workingDirectory = new File(".");
+	
+	/**
+	 * Root directory for the target tileset
+	 */
+	protected File tilesetRootDir = null;
 	
 	/**
 	 * Image processing system flag - true=GraphicsMagick, false=ImageMagick (default: true) 
@@ -98,7 +105,7 @@ public abstract class MagickTiler {
 	 * @throws TilingException if anything goes wrong
 	 */
 	public TilesetInfo convert(File image) throws TilingException {
-		return convert(image, null);
+		return convert(image, tilesetRootDir);
 	}
 	
 	/**
@@ -111,7 +118,8 @@ public abstract class MagickTiler {
 	 * @throws TilingException if anything goes wrong
 	 */
 	public TilesetInfo convert(File image, File target) throws TilingException {
-		TilesetInfo info;
+		TilesetInfo info = null;
+		tilesetRootDir = target;
 		
 		if (image.getAbsolutePath().endsWith("jp2")) {
 			try {
@@ -121,7 +129,7 @@ public abstract class MagickTiler {
 				log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 				
 				info = new TilesetInfo(tif, tileWidth, tileHeight, format, useGraphicsMagick);
-				convert(tif, info, target);
+				convert(tif, info);
 				
 				tif.delete();
 			} catch (Exception e) {
@@ -129,13 +137,13 @@ public abstract class MagickTiler {
 			}
 		} else {
 			info = new TilesetInfo(image, tileWidth, tileHeight, format, useGraphicsMagick);	
-			convert(image, info, target);
+			convert(image, info);
 		}
 		
 		return info;
 	}
 	
-	protected abstract void convert(File image, TilesetInfo info, File tilesetRoot) throws TilingException;
+	protected abstract void convert(File image, TilesetInfo info) throws TilingException;
 
 	/**
 	 * Set the working directory for this tiler implementation. The working
@@ -231,4 +239,37 @@ public abstract class MagickTiler {
 		throw new RuntimeException("Panic! Could not generate temporary TIF file.");
 	}
 	
+	/**
+	 * Create the target tileset root directory
+	 * 
+	 * @param baseName
+	 * @throws TilingException
+	 */
+	protected void createTargetDir(String baseName) throws TilingException {
+		if (tilesetRootDir == null) { 
+			tilesetRootDir = new File(workingDirectory, baseName);
+			if (tilesetRootDir.exists()) throw new TilingException("There is already a directory named " + baseName + "!");
+			tilesetRootDir.mkdir();
+		} else {
+			if (!tilesetRootDir.exists()) tilesetRootDir.mkdir();
+		}
+	}
+	
+	/**
+	 * Write the provided HTML string to the preview file
+	 * 
+	 * @param html
+	 * @throws IOException 
+	 */
+	protected void writeHtmlPreview(String html) throws IOException {
+		BufferedWriter out = null;
+		try {
+			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "preview.html")));
+		    out.write(html);
+		} catch (IOException e) {
+			log.error("Error writing openlayers preview HTML file: " + e.getMessage());
+		} finally {
+			if(out!=null) out.close();
+		}
+	}
 }

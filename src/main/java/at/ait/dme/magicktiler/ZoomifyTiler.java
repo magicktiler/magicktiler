@@ -96,7 +96,7 @@ public class ZoomifyTiler extends MagickTiler {
 	private Logger log = Logger.getLogger(ZoomifyTiler.class);
 	
 	@Override
-	protected void convert(File image, TilesetInfo info, File tilesetRoot) throws TilingException {
+	protected void convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
         log.info(
                 "Generating Zoomify tiles for file " + image.getName() + ": " +
@@ -111,15 +111,8 @@ public class ZoomifyTiler extends MagickTiler {
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
 		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		
 		// Create tileset root dir (unless provided)
-		if (tilesetRoot == null) { 
-			tilesetRoot = new File(workingDirectory, baseName);
-			if (tilesetRoot.exists()) throw new TilingException("There is already a directory named " + baseName + "!");
-			tilesetRoot.mkdir();
-		} else {
-			if (!tilesetRoot.exists()) tilesetRoot.mkdir();
-		}
+		createTargetDir(baseName);
 		
 		// Step 1 - stripe the base image
 		log.debug("Striping base image");
@@ -142,8 +135,7 @@ public class ZoomifyTiler extends MagickTiler {
 						info.getZoomLevels() - 1,
 						info.getNumberOfXTiles(0),
 						offset,
-						i,
-						tilesetRoot);
+						i);
 				offset += info.getNumberOfXTiles(0);
 			} catch (Exception e) {
 				throw new TilingException(e.getMessage());
@@ -173,8 +165,7 @@ public class ZoomifyTiler extends MagickTiler {
 							info.getZoomLevels() - i -1, 
 							info.getNumberOfXTiles(i),
 							offset,
-							j,
-							tilesetRoot);
+							j);
 					offset += info.getNumberOfXTiles(i);
 				} catch (Exception e) {
 					throw new TilingException(e.getMessage());
@@ -189,12 +180,12 @@ public class ZoomifyTiler extends MagickTiler {
 		for (Stripe s : levelBeneath) s.delete();
 		
 		// Step 4 - generate ImageProperties.xml file
-		generateImagePropertiesXML(tilesetRoot, info);
+		generateImagePropertiesXML(info);
 		
 		// Step 5 (optional) - generate OpenLayers preview
 		if (generatePreview) {
 			try {
-				generatePreview(info, tilesetRoot);
+				generatePreview(info);
 			} catch (IOException e) {
 				throw new TilingException("Error writing preview HTML: " + e.getMessage());
 			}
@@ -232,11 +223,10 @@ public class ZoomifyTiler extends MagickTiler {
 		return stripes;
 	}
 	
-	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber, 
-			File targetDirectory) 
-		throws IOException, InterruptedException, IM4JavaException {
+	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber) 
+			throws IOException, InterruptedException, IM4JavaException {
 		
-		String filenamePattern = targetDirectory + File.separator + "tmp-%d.jpg";
+		String filenamePattern = tilesetRootDir + File.separator + "tmp-%d.jpg";
 		
 		IMOperation op = new IMOperation();
 		op.addImage(stripe.getImageFile().getAbsolutePath());
@@ -251,7 +241,7 @@ public class ZoomifyTiler extends MagickTiler {
 		// Rename result files (not nice, but seems to be the fastest way to do it)
 		for (int idx=0; idx<xTiles; idx++) {
 			int tileGroup = (startIdx + idx) / MAX_TILES_PER_GROUP;
-			File tileGroupDir = new File(targetDirectory.getAbsolutePath() + File.separator + TILEGROUP + tileGroup);
+			File tileGroupDir = new File(tilesetRootDir.getAbsolutePath() + File.separator + TILEGROUP + tileGroup);
 			if (!tileGroupDir.exists()) tileGroupDir.mkdir();
 			
 			File fOld = new File(filenamePattern.replace("%d", Integer.toString(idx)));
@@ -275,7 +265,7 @@ public class ZoomifyTiler extends MagickTiler {
 		}
 	}
 	
-	private void generateImagePropertiesXML(File directory, TilesetInfo info) {
+	private void generateImagePropertiesXML(TilesetInfo info) {
 		String metadata = METADATA_TEMPLATE
 			.replace("@width@", Integer.toString(info.getWidth()))
 			.replace("@height@", Integer.toString(info.getHeight()))
@@ -285,7 +275,7 @@ public class ZoomifyTiler extends MagickTiler {
 		// Write to file
         BufferedWriter out;
 		try {
-			out = new BufferedWriter(new FileWriter(new File(directory, "ImageProperties.xml")));
+			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "ImageProperties.xml")));
 		    out.write(metadata);
 		    out.close();
 		} catch (IOException e) {
@@ -293,28 +283,26 @@ public class ZoomifyTiler extends MagickTiler {
 		}
 	}
 	
-	private void generatePreview(TilesetInfo info, File basedir) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass()
-				.getResourceAsStream("zoomify-template.html")));
-	
-		StringBuffer sb = new StringBuffer();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			sb.append(line + "\n");
-		}
-		
-		String html = sb.toString()
-			.replace("@title@", info.getImageFile().getName())
-			.replace("@tileset@", ".")
-			.replace("@playerPath@", "file://" + System.getProperty("user.dir").replace("\\", "/") + "/zoomify/");
-		
-        BufferedWriter out;
+	private void generatePreview(TilesetInfo info) throws IOException {
+		BufferedReader reader = null;
 		try {
-			out = new BufferedWriter(new FileWriter(new File(basedir, "preview.html")));
-		    out.write(html);
-		    out.close();
-		} catch (IOException e) {
-			log.error("Error writing openlayers preview HTML file: " + e.getMessage());
+			reader = new BufferedReader(new InputStreamReader(this.getClass()
+						.getResourceAsStream("zoomify-template.html")));
+		
+			StringBuffer sb = new StringBuffer();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+			
+			String html = sb.toString()
+				.replace("@title@", info.getImageFile().getName())
+				.replace("@tileset@", ".")
+				.replace("@playerPath@", "file://" + System.getProperty("user.dir").replace("\\", "/") + "/zoomify/");
+			
+			writeHtmlPreview(html);
+		} finally {
+			if(reader!=null) reader.close();
 		}
 	}
 }

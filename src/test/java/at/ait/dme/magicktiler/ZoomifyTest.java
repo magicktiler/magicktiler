@@ -30,7 +30,9 @@ public class ZoomifyTest extends BaseTest {
 	
 	@Test 
 	public void testZoomifyTiling() throws Exception {	
-		Collection<String> expectedTopLevel = new ArrayList<String>() {{
+		Collection<String> expectedTopLevel = new ArrayList<String>() {
+			private static final long serialVersionUID = 6316225258257078946L;
+		{
 			add("ImageProperties.xml");
 			add("preview.html");
 		}};

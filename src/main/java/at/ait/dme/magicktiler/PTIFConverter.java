@@ -54,6 +54,7 @@ import org.im4java.core.IMOperation;
  * </ol>
  * 
  * @author magicktiler@gmail.com
+ * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class PTIFConverter extends MagickTiler {
 	
@@ -68,7 +69,7 @@ public class PTIFConverter extends MagickTiler {
 	private Logger log = Logger.getLogger(PTIFConverter.class);
 	
 	@Override
-	protected void convert(File image, TilesetInfo info, File target) throws TilingException {
+	protected void convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
         log.info(
                 "Generating PTIF for file " + image.getName() + ": " +
@@ -98,8 +99,8 @@ public class PTIFConverter extends MagickTiler {
 			mergeCmd.run(merge);
 			
 			// Step 3 - rename
-			if (target.exists()) target.delete();
-			tempFile.renameTo(target);
+			if (tilesetRootDir.exists()) tilesetRootDir.delete();
+			tempFile.renameTo(tilesetRootDir);
 			
 			// Step 4 - remove temporary files
 			for (int i=1; i<pyramid.size(); i++) {
@@ -144,8 +145,6 @@ public class PTIFConverter extends MagickTiler {
 			pyramid.add(thisLevel);
 			previousLevel = thisLevel;
         }
-		
 		return pyramid;
 	}
-	
 }
