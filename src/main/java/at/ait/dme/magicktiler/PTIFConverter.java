@@ -71,11 +71,10 @@ public class PTIFConverter extends MagickTiler {
 	@Override
 	protected void convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
-        log.info(
-                "Generating PTIF for file " + image.getName() + ": " +
+		log.info("Generating PTIF for file " + image.getName() + ": " +
                 info.getWidth() + "x" + info.getHeight() + ", " +
                 info.getZoomLevels() + " zoom levels"
-        );
+		);
         
 		try {
 	        // Step 1 - compute pyramid
@@ -93,19 +92,24 @@ public class PTIFConverter extends MagickTiler {
 	        // Step 2 - merge
 			log.debug("Merging");
 			File tempFile = new File(image.getParent(), "tmp.tif");
-	        merge.addImage(tempFile.getAbsolutePath());
-
-        	ConvertCmd mergeCmd = new ConvertCmd(useGraphicsMagick);
+			merge.addImage(tempFile.getAbsolutePath());
+			
+			ConvertCmd mergeCmd = new ConvertCmd(useGraphicsMagick);
 			mergeCmd.run(merge);
 			
 			// Step 3 - rename
-			if (tilesetRootDir.exists()) tilesetRootDir.delete();
-			tempFile.renameTo(tilesetRootDir);
+			if (tilesetRootDir.exists()) {
+				if(!tilesetRootDir.delete()) 
+					throw new TilingException("Failed to delete directory:"+tilesetRootDir);
+			}
+			if(!tempFile.renameTo(tilesetRootDir))
+				throw new TilingException("Failed to rename directory:"+tempFile);
 			
 			// Step 4 - remove temporary files
 			for (int i=1; i<pyramid.size(); i++) {
 				tempFile = new File(pyramid.get(i));
-				tempFile.delete();
+				if(!tempFile.delete())
+					log.error("Failed to delete temp file:"+tempFile);
 			}
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
@@ -117,34 +121,34 @@ public class PTIFConverter extends MagickTiler {
 	private List<String> computePyramid(TilesetInfo info) throws IOException, InterruptedException, IM4JavaException {
 		ArrayList<String> pyramid = new ArrayList<String>();
 		
-        String inputFile = info.getImageFile().getAbsolutePath();
-        pyramid.add(inputFile);
-        
-        String tempFilePrefix = inputFile.substring(0, inputFile.lastIndexOf('.'));
-		
-        int w = info.getWidth();
-        int h = info.getHeight();
+		String inputFile = info.getImageFile().getAbsolutePath();
+		pyramid.add(inputFile);
+
+		String tempFilePrefix = inputFile.substring(0, inputFile.lastIndexOf('.'));
+
+		int w = info.getWidth();
+		int h = info.getHeight();
 		
 		String previousLevel = inputFile;
 		String thisLevel;
         
-        for (int i=1; i<info.getZoomLevels(); i++) {
-        	w /= 2;
-        	h /= 2;
-        	thisLevel = tempFilePrefix + "-" + i + ".tif";
-        	
-    		IMOperation scale = new IMOperation();
-    		scale.size(w, h);
-    		scale.scale(w, h);
-    		scale.addImage(previousLevel);
-    		scale.addImage(thisLevel);
-		
+		for (int i = 1; i < info.getZoomLevels(); i++) {
+			w /= 2;
+			h /= 2;
+			thisLevel = tempFilePrefix + "-" + i + ".tif";
+
+			IMOperation scale = new IMOperation();
+			scale.size(w, h);
+			scale.scale(w, h);
+			scale.addImage(previousLevel);
+			scale.addImage(thisLevel);
+
 			ConvertCmd scaleCmd = new ConvertCmd(useGraphicsMagick);
 			scaleCmd.run(scale);
-			
+
 			pyramid.add(thisLevel);
 			previousLevel = thisLevel;
-        }
+		}
 		return pyramid;
 	}
 }

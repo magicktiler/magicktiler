@@ -245,9 +245,11 @@ public class Stripe {
 	/**
 	 * Removes this stripe's image file from the file system.
 	 * (Note that stripes are normally used as temporary files only!) 
+	 * 
+	 * @throws TilingException 
 	 */
-	public void delete() {
-		file.delete();
+	public void delete() throws TilingException {
+		if(!file.delete()) throw new TilingException("Could not delete file:"+file);
 	}
 	
 }

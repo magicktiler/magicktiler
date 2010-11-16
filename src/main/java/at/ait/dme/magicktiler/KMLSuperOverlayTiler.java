@@ -127,15 +127,14 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		if (bbox == null) throw new TilingException("No bounding box set!");
 		
 		long startTime = System.currentTimeMillis();
-        log.info(
-                "Generating KML Superoverlay for file " + image.getName() + ": " +
+		log.info("Generating KML Superoverlay for file " + image.getName() + ": " +
                 info.getWidth() + "x" + info.getHeight() + ", " +
                 info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
                 info.getZoomLevels() + " zoom levels, " +
                 info.getTotalNumberOfTiles() + " tiles total"
-        );		
+		);		
 		
-		if (!workingDirectory.exists()) workingDirectory.mkdir();
+		if (!workingDirectory.exists()) createDir(workingDirectory);
 		
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
@@ -156,15 +155,12 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		// Step 2 - tile base image stripes
 		log.debug("Tiling level 1");
 		File baselayerDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - 1));
-		baselayerDir.mkdir();
+		createDir(baselayerDir);
 		for (int i=0; i<baseStripes.size(); i++) {
 			File targetDir = new File(baselayerDir, Integer.toString(i));
-			targetDir.mkdir();
+			createDir(targetDir);
 			try {
-				generateLOD(
-						baseStripes.get(i), 
-						info.getZoomLevels() - 1,
-						i);
+				generateLOD(baseStripes.get(i), info.getZoomLevels()-1, i);
 			} catch (Exception e) {
 				throw new TilingException(e.getMessage());
 			}
@@ -176,7 +172,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		for (int i=1; i<info.getZoomLevels(); i++) {
 			log.debug("Tiling level " + (i + 1));
 			File zoomLevelDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - i - 1));
-			zoomLevelDir.mkdir();
+			createDir(zoomLevelDir);
 			
 			for(int j=0; j<Math.ceil((double)levelBeneath.size() / 2); j++) {
 				try {
@@ -188,11 +184,8 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 					
 					// Step 3b - tile result stripe
 					File targetDir = new File(zoomLevelDir, Integer.toString(j));
-					targetDir.mkdir();
-					generateLOD(
-							result,
-							info.getZoomLevels() - i - 1,
-							j);
+					createDir(targetDir);
+					generateLOD(result, info.getZoomLevels()-i-1, j);
 				} catch (Exception e) {
 					throw new TilingException(e.getMessage());
 				} 
@@ -282,7 +275,9 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		this.bbox = bbox;
 	}
 	
-	private void generateLOD(Stripe stripe, int zoomlevel, int col) throws IOException, InterruptedException, IM4JavaException {
+	private void generateLOD(Stripe stripe, int zoomlevel, int col) throws IOException, 
+		InterruptedException, IM4JavaException, TilingException {
+		
 		// Tile the stripe
 		String filenamePattern = tilesetRootDir.getAbsolutePath() + File.separator + "tmp-%d.jpg";
 		
@@ -308,7 +303,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 			// Rename result files
 			File fOld = new File(filenamePattern.replace("%d", Integer.toString(i)));
 			File fNew = new File(filenamePattern.replace("tmp-%d", Integer.toString((stripe.getHeight() / tileHeight) - i - 1)));
-			fOld.renameTo(fNew);
+			if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
 			
 			// Generate KML
 			generateTileKML(zoomlevel, col, rows - i - 1, north, west, width, height, fNew);

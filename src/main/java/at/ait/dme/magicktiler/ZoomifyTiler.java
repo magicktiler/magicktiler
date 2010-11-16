@@ -88,7 +88,8 @@ public class ZoomifyTiler extends MagickTiler {
 	 * XML descriptor file template 
 	 */
 	private static final String METADATA_TEMPLATE = 
-		"<IMAGE_PROPERTIES WIDTH=\"@width@\" HEIGHT=\"@height@\" NUMTILES=\"@numtiles@\" NUMIMAGES=\"1\" VERSION=\"1.8\" TILESIZE=\"@tilesize@\" />";
+		"<IMAGE_PROPERTIES WIDTH=\"@width@\" HEIGHT=\"@height@\" NUMTILES=\"@numtiles@\"" +
+		" NUMIMAGES=\"1\" VERSION=\"1.8\" TILESIZE=\"@tilesize@\" />";
 
 	/**
 	 * Log4j logger
@@ -98,20 +99,18 @@ public class ZoomifyTiler extends MagickTiler {
 	@Override
 	protected void convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
-        log.info(
-                "Generating Zoomify tiles for file " + image.getName() + ": " +
-                info.getWidth() + "x" + info.getHeight() + ", " +
+		log.info("Generating Zoomify tiles for file " + image.getName() + ": " +
+				info.getWidth() + "x" + info.getHeight() + ", " +
                 info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
                 info.getZoomLevels() + " zoom levels, " +
                 info.getTotalNumberOfTiles() + " tiles total"
-        );
+		);
 		
-		if (!workingDirectory.exists()) workingDirectory.mkdir();
+		if (!workingDirectory.exists()) createDir(workingDirectory);
 		
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
 		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		// Create tileset root dir (unless provided)
 		createTargetDir(baseName);
 		
 		// Step 1 - stripe the base image
@@ -130,8 +129,7 @@ public class ZoomifyTiler extends MagickTiler {
 		int offset = zoomlevelStartIdx;
 		for (int i=0; i<baseStripes.size(); i++) {
 			try {
-				generateZoomifyTiles(
-						baseStripes.get(i),
+				generateZoomifyTiles(baseStripes.get(i), 
 						info.getZoomLevels() - 1,
 						info.getNumberOfXTiles(0),
 						offset,
@@ -160,8 +158,7 @@ public class ZoomifyTiler extends MagickTiler {
 					thisLevel.add(result);
 					
 					// Step 3b - tile result stripe
-					generateZoomifyTiles(
-							result,
+					generateZoomifyTiles(result,
 							info.getZoomLevels() - i -1, 
 							info.getNumberOfXTiles(i),
 							offset,
@@ -213,7 +210,8 @@ public class ZoomifyTiler extends MagickTiler {
 		for (int i=0; i<info.getNumberOfYTiles(0); i++) {
 			// The last stripe may have height < tileHeight!
 			if (i == (info.getNumberOfYTiles(0) - 1))
-				height = new ImageInfo(new File(workingDirectory, outfilePrefix + i + ".tif"), useGraphicsMagick).getHeight();
+				height = new ImageInfo(new File(workingDirectory, outfilePrefix + i + ".tif"), 
+						useGraphicsMagick).getHeight();
 			
 			stripes.add(new Stripe(
 							new File(workingDirectory, outfilePrefix + i + ".tif"),
@@ -224,7 +222,7 @@ public class ZoomifyTiler extends MagickTiler {
 	}
 	
 	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber) 
-			throws IOException, InterruptedException, IM4JavaException {
+			throws IOException, InterruptedException, IM4JavaException, TilingException {
 		
 		String filenamePattern = tilesetRootDir + File.separator + "tmp-%d.jpg";
 		
@@ -242,7 +240,7 @@ public class ZoomifyTiler extends MagickTiler {
 		for (int idx=0; idx<xTiles; idx++) {
 			int tileGroup = (startIdx + idx) / MAX_TILES_PER_GROUP;
 			File tileGroupDir = new File(tilesetRootDir.getAbsolutePath() + File.separator + TILEGROUP + tileGroup);
-			if (!tileGroupDir.exists()) tileGroupDir.mkdir();
+			if (!tileGroupDir.exists()) createDir(tileGroupDir);
 			
 			File fOld = new File(filenamePattern.replace("%d", Integer.toString(idx)));
 			
@@ -251,7 +249,7 @@ public class ZoomifyTiler extends MagickTiler {
 					File.separator + 
 					Integer.toString(zoomlevel) + "-" + (idx % xTiles) + "-" + rowNumber));
 
-			fOld.renameTo(fNew);
+			if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
 		}
 	}
 	
@@ -259,9 +257,11 @@ public class ZoomifyTiler extends MagickTiler {
 		throws IOException, InterruptedException, IM4JavaException {
 		
 		if (stripe2 == null) {
-			return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), useGraphicsMagick);
+			return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
+					useGraphicsMagick);
 		} else {
-			return stripe1.merge(stripe2, new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), useGraphicsMagick);
+			return stripe1.merge(stripe2, new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
+					useGraphicsMagick);
 		}
 	}
 	
@@ -273,13 +273,19 @@ public class ZoomifyTiler extends MagickTiler {
 			.replace("@tilesize@", Integer.toString(tileHeight));
 		
 		// Write to file
-        BufferedWriter out;
+		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "ImageProperties.xml")));
-		    out.write(metadata);
-		    out.close();
+			out.write(metadata);
 		} catch (IOException e) {
 			log.error("Error writing metadata XML: " + e.getMessage());
+		} finally {
+			if(out!=null)
+				try {
+					out.close();
+				} catch (IOException e) {
+					log.error("Error closing stream: " + e.getMessage());
+				}
 		}
 	}
 	

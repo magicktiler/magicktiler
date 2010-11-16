@@ -131,7 +131,7 @@ public abstract class MagickTiler {
 				info = new TilesetInfo(tif, tileWidth, tileHeight, format, useGraphicsMagick);
 				convert(tif, info);
 				
-				tif.delete();
+				if(!tif.delete()) log.error("Failed to delete TIF file:"+tif);
 			} catch (Exception e) {
 				throw new TilingException(e.getMessage());
 			}
@@ -225,8 +225,8 @@ public abstract class MagickTiler {
 		String outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".tif";
 	
 		IMOperation convert = new IMOperation();
-    	convert.addImage(inFile);
-    	convert.addImage(outFile);
+		convert.addImage(inFile);
+		convert.addImage(outFile);
 		
 		ConvertCmd convertCmd = new ConvertCmd(useGraphicsMagick);
 		convertCmd.run(convert);
@@ -249,10 +249,21 @@ public abstract class MagickTiler {
 		if (tilesetRootDir == null) { 
 			tilesetRootDir = new File(workingDirectory, baseName);
 			if (tilesetRootDir.exists()) throw new TilingException("There is already a directory named " + baseName + "!");
-			tilesetRootDir.mkdir();
+			createDir(tilesetRootDir);
 		} else {
-			if (!tilesetRootDir.exists()) tilesetRootDir.mkdir();
+			if (!tilesetRootDir.exists()) createDir(tilesetRootDir);
 		}
+	}
+	
+	/**
+	 * Create a directory and throw a {@link TilingException} when unsuccessful
+	 * 
+	 * @param directory
+	 * @throws TilingException
+	 */
+	protected void createDir(File dir) throws TilingException {
+		if(dir!=null && !dir.mkdir()) 
+			throw new TilingException("Problem creating directory:"+dir);
 	}
 	
 	/**
@@ -265,7 +276,7 @@ public abstract class MagickTiler {
 		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "preview.html")));
-		    out.write(html);
+			out.write(html);
 		} catch (IOException e) {
 			log.error("Error writing openlayers preview HTML file: " + e.getMessage());
 		} finally {

@@ -109,20 +109,18 @@ public class TMSTiler extends MagickTiler {
 	@Override
 	protected void convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
-        log.info(
-                "Generating TMS tiles for file " + image.getName() + ": " +
+		log.info("Generating TMS tiles for file " + image.getName() + ": " +
                 info.getWidth() + "x" + info.getHeight() + ", " +
                 info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
                 info.getZoomLevels() + " zoom levels, " +
                 info.getTotalNumberOfTiles() + " tiles total"
-        );		
+		);		
 		
-		if (!workingDirectory.exists()) workingDirectory.mkdir();
+		if (!workingDirectory.exists()) createDir(workingDirectory);
 		
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
 		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		// Create tileset root dir (unless provided)
 		createTargetDir(baseName);
 		
 		// Step 1 - stripe the base image
@@ -138,10 +136,10 @@ public class TMSTiler extends MagickTiler {
 		// Step 2 - tile base image stripes
 		log.debug("Tiling level 1");
 		File baselayerDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - 1));
-		baselayerDir.mkdir();
+		createDir(baselayerDir);
 		for (int i=0; i<baseStripes.size(); i++) {
 			File targetDir = new File(baselayerDir, Integer.toString(i));
-			targetDir.mkdir();
+			createDir(targetDir);
 			try {
 				generateTMSTiles(baseStripes.get(i), info, targetDir);
 			} catch (Exception e) {
@@ -155,7 +153,7 @@ public class TMSTiler extends MagickTiler {
 		for (int i=1; i<info.getZoomLevels(); i++) {
 			log.debug("Tiling level " + (i + 1));
 			File zoomLevelDir = new File(tilesetRootDir, Integer.toString(info.getZoomLevels() - i - 1));
-			zoomLevelDir.mkdir();
+			createDir(zoomLevelDir);
 			
 			for(int j=0; j<Math.ceil((double)levelBeneath.size() / 2); j++) {
 				try {
@@ -167,7 +165,7 @@ public class TMSTiler extends MagickTiler {
 					
 					// Step 3b - tile result stripe
 					File targetDir = new File(zoomLevelDir, Integer.toString(j));
-					targetDir.mkdir();
+					createDir(targetDir);
 					generateTMSTiles(result, info, targetDir);
 				} catch (Exception e) {
 					throw new TilingException(e.getMessage());
@@ -217,15 +215,16 @@ public class TMSTiler extends MagickTiler {
 		for (int i=0; i<info.getNumberOfXTiles(0); i++) {
 			// Somewhat risky to not check whether GM has generated all stripes correctly - but checking would take time...
 			stripes.add(new Stripe(
-							new File(workingDirectory, outfilePrefix + i + ".tif"),
-							tileWidth, canvasHeight,
-							Stripe.Orientation.VERTICAL));
+					new File(workingDirectory, outfilePrefix + i + ".tif"),
+					tileWidth, canvasHeight,
+					Stripe.Orientation.VERTICAL)
+			);
 		}
 		return stripes;
 	}
 	
 	private void generateTMSTiles(Stripe stripe, TilesetInfo info, File targetDir)
-			throws IOException, InterruptedException, IM4JavaException {
+			throws IOException, InterruptedException, IM4JavaException, TilingException {
 
 		// Tile the stripe
 		String filenamePattern = targetDir.getAbsolutePath() + File.separator + "tmp-%d." + 
@@ -247,7 +246,7 @@ public class TMSTiler extends MagickTiler {
 			File fOld = new File(filenamePattern.replace("%d", Integer.toString(i)));
 			File fNew = new File(filenamePattern.replace("tmp-%d", 
 					Integer.toString((stripe.getHeight() / tileHeight) - i - 1)));
-			fOld.renameTo(fNew);
+			if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
 		}
 	}
 	
@@ -296,10 +295,10 @@ public class TMSTiler extends MagickTiler {
 			.replace("@ext@", info.getTileFormat().getExtension())
 			.replace("@tilesets@", tilesets.toString());
 		
-        BufferedWriter out = null;
+		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "tilemapresource.xml")));
-		    out.write(metadata);
+			out.write(metadata);
 		} catch (IOException e) {
 			log.error("Error writing metadata XML: " + e.getMessage());
 		} finally {
@@ -316,7 +315,7 @@ public class TMSTiler extends MagickTiler {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(this.getClass()
-					.getResourceAsStream("tms-template.html")));
+						.getResourceAsStream("tms-template.html")));
 	
 			StringBuffer sb = new StringBuffer();
 			String line;
@@ -334,7 +333,7 @@ public class TMSTiler extends MagickTiler {
 				.replace("@tilesetpath@", tilesetRootDir.getAbsolutePath().replace("\\", "/"))
 				.replace("@ext@", info.getTileFormat().getExtension());
 			
-		writeHtmlPreview(html);
+			writeHtmlPreview(html);
 		} finally {
 			if(reader!=null) reader.close();
 		}

@@ -29,5 +29,8 @@ package at.ait.dme.magicktiler;
  * @author magicktiler@gmail.com
  *
  */
-public enum ImageProcessingSystem {	GRAPHICSMAGICK,	IMAGEMAGICK }
+public enum ImageProcessingSystem {
+	GRAPHICSMAGICK,	
+	IMAGEMAGICK 
+}
 
