@@ -139,7 +139,6 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		// Store 'base name' (= filename without extension)
 		String baseName = image.getName();
 		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		// Create tileset root dir (unless provided)
 		createTargetDir(baseName);
 		
 		// Step 1 - stripe the base image

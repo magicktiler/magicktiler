@@ -330,7 +330,7 @@ public class TMSTiler extends MagickTiler {
 				.replace("@maxZoom@", Integer.toString(info.getZoomLevels() - 1))
 				.replace("@maxResolution@", Integer.toString((int) Math.pow(2, info.getZoomLevels() - 1)))
 				.replace("@numZoomLevels@", Integer.toString(info.getZoomLevels()))
-				.replace("@tilesetpath@", tilesetRootDir.getAbsolutePath().replace("\\", "/"))
+				.replace("@tilesetpath@", tilesetRootDir.getAbsolutePath().replace("\\", "/")+"/")
 				.replace("@ext@", info.getTileFormat().getExtension());
 			
 			writeHtmlPreview(html);
