@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler;
+package at.ait.dme.magicktiler.kml;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,6 +32,12 @@ import org.apache.log4j.Logger;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
+
+import at.ait.dme.magicktiler.TilesetInfo;
+import at.ait.dme.magicktiler.TilingException;
+import at.ait.dme.magicktiler.image.BoundingBox;
+import at.ait.dme.magicktiler.image.Stripe;
+import at.ait.dme.magicktiler.tms.TMSTiler;
 
 /**
  * A tiler that generates a KML Superoverlay for Google Earth (unfinished!).

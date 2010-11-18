@@ -29,6 +29,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import at.ait.dme.magicktiler.ptif.PTIFConverter;
+import at.ait.dme.magicktiler.tms.TMSTiler;
+import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
+
 import scala.actors.threadpool.Arrays;
 
 /**

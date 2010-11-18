@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.junit.Test;
 
+import at.ait.dme.magicktiler.ptif.PTIFConverter;
+
 import junit.framework.TestCase;
 
 /**

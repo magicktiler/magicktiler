@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler;
+package at.ait.dme.magicktiler.image;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,6 +30,8 @@ import java.io.InputStreamReader;
 import org.im4java.core.IMOperation;
 import org.im4java.core.IdentifyCmd;
 import org.im4java.process.OutputConsumer;
+
+import at.ait.dme.magicktiler.TilingException;
 
 /**
  * Image information for a specified file (currently width and height only).

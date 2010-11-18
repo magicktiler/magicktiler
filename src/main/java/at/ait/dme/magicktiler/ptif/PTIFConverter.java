@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler;
+package at.ait.dme.magicktiler.ptif;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +30,10 @@ import org.apache.log4j.Logger;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
+
+import at.ait.dme.magicktiler.MagickTiler;
+import at.ait.dme.magicktiler.TilesetInfo;
+import at.ait.dme.magicktiler.TilingException;
 
 /**
  * A converter that implements conversion to the Pyramid TIFF (PTIF) format.

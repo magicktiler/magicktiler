@@ -6,6 +6,11 @@ import scala.swing.event._
 import scala.actors.Actor
 
 import at.ait.dme.magicktiler._
+import at.ait.dme.magicktiler.ptif._
+import at.ait.dme.magicktiler.tms._
+import at.ait.dme.magicktiler.zoomify._
+
+
 import java.io.File
 
 /**
