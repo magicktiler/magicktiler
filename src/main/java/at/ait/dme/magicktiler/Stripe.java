@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler.image;
+package at.ait.dme.magicktiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,6 @@ import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.core.MontageCmd;
 
-import at.ait.dme.magicktiler.TilingException;
 
 /**
  * To speed up the MagickTiler tiling process, images are (for most tiling schemes)

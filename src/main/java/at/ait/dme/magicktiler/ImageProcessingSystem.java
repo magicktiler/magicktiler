@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler.image;
+package at.ait.dme.magicktiler;
 
 /**
  * Supported image processing systems: GraphicsMagick or ImageMagick.

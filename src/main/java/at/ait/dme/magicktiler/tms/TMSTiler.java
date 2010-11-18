@@ -36,10 +36,10 @@ import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.MagickTiler;
+import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TileFormat;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
-import at.ait.dme.magicktiler.image.Stripe;
 
 /**
  * A tiler that implements the TMS tiling scheme.

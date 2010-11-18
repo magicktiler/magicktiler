@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler.kml;
+package at.ait.dme.magicktiler.geo;
 
 /**
  * A BoundingBox consisting of a north and south latitude, and

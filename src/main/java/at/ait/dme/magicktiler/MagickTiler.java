@@ -31,7 +31,6 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
-import at.ait.dme.magicktiler.image.ImageProcessingSystem;
 
 /**
  * The base class for all supported tile scheme implementations.

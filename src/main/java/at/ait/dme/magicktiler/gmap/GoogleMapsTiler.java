@@ -10,10 +10,10 @@ import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.GoogleMapsTest;
+import at.ait.dme.magicktiler.ImageInfo;
 import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
-import at.ait.dme.magicktiler.image.ImageInfo;
 
 /**
  * A tiler that implements the Google Maps tiling scheme
