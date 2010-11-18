@@ -308,7 +308,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 			// Rename result files
 			File fOld = new File(filenamePattern.replace("%d", Integer.toString(i)));
 			File fNew = new File(filenamePattern.replace("tmp-%d", Integer.toString((stripe.getHeight() / tileHeight) - i - 1)));
-			if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
+			if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file: " + fOld);
 			
 			// Generate KML
 			generateTileKML(zoomlevel, col, rows - i - 1, north, west, width, height, fNew);
