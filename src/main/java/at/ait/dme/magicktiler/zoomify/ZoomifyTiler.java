@@ -100,7 +100,7 @@ public class ZoomifyTiler extends MagickTiler {
 	/**
 	 * Log4j logger
 	 */
-	private Logger log = Logger.getLogger(ZoomifyTiler.class);
+	private static Logger log = Logger.getLogger(ZoomifyTiler.class);
 	
 	@Override
 	protected void convert(File image, TilesetInfo info) throws TilingException {

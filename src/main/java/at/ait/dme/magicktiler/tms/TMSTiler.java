@@ -103,7 +103,7 @@ public class TMSTiler extends MagickTiler {
 	/**
 	 * Log4j logger
 	 */
-	private Logger log = Logger.getLogger(TMSTiler.class);
+	private static Logger log = Logger.getLogger(TMSTiler.class);
 	
 	public TMSTiler() {
 		super();

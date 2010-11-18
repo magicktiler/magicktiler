@@ -70,7 +70,7 @@ public class PTIFConverter extends MagickTiler {
 	/**
 	 * Log4j logger
 	 */
-	private Logger log = Logger.getLogger(PTIFConverter.class);
+	private static Logger log = Logger.getLogger(PTIFConverter.class);
 	
 	@Override
 	protected void convert(File image, TilesetInfo info) throws TilingException {

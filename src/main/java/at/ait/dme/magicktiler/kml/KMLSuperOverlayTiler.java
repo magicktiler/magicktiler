@@ -35,7 +35,6 @@ import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
-import at.ait.dme.magicktiler.image.BoundingBox;
 import at.ait.dme.magicktiler.image.Stripe;
 import at.ait.dme.magicktiler.tms.TMSTiler;
 
@@ -121,7 +120,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 	/**
 	 * Log4j logger
 	 */
-	private Logger log = Logger.getLogger(KMLSuperOverlayTiler.class);
+	private static Logger log = Logger.getLogger(KMLSuperOverlayTiler.class);
 	
 	/**
 	 * Geographical bounding box for this Superoverlay
