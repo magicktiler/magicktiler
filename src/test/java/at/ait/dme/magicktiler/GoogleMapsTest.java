@@ -49,5 +49,7 @@ public class GoogleMapsTest extends BaseTest {
 			}
 		}
 		assertEquals(filesVerified, info.getTotalNumberOfTiles());
+		assertTrue("Preview was not generated!" , new File(tilesetRoot,"preview.html").exists());
+		
 	}
 }
