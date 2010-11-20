@@ -13,7 +13,6 @@ import at.ait.dme.magicktiler.gmap.GoogleMapsTiler;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class GoogleMapsTest extends BaseTest {
-	//TODO finish this implementation
 	
 	private File workingDir = new File("test/gmap");
 	
@@ -33,7 +32,6 @@ public class GoogleMapsTest extends BaseTest {
 		// Check if tileset files were generated correctly
 		File tilesetRoot = new File(workingDir, "Hong_Kong_Night_Skyline");
 		assertTrue("Tileset root directory not found!", tilesetRoot.exists());
-		
 		assertEquals("Wrong number of x-basetiles calculated for the GMAP tileset!", 16, info.getNumberOfXTiles(0));
 		assertEquals("Wrong number of y-basetiles calculated for the GMAP tileset!", 16, info.getNumberOfYTiles(0));
 		assertEquals("Wrong number of zoom levels calculated for the GMAP tileset!", 5, info.getZoomLevels());
@@ -50,6 +48,5 @@ public class GoogleMapsTest extends BaseTest {
 		}
 		assertEquals(filesVerified, info.getTotalNumberOfTiles());
 		assertTrue("Preview was not generated!" , new File(tilesetRoot,"preview.html").exists());
-		
 	}
 }

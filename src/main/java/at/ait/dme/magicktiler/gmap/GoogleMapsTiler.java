@@ -48,10 +48,9 @@ import at.ait.dme.magicktiler.TilingException;
 public class GoogleMapsTiler extends MagickTiler {
 	private static Logger log = Logger.getLogger(GoogleMapsTiler.class);
 
-	//TODO finish this implementation
-	
 	@Override
 	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
+		TilesetInfo updatedInfo = null;
 		long startTime = System.currentTimeMillis();
 		log.info("Generating Google Map tiles for file " + image.getName());	
 		
@@ -63,7 +62,6 @@ public class GoogleMapsTiler extends MagickTiler {
 
 		try {
 			log.debug("Resizing and squaring base image");
-			
 			String baseImageFileName = tilesetRootDir.getAbsolutePath()+"/base."+format.getExtension();
 			
 			// Step 1: resize to the closest multiple of 256 and the power of 2
@@ -73,9 +71,10 @@ public class GoogleMapsTiler extends MagickTiler {
 			ImageInfo squaredImage=squareBaseImage(resizedImage, baseImageFileName);
 			
 			// reinitialize the tileset info based on the new base image
-			info = new TilesetInfo(squaredImage.getFile(), tileWidth, tileHeight, format, useGraphicsMagick);	
-		
-			for(int z=0;z<info.getZoomLevels();z++) {
+			updatedInfo = new TilesetInfo(squaredImage.getFile(), 
+					tileWidth, tileHeight, format, useGraphicsMagick);	
+			
+			for(int z=0;z<updatedInfo.getZoomLevels();z++) {
 				log.debug("Tiling level " + z);
 				String tilesBaseFileName = tilesetRootDir.getAbsolutePath()+File.separator+z;
 				
@@ -103,7 +102,7 @@ public class GoogleMapsTiler extends MagickTiler {
 				for(int x=0,i=0;x<baseInfo.getNumberOfXTiles(0);x++) {
 					for(int y=0;y<baseInfo.getNumberOfYTiles(0);y++,i++) {
 						File fOld = new File(tilesBaseFileName+"_"+i+"."+format.getExtension());
-						File fNew = new File(tilesBaseFileName+"_"+x+"_"+y+"."+format.getExtension());
+						File fNew = new File(tilesBaseFileName+"_"+y+"_"+x+"."+format.getExtension());
 						if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
 					}
 				}
@@ -112,14 +111,14 @@ public class GoogleMapsTiler extends MagickTiler {
 			if(!squaredImage.getFile().delete()) log.error("could not delete file:"+squaredImage.getFile());
 			
 			//step 5: optionally create preview.html
-			if(generatePreview) generatePreview(info);
+			if(generatePreview) generatePreview(info, updatedInfo);
 			log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		} catch (Exception e) {
 			log.error("Failed to resize image", e);
 			throw new TilingException(e.getMessage());
 		} 
 		
-		return info;
+		return updatedInfo;
 	}
 	
 
@@ -178,7 +177,7 @@ public class GoogleMapsTiler extends MagickTiler {
 		return resizeImage(image.getAbsolutePath(), targetFileName, newWidth, newHeight);
 	}
 	
-	private void generatePreview(TilesetInfo info) throws IOException {
+	private void generatePreview(TilesetInfo info, TilesetInfo updatedInfo) throws IOException {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(this.getClass()
@@ -192,6 +191,8 @@ public class GoogleMapsTiler extends MagickTiler {
 			
 			String html = sb.toString()
 				.replace("@title@", info.getImageFile().getName())
+				.replace("@zoomlevels@", Integer.toString(updatedInfo.getZoomLevels() ))
+				.replace("@maxzoom@", Integer.toString(updatedInfo.getZoomLevels() - 1))
 				.replace("@tilesetpath@", tilesetRootDir.getAbsolutePath().replace("\\", "/")+"/")
 				.replace("@ext@", info.getTileFormat().getExtension());
 			

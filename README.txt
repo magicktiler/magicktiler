@@ -47,7 +47,7 @@ in the folder 'images'. A preview HTML file will be added to each tileset.
 Command options:
 -h   displays help text
 -i	input file or directory
--s   selects the tiling scheme ('tms', 'zoomify' or 'ptif')
+-s   selects the tiling scheme ('tms', 'zoomify', 'gmap', or 'ptif')
 -f   selects the tile image format ('jpeg' or 'png')
 -b   selects a background color (if applicable for the selected tile scheme)
 -o   output directory (for tilesets) or file (for PTIF)

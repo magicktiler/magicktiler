@@ -1,5 +1,6 @@
 package at.ait.dme.magicktiler.gui
 
+import at.ait.dme.magicktiler.gmap.GoogleMapsTiler
 import javax.swing.JOptionPane
 import scala.swing._
 import scala.swing.event._
@@ -23,7 +24,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
   val input:FileSelector = new FileSelector(25, true)
   val output:FileSelector = new FileSelector(25, false)
  
-  val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "PTIF")
+  val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "GMAP", "PTIF")
   val tileFormats:RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
   
   val jpegQuality:Slider = new Slider() {min=0;max=100;value=75}
@@ -109,6 +110,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
     tilingSchemes.value match {
       case "TMS" => tiler = new TMSTiler()
       case "Zoomify" => tiler = new ZoomifyTiler()
+      case "GMAP" => tiler = new GoogleMapsTiler()
       case "PTIF" => tiler = new PTIFConverter()
     }
     tileFormats.value match {

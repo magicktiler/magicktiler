@@ -29,11 +29,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import scala.actors.threadpool.Arrays;
+import at.ait.dme.magicktiler.gmap.GoogleMapsTiler;
 import at.ait.dme.magicktiler.ptif.PTIFConverter;
 import at.ait.dme.magicktiler.tms.TMSTiler;
 import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
-
-import scala.actors.threadpool.Arrays;
 
 /**
  * MagickTiler Command-line interface.
@@ -45,7 +45,7 @@ import scala.actors.threadpool.Arrays;
  * Command options:<br>
  * -h   displays this help text<br>
  * -g   displays the GUI<br>
- * -s   tiling scheme ('tms', 'zoomify' or 'ptif')<br>
+ * -s   tiling scheme ('tms', 'zoomify', 'gmap' or 'ptif')<br>
  * -f   tile format ('jpeg' or 'png')<br>
  * -b   background color<br>
  * -i	input file or directory<br>
@@ -59,6 +59,7 @@ import scala.actors.threadpool.Arrays;
 public class MagickTilerCLI {	
 	private static final String TARGET_SCHEME_TMS = "TMS tileset";
 	private static final String TARGET_SCHEME_ZOOMIFY = "Zoomify tileset";
+	private static final String TARGET_SCHEME_GMAP = "Google Maps tileset";
 	private static final String TARGET_SCHEME_PTIF = "Pyramid TIFF";
 	private static final String TARGET_FMT_JPEG = "(JPEG tiles)";
 	private static final String TARGET_FMT_PNG = "(PNG tiles)";
@@ -77,7 +78,7 @@ public class MagickTilerCLI {
 	private static final Options options = new Options(){
 		private static final long serialVersionUID = 8442627813822171704L;
 	{
-		addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify' or 'ptif')", true));
+		addOption(new Option("s", "scheme", "mandatory tiling scheme ('tms', 'zoomify', 'gmap' or 'ptif')", true));
 		addOption(new Option("i", "input", "mandatory input file or directory", true));
 		addOption(new Option("o", "output", "output directory (for tilesets) or file (for PTIF), default=.", false));
 		addOption(new Option("f", "format", "tile format ('jpeg' or 'png'), default=jpeg", false));
@@ -116,6 +117,10 @@ public class MagickTilerCLI {
 			} else if (scheme.equalsIgnoreCase("zoomify")) {
 				tiler = new ZoomifyTiler();
 				consoleOutScheme = TARGET_SCHEME_ZOOMIFY;
+				consoleOutFormat = TARGET_FMT_JPEG;
+			} else if (scheme.equalsIgnoreCase("gmap")) {
+				tiler = new GoogleMapsTiler();
+				consoleOutScheme = TARGET_SCHEME_GMAP;
 				consoleOutFormat = TARGET_FMT_JPEG;
 			} else if (scheme.equalsIgnoreCase("ptif")) {
 				tiler = new PTIFConverter();
