@@ -129,7 +129,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 	private BoundingBox bbox = null;
 	
 	@Override
-	protected void convert(File image, TilesetInfo info) throws TilingException {
+	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		if (bbox == null) throw new TilingException("No bounding box set!");
 		
 		long startTime = System.currentTimeMillis();
@@ -270,6 +270,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 
 		for (Stripe s : levelBeneath) s.delete();
 		*/	
+		return info;
 	}
 	
 	/**

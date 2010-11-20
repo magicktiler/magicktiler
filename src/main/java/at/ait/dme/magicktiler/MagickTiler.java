@@ -129,22 +129,20 @@ public abstract class MagickTiler {
 				File tif = convertToTIF(image); 
 				log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 				
-				info = new TilesetInfo(tif, tileWidth, tileHeight, format, useGraphicsMagick);
-				convert(tif, info);
+				info = convert(tif, new TilesetInfo(tif, tileWidth, tileHeight, format, useGraphicsMagick));
 				
 				if(!tif.delete()) log.error("Failed to delete TIF file:"+tif);
 			} catch (Exception e) {
 				throw new TilingException(e.getMessage());
 			}
 		} else {
-			info = new TilesetInfo(image, tileWidth, tileHeight, format, useGraphicsMagick);	
-			convert(image, info);
+			info = convert(image, new TilesetInfo(image, tileWidth, tileHeight, format, useGraphicsMagick));
 		}
 		
 		return info;
 	}
 	
-	protected abstract void convert(File image, TilesetInfo info) throws TilingException;
+	protected abstract TilesetInfo convert(File image, TilesetInfo info) throws TilingException;
 
 	/**
 	 * Set the working directory for this tiler implementation. The working

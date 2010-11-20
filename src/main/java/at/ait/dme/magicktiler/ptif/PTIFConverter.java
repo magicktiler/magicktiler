@@ -73,7 +73,7 @@ public class PTIFConverter extends MagickTiler {
 	private static Logger log = Logger.getLogger(PTIFConverter.class);
 	
 	@Override
-	protected void convert(File image, TilesetInfo info) throws TilingException {
+	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating PTIF for file " + image.getName() + ": " +
                 info.getWidth() + "x" + info.getHeight() + ", " +
@@ -120,6 +120,7 @@ public class PTIFConverter extends MagickTiler {
 		}
 		
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+		return info;
 	}
 	
 	private List<String> computePyramid(TilesetInfo info) throws IOException, InterruptedException, IM4JavaException {

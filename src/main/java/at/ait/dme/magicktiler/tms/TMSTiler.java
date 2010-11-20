@@ -113,7 +113,7 @@ public class TMSTiler extends MagickTiler {
 	}
 	
 	@Override
-	protected void convert(File image, TilesetInfo info) throws TilingException {
+	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating TMS tiles for file " + image.getName() + ": " +
                 info.getWidth() + "x" + info.getHeight() + ", " +
@@ -197,6 +197,7 @@ public class TMSTiler extends MagickTiler {
 		}
 
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+		return info;
 	}
 	
 	protected List<Stripe> stripeVertically(File image, TilesetInfo info, String outfilePrefix)

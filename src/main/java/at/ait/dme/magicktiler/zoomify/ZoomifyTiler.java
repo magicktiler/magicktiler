@@ -103,7 +103,7 @@ public class ZoomifyTiler extends MagickTiler {
 	private static Logger log = Logger.getLogger(ZoomifyTiler.class);
 	
 	@Override
-	protected void convert(File image, TilesetInfo info) throws TilingException {
+	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating Zoomify tiles for file " + image.getName() + ": " +
 				info.getWidth() + "x" + info.getHeight() + ", " +
@@ -149,7 +149,6 @@ public class ZoomifyTiler extends MagickTiler {
 		// Step 3 - compute the pyramid
 		List<Stripe> levelBeneath = baseStripes;
 		List<Stripe> thisLevel = new ArrayList<Stripe>();
-
  
 		for (int i=1; i<info.getZoomLevels(); i++) {
 			log.debug("Tiling level " + (i + 1));
@@ -195,6 +194,7 @@ public class ZoomifyTiler extends MagickTiler {
 		}
 		
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+		return info;
 	}
 	
 	private List<Stripe> stripeHorizontally(File image, TilesetInfo info, String outfilePrefix) 
