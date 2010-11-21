@@ -39,6 +39,8 @@ import org.im4java.core.IMOperation;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public abstract class MagickTiler {
+	private static Logger log = Logger.getLogger(MagickTiler.class);
+	
 	
 	/**
 	 * Gravity constant for WEST gravity orientation
@@ -91,11 +93,6 @@ public abstract class MagickTiler {
 	 */
 	protected boolean generatePreview = false;
 	
-	/**
-	 * Log4j logger
-	 */
-	private Logger log = Logger.getLogger(MagickTiler.class);
-		
 	/**
 	 * Generate a new tile set from the specified image file.
 	 * The tileset will be produced in the same directory as the
@@ -207,38 +204,6 @@ public abstract class MagickTiler {
 	}
 	
 	/**
-	 * Utility method that converts any supported input
-	 * file to TIF. This makes sense e.g. for JPEG 2000, since
-	 * handling of JP2 in GraphicsMagick is so incredibly slow
-	 * that converting first and then tiling the TIF is faster
-	 * overall.
-	 * 
-	 * @param file the input file
-	 * @return the TIF result file
-	 * @throws IM4JavaException 
-	 * @throws InterruptedException 
-	 * @throws IOException 
-	 */
-	private File convertToTIF(File file) throws IOException, InterruptedException, IM4JavaException {
-		String inFile = file.getAbsolutePath();
-		String outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".tif";
-	
-		IMOperation convert = new IMOperation();
-		convert.addImage(inFile);
-		convert.addImage(outFile);
-		
-		ConvertCmd convertCmd = new ConvertCmd(useGraphicsMagick);
-		convertCmd.run(convert);
-		
-		File out = new File(outFile);
-		if (out.exists()) 
-			return out;
-			
-		// No file created without Exception raised by IM4Java - should never happen
-		throw new RuntimeException("Panic! Could not generate temporary TIF file.");
-	}
-	
-	/**
 	 * Create the target tileset root directory
 	 * 
 	 * @param baseName
@@ -281,5 +246,37 @@ public abstract class MagickTiler {
 		} finally {
 			if(out!=null) out.close();
 		}
+	}
+	
+	/**
+	 * Utility method that converts any supported input
+	 * file to TIF. This makes sense e.g. for JPEG 2000, since
+	 * handling of JP2 in GraphicsMagick is so incredibly slow
+	 * that converting first and then tiling the TIF is faster
+	 * overall.
+	 * 
+	 * @param file the input file
+	 * @return the TIF result file
+	 * @throws IM4JavaException 
+	 * @throws InterruptedException 
+	 * @throws IOException 
+	 */
+	private File convertToTIF(File file) throws IOException, InterruptedException, IM4JavaException {
+		String inFile = file.getAbsolutePath();
+		String outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".tif";
+	
+		IMOperation convert = new IMOperation();
+		convert.addImage(inFile);
+		convert.addImage(outFile);
+		
+		ConvertCmd convertCmd = new ConvertCmd(useGraphicsMagick);
+		convertCmd.run(convert);
+		
+		File out = new File(outFile);
+		if (out.exists()) 
+			return out;
+			
+		// No file created without Exception raised by IM4Java - should never happen
+		throw new RuntimeException("Panic! Could not generate temporary TIF file.");
 	}
 }
