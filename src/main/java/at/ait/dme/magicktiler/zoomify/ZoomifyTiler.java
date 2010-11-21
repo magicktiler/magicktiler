@@ -112,13 +112,8 @@ public class ZoomifyTiler extends MagickTiler {
                 info.getTotalNumberOfTiles() + " tiles total"
 		);
 		
-		if (!workingDirectory.exists()) createDir(workingDirectory);
-		
-		// Store 'base name' (= filename without extension)
-		String baseName = image.getName();
-		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		createTargetDir(baseName);
-		
+		String baseName = image.getName().substring(0, image.getName().lastIndexOf('.'));
+				
 		// Step 1 - stripe the base image
 		log.debug("Striping base image");
 		String basestripePrefix = baseName + "-0-";

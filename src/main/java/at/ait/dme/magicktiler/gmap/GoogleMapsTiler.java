@@ -54,18 +54,12 @@ public class GoogleMapsTiler extends MagickTiler {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating Google Map tiles for file " + image.getName());	
 		
-		if (!workingDirectory.exists()) createDir(workingDirectory);
-		
-		String baseName = image.getName();
-		baseName = baseName.substring(0, baseName.lastIndexOf('.'));
-		createTargetDir(baseName);
-
 		try {
 			log.debug("Resizing and squaring base image");
 			String baseImageFileName = tilesetRootDir.getAbsolutePath()+"/base."+format.getExtension();
 			
 			// Step 1: resize to the closest multiple of 256 and the power of 2
-			ImageInfo resizedImage=resizeBaseImage(image,info,baseImageFileName);
+			ImageInfo resizedImage=resizeBaseImage(image, info, baseImageFileName);
 			
 			// Step 2: square the image
 			ImageInfo squaredImage=squareBaseImage(resizedImage, baseImageFileName);
@@ -83,19 +77,17 @@ public class GoogleMapsTiler extends MagickTiler {
 				baseImageFileName = tilesetRootDir.getAbsolutePath()+"/base"+z+"."+format.getExtension();
 				resizeImage(squaredImage.getFile().getAbsolutePath(), baseImageFileName, dim, dim);
 				File baseImageFile = new File(baseImageFileName);
-					
-				// Step 4: create the tiles for each zoomlevel
 				TilesetInfo baseInfo = 
 					new TilesetInfo(baseImageFile, tileWidth, tileHeight, format, useGraphicsMagick);	
-				
+	
+				// Step 4: create the tiles for each zoomlevel
+				// as the offset is omitted when calling crop, it creates tiles for the entire input image, which we 
+				// will rename. this is also a performance improvement compared to generating each tile separately.
 				IMOperation op = new IMOperation();
-				// as the offset is omitted, this will create tiles for the entire input image, which we will rename.
-				// this is also a performance improvement compared to generating each tile separately.
 				op.crop(tileWidth, tileHeight);
 				if (format == TileFormat.JPEG) op.quality(new Double(jpegQuality));
 				op.addImage(baseImageFileName);
 				op.addImage(tilesBaseFileName+"_"+"%d"+"."+format.getExtension());
-				
 				ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
 				convert.run(op);
 				
@@ -106,9 +98,9 @@ public class GoogleMapsTiler extends MagickTiler {
 						if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
 					}
 				}
-				if(!baseImageFile.delete()) log.error("could not delete file:"+baseImageFile);
+				if(!baseImageFile.delete()) log.error("Could not delete file:"+baseImageFile);
 			}
-			if(!squaredImage.getFile().delete()) log.error("could not delete file:"+squaredImage.getFile());
+			if(!squaredImage.getFile().delete()) log.error("Could not delete file:"+squaredImage.getFile());
 			
 			//step 5: optionally create preview.html
 			if(generatePreview) generatePreview(info, updatedInfo);
@@ -121,7 +113,6 @@ public class GoogleMapsTiler extends MagickTiler {
 		return updatedInfo;
 	}
 	
-
 	private ImageInfo squareBaseImage(ImageInfo imageInfo, String targetImageFileName) 
 		throws IOException, InterruptedException, IM4JavaException, TilingException {	
 		
