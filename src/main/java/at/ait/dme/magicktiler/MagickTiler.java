@@ -146,6 +146,15 @@ public abstract class MagickTiler {
 	protected abstract TilesetInfo convert(File image, TilesetInfo info) throws TilingException;
 
 	/**
+	 * get the tileset root directory
+	 * 
+	 * @return tileset root dir
+	 */
+	public File getTilesetRootDir() {
+		return tilesetRootDir;
+	}
+
+	/**
 	 * Set the working directory for this tiler implementation. The working
 	 * directory is used to store intermediate files (if any). After the
 	 * tileset is rendered, the working directory will be emptied.

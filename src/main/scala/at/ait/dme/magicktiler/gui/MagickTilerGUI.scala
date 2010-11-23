@@ -1,5 +1,6 @@
 package at.ait.dme.magicktiler.gui
 
+import java.awt.Desktop
 import at.ait.dme.magicktiler.gmap.GoogleMapsTiler
 import javax.swing.JOptionPane
 import scala.swing._
@@ -11,7 +12,6 @@ import at.ait.dme.magicktiler.ptif._
 import at.ait.dme.magicktiler.tms._
 import at.ait.dme.magicktiler.zoomify._
 
-
 import java.io.File
 
 /**
@@ -21,24 +21,23 @@ import java.io.File
  * @author magicktiler@gmail.com
  */
 class MagickTilerGUI extends SimpleSwingApplication {
-  val input:FileSelector = new FileSelector(25, true)
-  val output:FileSelector = new FileSelector(25, false)
- 
-  val tilingSchemes:RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "GMAP", "PTIF")
-  val tileFormats:RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
-  
-  val jpegQuality:Slider = new Slider() {min=0;max=100;value=75}
-  
-  val backgroundColor:TextField = new TextField("white", 10)
- 
-  val generatePreview:CheckBox = new CheckBox("")
-  
-  val progressBar:ProgressBar = new ProgressBar() 
-  	{indeterminate=true;visible=false;preferredSize=new Dimension(300,20)}
-  
-  val startButton:Button = new Button("Create those tiles, dude!") {
+  val input: FileSelector = new FileSelector(25, true)
+  val output: FileSelector = new FileSelector(25, false)
+
+  val tilingSchemes: RadioButtonGroup = new RadioButtonGroup("TMS", "Zoomify", "GMAP", "PTIF")
+  val tileFormats: RadioButtonGroup = new RadioButtonGroup("jpeg", "png")
+
+  val jpegQuality: Slider = new Slider() { min = 0; max = 100; value = 75 }
+
+  val backgroundColor: TextField = new TextField("white", 10)
+
+  val generatePreview: CheckBox = new CheckBox("")
+
+  val progressBar: ProgressBar = new ProgressBar() { indeterminate = true; visible = false; preferredSize = new Dimension(300, 20) }
+
+  val startButton: Button = new Button("Create those tiles, dude!") {
     reactions += {
-      case ButtonClicked(b) => if(input.validate) TilingActor ! "start"
+      case ButtonClicked(b) => if (input.validate) TilingActor ! "start"
     }
   }
 
@@ -48,6 +47,8 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
     var x = 0; var y = 0;
     val gridPanel = new GridBagPanel {
+      var rows = 11; var cols = 2;
+
       add(new Label("Input File or Directory:"))
       add(input)
 
@@ -60,13 +61,13 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
       add(new Label("Tile format:"))
       add(tileFormats)
-      
+
       add(new Label("JPEG Quality:"))
       add(jpegQuality)
       addSeparator();
 
       add(new Label("Background color:"))
-      add(new FlowPanel {contents += backgroundColor; contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')") })
+      add(new FlowPanel { contents += backgroundColor; contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')") })
 
       add(new Label("Generate HTML preview:"))
       add(generatePreview)
@@ -78,22 +79,22 @@ class MagickTilerGUI extends SimpleSwingApplication {
       def add(component: Component, anc: GridBagPanel.Anchor.Value = GridBagPanel.Anchor.West) {
         var constraints = new this.Constraints
         constraints.anchor = anc
-        constraints.gridx = x % 2
-        constraints.gridy = y % 11
+        constraints.gridx = x % cols
+        constraints.gridy = y % rows
 
         add(component, constraints)
-        x += 1; if (x % 2 == 0) y += 1
+        x += 1; if (x % cols == 0) y += 1
       }
-     
-      def addSeparator() {
-    	var constraints = new this.Constraints
-    	constraints.gridx = 0
-        constraints.gridy = y
-    	constraints.fill = GridBagPanel.Fill.Horizontal
-    	constraints.gridwidth=2;
 
-    	add(new Separator(), constraints)
-        y=y+1
+      def addSeparator() {
+        var constraints = new this.Constraints
+        constraints.gridx = 0
+        constraints.gridy = y
+        constraints.fill = GridBagPanel.Fill.Horizontal
+        constraints.gridwidth = cols;
+
+        add(new Separator(), constraints)
+        y = y + 1
       }
     }
     contents = gridPanel
@@ -102,7 +103,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
   def startTiler() {
     startButton.enabled = false;
     progressBar.visible = true;
-    
+
     var tiler: MagickTiler = null
     var inputFile: File = null
     var outputFile: File = null
@@ -128,14 +129,20 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
     tiler.setGeneratePreviewHTML(generatePreview.selected);
     try {
-    	tiler.convert(inputFile, outputFile)
+      tiler.convert(inputFile, outputFile)
+      // display the result (either the dir or the preview)
+      var result = tiler.getTilesetRootDir().getAbsolutePath();
+      if (generatePreview.selected) result+=File.separator+"preview.html";
+      Desktop.getDesktop.open(new File(result));
     } catch {
-    	case e => JOptionPane.showMessageDialog(null, "Sorry, something went wrong here. " +
-    			"For now we only have these details:\n" + e.getMessage, 
-    			"Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        progressBar.visible = false;
-        startButton.enabled = true;
+      case e =>
+        JOptionPane.showMessageDialog(null, "Sorry, something went wrong here. " +
+          "For now we only have these details:\n" + e.getMessage,
+          "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    finally {
+      progressBar.visible = false;
+      startButton.enabled = true;
     }
   }
 
@@ -150,8 +157,8 @@ class MagickTilerGUI extends SimpleSwingApplication {
     }
     start()
   }
-  
-  override def shutdown() { 
-	  TilingActor ! "stop"
+
+  override def shutdown() {
+    TilingActor ! "stop"
   }
 }
