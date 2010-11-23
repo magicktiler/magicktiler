@@ -216,7 +216,8 @@ public abstract class MagickTiler {
 	protected void createTargetDir(String baseName) throws TilingException {
 		if (tilesetRootDir == null) { 
 			tilesetRootDir = new File(workingDirectory, baseName);
-			if (tilesetRootDir.exists()) throw new TilingException("There is already a directory named " + baseName + "!");
+			if (tilesetRootDir.exists()) 
+				throw new TilingException("There is already a directory named " + baseName + "!");
 			createDir(tilesetRootDir);
 		} else {
 			if (!tilesetRootDir.exists()) createDir(tilesetRootDir);

@@ -125,9 +125,9 @@ public class Stripe {
 	 * width/height must be integer multiples of the tile-size). 
 	 * 
 	 * @param stripe the stripe to join with this stripe
-	 * @param gravity the gravity to use when compositing the images on the background canvas
+	 * @param gravity the gravity to use when composing the images on the background canvas
 	 * @param xExtent the width of the result stripe canvas
-	 * @param yExtent the height of the resul stripe canvas
+	 * @param yExtent the height of the result stripe canvas
 	 * @param backgroundColor the background color of the canvas
 	 * @param targetFile the file which will hold the result stripe image
 	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
@@ -197,9 +197,9 @@ public class Stripe {
 	 * the employed tiling scheme mandates certain image resolution constraints (e.g.
 	 * width/height must be integer multiples of the tile-size). 
 	 * 
-	 * @param gravity the gravity to use when compositing the images on the background canvas
+	 * @param gravity the gravity to use when composing the images on the background canvas
 	 * @param xExtent the width of the result stripe canvas
-	 * @param yExtent the height of the resul stripe canvas
+	 * @param yExtent the height of the result stripe canvas
 	 * @param backgroundColor the background color of the canvas
 	 * @param targetFile the file which will hold the result stripe image
 	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
