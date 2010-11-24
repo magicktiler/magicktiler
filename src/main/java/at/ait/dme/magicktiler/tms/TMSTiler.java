@@ -76,7 +76,11 @@ import at.ait.dme.magicktiler.TilingException;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TMSTiler extends MagickTiler {
-	
+	/**
+	 * Gravity constant for SOUTHWEST gravity orientation
+	 */
+	protected static final String GRAVITY_SOUTH_WEST = "SouthWest";
+
 	/**
 	 * XML descriptor file template 
 	 */
@@ -205,7 +209,7 @@ public class TMSTiler extends MagickTiler {
 		op.crop(tileWidth, info.getHeight());
 		op.p_adjoin();
 		op.addImage(image.getAbsolutePath());
-		op.gravity(MagickTiler.GRAVITY_SOUTH_WEST);
+		op.gravity(GRAVITY_SOUTH_WEST);
 		op.extent(tileWidth, canvasHeight);
 		op.addImage(workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif");
 		

@@ -40,18 +40,7 @@ import org.im4java.core.IMOperation;
  */
 public abstract class MagickTiler {
 	private static Logger log = Logger.getLogger(MagickTiler.class);
-	
-	
-	/**
-	 * Gravity constant for WEST gravity orientation
-	 */
-	protected static final String GRAVITY_WEST = "West";
-	
-	/**
-	 * Gravity constant for SOUTHWEST gravity orientation
-	 */
-	protected static final String GRAVITY_SOUTH_WEST = "SouthWest";
-	
+		
 	/**
 	 * Working directory (default: app root)
 	 */
@@ -68,9 +57,13 @@ public abstract class MagickTiler {
 	protected boolean useGraphicsMagick = true;
 
 	/**
-	 * Tile width and height (default: 256x256)
+	 * Tile width (default: 256)
 	 */
 	protected int tileWidth = 256;
+	
+	/**
+	 * Tile height (default: 256)
+	 */
 	protected int tileHeight = 256;
 	
 	/**

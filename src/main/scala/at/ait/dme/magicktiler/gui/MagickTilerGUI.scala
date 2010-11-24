@@ -121,7 +121,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
     tiler.setJPEGCompressionQuality(jpegQuality.value)
     tiler.setBackgroundColor(backgroundColor.text)
 
-    if (output.selection.text != null)
+    if (!output.selection.text.isEmpty)
       outputFile = new File(output.selection.text)
 
     if (input.selection.text != null)
