@@ -40,7 +40,13 @@ import org.im4java.core.IMOperation;
  */
 public abstract class MagickTiler {
 	private static Logger log = Logger.getLogger(MagickTiler.class);
-		
+	
+	/**
+	 * Image processor initialized with default values
+	 */
+	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK,
+			TileFormat.JPEG, "white", 75);
+	
 	/**
 	 * Working directory (default: app root)
 	 */
@@ -52,11 +58,6 @@ public abstract class MagickTiler {
 	protected File tilesetRootDir = null;
 	
 	/**
-	 * Image processing system flag - true=GraphicsMagick, false=ImageMagick (default: true) 
-	 */
-	protected boolean useGraphicsMagick = true;
-
-	/**
 	 * Tile width (default: 256)
 	 */
 	protected int tileWidth = 256;
@@ -65,21 +66,6 @@ public abstract class MagickTiler {
 	 * Tile height (default: 256)
 	 */
 	protected int tileHeight = 256;
-	
-	/**
-	 * Tile file format (default: JPEG)
-	 */
-	protected TileFormat format = TileFormat.JPEG;
-	
-	/**
-	 * Background color (default: white)
-	 */
-	protected String backgroundColor = "white";
-	
-	/**
-	 * JPEG compression quality (range 0 - 100, default: 75)
-	 */
-	protected int jpegQuality = 75;
 	
 	/**
 	 * Flag indicating whether a HTML preview should be generated (default: false)
@@ -123,14 +109,14 @@ public abstract class MagickTiler {
 				File tif = convertToTIF(image); 
 				log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 				
-				info = convert(tif, new TilesetInfo(tif, tileWidth, tileHeight, format, useGraphicsMagick));
+				info = convert(tif, new TilesetInfo(tif, tileWidth, tileHeight, processor));
 				
 				if(!tif.delete()) log.error("Failed to delete TIF file:"+tif);
 			} catch (Exception e) {
 				throw new TilingException(e.getMessage());
 			}
 		} else {
-			info = convert(image, new TilesetInfo(image, tileWidth, tileHeight, format, useGraphicsMagick));
+			info = convert(image, new TilesetInfo(image, tileWidth, tileHeight, processor));
 		}
 		
 		return info;
@@ -164,7 +150,7 @@ public abstract class MagickTiler {
 	 * @param system the image processing system to use
 	 */
 	public void setImageProcessingSystem(ImageProcessingSystem system) {
-		useGraphicsMagick = (system == ImageProcessingSystem.GRAPHICSMAGICK) ? true : false;
+		processor.setUseGraphicsMagick(system == ImageProcessingSystem.GRAPHICSMAGICK);
 	}
 	
 	/**
@@ -174,7 +160,7 @@ public abstract class MagickTiler {
 	 * @param format the tile format
 	 */
 	public void setTileFormat(TileFormat format) {
-		this.format = format;
+		processor.setTileFormat(format);
 	}
 	
 	/**
@@ -184,7 +170,7 @@ public abstract class MagickTiler {
 	 * @param color the background color
 	 */
 	public void setBackgroundColor(String color) {
-		this.backgroundColor = color;
+		processor.setBackground(color);
 	}
 
 	/**
@@ -197,7 +183,7 @@ public abstract class MagickTiler {
 	public void setJPEGCompressionQuality(int quality) {
 		if (quality < 0) throw new IllegalArgumentException("quality below 0");
 		if (quality > 100) throw new IllegalArgumentException("quality above 100");
-		this.jpegQuality = quality;
+		processor.setQuality(quality);
 	}
 	
 	/**
@@ -276,7 +262,7 @@ public abstract class MagickTiler {
 		convert.addImage(inFile);
 		convert.addImage(outFile);
 		
-		ConvertCmd convertCmd = new ConvertCmd(useGraphicsMagick);
+		ConvertCmd convertCmd = new ConvertCmd(processor.isGraphicsMagickUsed());
 		convertCmd.run(convert);
 		
 		File out = new File(outFile);

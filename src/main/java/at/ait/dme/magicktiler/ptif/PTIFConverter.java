@@ -98,7 +98,7 @@ public class PTIFConverter extends MagickTiler {
 			File tempFile = new File(image.getParent(), "tmp.tif");
 			merge.addImage(tempFile.getAbsolutePath());
 			
-			ConvertCmd mergeCmd = new ConvertCmd(useGraphicsMagick);
+			ConvertCmd mergeCmd = new ConvertCmd(true);
 			mergeCmd.run(merge);
 			
 			// Step 3 - rename
@@ -148,7 +148,7 @@ public class PTIFConverter extends MagickTiler {
 			scale.addImage(previousLevel);
 			scale.addImage(thisLevel);
 
-			ConvertCmd scaleCmd = new ConvertCmd(useGraphicsMagick);
+			ConvertCmd scaleCmd = new ConvertCmd(true);
 			scaleCmd.run(scale);
 
 			pyramid.add(thisLevel);

@@ -281,16 +281,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		
 		// Tile the stripe
 		String filenamePattern = tilesetRootDir.getAbsolutePath() + File.separator + "tmp-%d.jpg";
-		
-		IMOperation op = new IMOperation();
-		op.addImage(stripe.getImageFile().getAbsolutePath());
-		op.crop(tileWidth, tileHeight);
-		op.quality(new Double(jpegQuality));
-		op.p_adjoin();
-		op.addImage(filenamePattern);
-		
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
-		convert.run(op);
+		processor.crop(stripe.getImageFile().getAbsolutePath(), filenamePattern, tileWidth, tileHeight);
 
 		// Tile boundaries
 		double width = bbox.getLonExtent() / Math.pow(2, zoomlevel);

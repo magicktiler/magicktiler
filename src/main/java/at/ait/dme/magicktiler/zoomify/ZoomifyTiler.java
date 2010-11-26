@@ -31,9 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.ImageInfo;
 import at.ait.dme.magicktiler.MagickTiler;
@@ -196,14 +194,9 @@ public class ZoomifyTiler extends MagickTiler {
 		throws IOException, InterruptedException, IM4JavaException, TilingException {
 		
 		// Generate stripes
-		IMOperation op = new IMOperation();
-		op.crop(info.getWidth(), tileHeight);
-		op.p_adjoin();
-		op.addImage(image.getAbsolutePath());
-		op.addImage(workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif");
-		
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
-		convert.run(op);
+		processor.crop(image.getAbsolutePath(), 
+				workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif", 
+				info.getWidth(), tileHeight);
 
 		// Assemble the list of Stripes
 		List<Stripe> stripes = new ArrayList<Stripe>();
@@ -212,7 +205,7 @@ public class ZoomifyTiler extends MagickTiler {
 			// The last stripe may have height < tileHeight!
 			if (i == (info.getNumberOfYTiles(0) - 1))
 				height = new ImageInfo(new File(workingDirectory, outfilePrefix + i + ".tif"), 
-						useGraphicsMagick).getHeight();
+						processor.isGraphicsMagickUsed()).getHeight();
 			
 			stripes.add(new Stripe(
 							new File(workingDirectory, outfilePrefix + i + ".tif"),
@@ -226,16 +219,7 @@ public class ZoomifyTiler extends MagickTiler {
 			throws IOException, InterruptedException, IM4JavaException, TilingException {
 		
 		String filenamePattern = tilesetRootDir + File.separator + "tmp-%d.jpg";
-		
-		IMOperation op = new IMOperation();
-		op.addImage(stripe.getImageFile().getAbsolutePath());
-		op.crop(tileWidth, tileHeight);
-		op.p_adjoin();
-		op.quality(new Double(jpegQuality));
-		op.addImage(filenamePattern);
-		
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
-		convert.run(op);
+		processor.crop(stripe.getImageFile().getAbsolutePath(), filenamePattern, tileWidth, tileHeight);
 
 		// Rename result files (not nice, but seems to be the fastest way to do it)
 		for (int idx=0; idx<xTiles; idx++) {
@@ -259,10 +243,10 @@ public class ZoomifyTiler extends MagickTiler {
 		
 		if (stripe2 == null) {
 			return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					useGraphicsMagick);
+					processor.isGraphicsMagickUsed());
 		} else {
 			return stripe1.merge(stripe2, new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					useGraphicsMagick);
+					processor.isGraphicsMagickUsed());
 		}
 	}
 	

@@ -66,13 +66,13 @@ public class TilesetInfo {
 	 */
 	private int tilesTotal;
 	
-	public TilesetInfo(File image, int tileWidth, int tileHeight, TileFormat format, 
-			boolean useGraphicsMagick) throws TilingException {
+	public TilesetInfo(File image, int tileWidth, int tileHeight, ImageProcessor processor) 
+		throws TilingException {
 		
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
-		this.format = format;
-		this.imgInfo = new ImageInfo(image, useGraphicsMagick);
+		this.format = processor.getTileFormat();
+		this.imgInfo = new ImageInfo(image, processor.isGraphicsMagickUsed());
 		
 		// Compute no. of tiles in base layer
 		int xBaseTiles = (int) Math.ceil((float) imgInfo.getWidth() / tileWidth);

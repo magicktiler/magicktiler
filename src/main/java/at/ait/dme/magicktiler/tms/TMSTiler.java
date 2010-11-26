@@ -31,13 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.Stripe;
-import at.ait.dme.magicktiler.TileFormat;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
 
@@ -113,7 +110,7 @@ public class TMSTiler extends MagickTiler {
 		super();
 		
 		// Set default background color to white, fully transparent
-		this.backgroundColor = "#ffffffff";
+		processor.setBackground("#ffffffff");
 	}
 	
 	@Override
@@ -203,18 +200,9 @@ public class TMSTiler extends MagickTiler {
 			throws IOException, InterruptedException, IM4JavaException {
 	
 		int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
-		
-		IMOperation op = new IMOperation();
-		op.background(backgroundColor);
-		op.crop(tileWidth, info.getHeight());
-		op.p_adjoin();
-		op.addImage(image.getAbsolutePath());
-		op.gravity(GRAVITY_SOUTH_WEST);
-		op.extent(tileWidth, canvasHeight);
-		op.addImage(workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif");
-		
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
-		convert.run(op);
+		processor.crop(image.getAbsolutePath(), 
+				workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif", 
+				tileWidth, info.getHeight(), GRAVITY_SOUTH_WEST, tileWidth, canvasHeight);
 
 		// Assemble the list of Stripes
 		List<Stripe> stripes = new ArrayList<Stripe>();
@@ -235,17 +223,7 @@ public class TMSTiler extends MagickTiler {
 		// Tile the stripe
 		String filenamePattern = targetDir.getAbsolutePath() + File.separator + "tmp-%d." + 
 			info.getTileFormat().getExtension();
-
-		IMOperation op = new IMOperation();
-		op.addImage(stripe.getImageFile().getAbsolutePath());
-		op.crop(tileWidth, tileHeight);
-		if (info.getTileFormat() == TileFormat.JPEG)
-			op.quality(new Double(jpegQuality));
-		op.p_adjoin();
-		op.addImage(filenamePattern);
-		
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
-		convert.run(op);
+		processor.crop(stripe.getImageFile().getAbsolutePath(), filenamePattern, tileWidth, tileHeight);
 
 		// Rename result files (not nice, but seems to be the fastest way to do it)
 		for (int i=0; i<(stripe.getHeight() / tileHeight); i++) {
@@ -267,18 +245,18 @@ public class TMSTiler extends MagickTiler {
 					GRAVITY_SOUTH_WEST, 
 					tileWidth, 
 					height,
-					backgroundColor,
+					processor.getBackground(),
 					new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					useGraphicsMagick);
+					processor.isGraphicsMagickUsed());
 		} else {
 			return stripe1.merge(
 					stripe2,
 					GRAVITY_SOUTH_WEST,
 					tileWidth,
 					height,
-					backgroundColor,
+					processor.getBackground(),
 					new File(workingDirectory.getAbsolutePath() + File.separator + targetFile),
-					useGraphicsMagick);
+					processor.isGraphicsMagickUsed());
 		}
 	}
 	
