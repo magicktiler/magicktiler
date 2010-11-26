@@ -5,9 +5,6 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.ait.dme.magicktiler.geo.BoundingBox;
-import at.ait.dme.magicktiler.kml.KMLSuperOverlayTiler;
-
 /**
  * KML tiling tests
  * 
