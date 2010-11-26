@@ -29,6 +29,18 @@ public class ImageProcessor {
 		this.background = background;
 	}
 	
+	/**
+	 * Crops an image using the width and height provided
+	 * 
+	 * @param src  absolute path to source image
+	 * @param target  absolute path to target image
+	 * @param width  the width of the resulting image
+	 * @param height  the height of the resulting image
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
 	public void crop(String src, String target, int width, int height) 
 		throws IOException, InterruptedException, IM4JavaException {
 		
@@ -42,7 +54,24 @@ public class ImageProcessor {
 		convert.run(op);
 	}
 	
-	public void crop(String src, String target, int width, int height, String gravity, int x, int y) 
+	/**
+	 * Crops an image using the width and height provided and places it on a
+	 * canvas with the specified gravity, width and height.
+	 * 
+	 * @param src  absolute path to source image
+	 * @param target  absolute path to target image
+	 * @param width  the width of the resulting image
+	 * @param height the height of the resulting image
+	 * @param gravity  the gravity specifies the location of the image on the canvas
+	 * @param canvasWidth  the width of the canvas
+	 * @param canvasHeight the height of the canvas
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
+	public void crop(String src, String target, int width, int height, String gravity, 
+			int canvasWidth, int canvasHeight) 
 		throws IOException, InterruptedException, IM4JavaException {
 
 		IMOperation op = createOperation();
@@ -51,13 +80,24 @@ public class ImageProcessor {
 		op.p_adjoin();
 		op.addImage(src);
 		op.gravity(gravity);
-		op.extent(x, y);
+		op.extent(canvasWidth, canvasHeight);
 		op.addImage(target);
 
 		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
 		convert.run(op);
 	}
 	
+	/**
+	 * Squares an image using the specified dimension
+	 * 
+	 * @param src  absolute path to source image
+	 * @param target  absolute path to target image
+	 * @param dim  dimension of the new image
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
 	public void square(String src, String target, int dim) 
 		throws IOException, InterruptedException, IM4JavaException {
 		
@@ -71,6 +111,18 @@ public class ImageProcessor {
 		
 	}
 	
+	/**
+	 * Resizes as image to the specified width and height
+	 * 
+	 * @param src  absolute path to source image
+	 * @param target  absolute path to target image
+	 * @param width  the width of the resulting image
+	 * @param height  the height of the resulting image
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
 	public void resize(String src, String target, int width, int height) 
 		throws IOException, InterruptedException, IM4JavaException {
 		
