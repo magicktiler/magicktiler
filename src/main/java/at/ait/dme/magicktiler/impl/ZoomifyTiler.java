@@ -205,7 +205,7 @@ public class ZoomifyTiler extends MagickTiler {
 			// The last stripe may have height < tileHeight!
 			if (i == (info.getNumberOfYTiles(0) - 1))
 				height = new ImageInfo(new File(workingDirectory, outfilePrefix + i + ".tif"), 
-						processor.isGraphicsMagickUsed()).getHeight();
+						processor.getImageProcessingSystem()).getHeight();
 			
 			stripes.add(new Stripe(
 							new File(workingDirectory, outfilePrefix + i + ".tif"),
@@ -243,10 +243,10 @@ public class ZoomifyTiler extends MagickTiler {
 		
 		if (stripe2 == null) {
 			return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					processor.isGraphicsMagickUsed());
+					processor.getImageProcessingSystem());
 		} else {
 			return stripe1.merge(stripe2, new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					processor.isGraphicsMagickUsed());
+					processor.getImageProcessingSystem());
 		}
 	}
 	

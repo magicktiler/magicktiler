@@ -13,18 +13,25 @@ import org.im4java.core.IMOperation;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ImageProcessor {
-	private boolean useGraphicsMagick;
+	
+	/**
+	 * Supported image processing systems: GraphicsMagick or ImageMagick.
+	 * Please note that there are currently some issues with ImageMagick though.
+	 * It is highly recommended to use this software with GraphicsMagick!
+	 */
+	public enum ImageProcessingSystem { GRAPHICSMAGICK,	IMAGEMAGICK }
+	
+	private ImageProcessingSystem imageProcessingSystem = ImageProcessingSystem.GRAPHICSMAGICK;
 	private TileFormat tileFormat;
 	private int quality;
 	private String background;
 
-	public ImageProcessor(ImageProcessingSystem imageProcessingSystem, TileFormat tileFormat) {
-		this.useGraphicsMagick = (imageProcessingSystem==ImageProcessingSystem.GRAPHICSMAGICK);
+	public ImageProcessor(TileFormat tileFormat) {
 		this.tileFormat = tileFormat;
 	}
 	
-	public ImageProcessor(ImageProcessingSystem imageProcessingSystem, TileFormat tileFormat, String background, int quality) {
-		this(imageProcessingSystem, tileFormat);
+	public ImageProcessor(TileFormat tileFormat, String background, int quality) {
+		this(tileFormat);
 		this.quality = quality;
 		this.background = background;
 	}
@@ -50,7 +57,7 @@ public class ImageProcessor {
 		op.p_adjoin();
 		op.addImage(target);
 		
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
+		ConvertCmd convert = new ConvertCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
 		convert.run(op);
 	}
 	
@@ -83,7 +90,7 @@ public class ImageProcessor {
 		op.extent(canvasWidth, canvasHeight);
 		op.addImage(target);
 
-		ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
+		ConvertCmd convert = new ConvertCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
 		convert.run(op);
 	}
 	
@@ -107,7 +114,7 @@ public class ImageProcessor {
 		op.geometry(dim, dim);
 		op.addRawArgs("xc:"+background);
 		op.addImage(target);
-		new CompositeCmd(useGraphicsMagick).run(op);
+		new CompositeCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 		
 	}
 	
@@ -130,7 +137,7 @@ public class ImageProcessor {
 		op.addImage(src);
 		op.resize(width, height);
 		op.addImage(target);
-		new ConvertCmd(useGraphicsMagick).run(op);		
+		new ConvertCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);		
 	}
 	
 	private IMOperation createOperation() {
@@ -139,10 +146,14 @@ public class ImageProcessor {
 		return op;
 	}
 
-	public boolean isGraphicsMagickUsed() {
-		return useGraphicsMagick;
+	public ImageProcessingSystem getImageProcessingSystem() {
+		return imageProcessingSystem;
 	}
 
+	public void setImageProcessingSystem(ImageProcessingSystem imageProcessingSystem) {
+		this.imageProcessingSystem = imageProcessingSystem;
+	}
+	
 	public TileFormat getTileFormat() {
 		return tileFormat;
 	}
@@ -158,10 +169,6 @@ public class ImageProcessor {
 	public String getBackground() {
 		return background;
 	}
-	
-	public void setUseGraphicsMagick(boolean useGraphicsMagick) {
-		this.useGraphicsMagick = useGraphicsMagick;
-	}
 
 	public void setTileFormat(TileFormat tileFormat) {
 		this.tileFormat = tileFormat;
@@ -174,4 +181,5 @@ public class ImageProcessor {
 	public void setBackground(String background) {
 		this.background = background;
 	}
+	
 }

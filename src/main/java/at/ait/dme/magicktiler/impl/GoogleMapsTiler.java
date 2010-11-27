@@ -111,14 +111,14 @@ public class GoogleMapsTiler extends MagickTiler {
 		
 		int maxDim=Math.max(imageInfo.getHeight(), imageInfo.getWidth());
 		processor.square(imageInfo.getFile().getAbsolutePath(), targetImageFileName, maxDim);
-		return new ImageInfo(new File(targetImageFileName), processor.isGraphicsMagickUsed());
+		return new ImageInfo(new File(targetImageFileName), processor.getImageProcessingSystem());
 	}
 
 	private ImageInfo resizeImage(String src, String target, int width, int height) 
 		throws IOException, InterruptedException, IM4JavaException, TilingException {
 		
 		processor.resize(src, target, width, height);
-		return new ImageInfo(new File(target), processor.isGraphicsMagickUsed());
+		return new ImageInfo(new File(target), processor.getImageProcessingSystem());
 	}
 	
 	private ImageInfo resizeBaseImage(File image, TilesetInfo info, String targetFileName) 

@@ -247,7 +247,7 @@ public class TMSTiler extends MagickTiler {
 					height,
 					processor.getBackground(),
 					new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					processor.isGraphicsMagickUsed());
+					processor.getImageProcessingSystem());
 		} else {
 			return stripe1.merge(
 					stripe2,
@@ -256,7 +256,7 @@ public class TMSTiler extends MagickTiler {
 					height,
 					processor.getBackground(),
 					new File(workingDirectory.getAbsolutePath() + File.separator + targetFile),
-					processor.isGraphicsMagickUsed());
+					processor.getImageProcessingSystem());
 		}
 	}
 	

@@ -31,6 +31,8 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
+import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+
 
 /**
  * The base class for all supported tile scheme implementations.
@@ -44,8 +46,7 @@ public abstract class MagickTiler {
 	/**
 	 * Image processor initialized with default values
 	 */
-	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK,
-			TileFormat.JPEG, "white", 75);
+	protected ImageProcessor processor = new ImageProcessor(TileFormat.JPEG, "white", 75);
 	
 	/**
 	 * Working directory (default: app root)
@@ -150,7 +151,7 @@ public abstract class MagickTiler {
 	 * @param system the image processing system to use
 	 */
 	public void setImageProcessingSystem(ImageProcessingSystem system) {
-		processor.setUseGraphicsMagick(system == ImageProcessingSystem.GRAPHICSMAGICK);
+		processor.setImageProcessingSystem(system);
 	}
 	
 	/**
@@ -262,7 +263,7 @@ public abstract class MagickTiler {
 		convert.addImage(inFile);
 		convert.addImage(outFile);
 		
-		ConvertCmd convertCmd = new ConvertCmd(processor.isGraphicsMagickUsed());
+		ConvertCmd convertCmd = new ConvertCmd(processor.getImageProcessingSystem() == ImageProcessingSystem.GRAPHICSMAGICK);
 		convertCmd.run(convert);
 		
 		File out = new File(outFile);

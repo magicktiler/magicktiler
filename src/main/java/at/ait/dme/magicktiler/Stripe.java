@@ -29,6 +29,8 @@ import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.core.MontageCmd;
 
+import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+
 
 /**
  * To speed up the MagickTiler tiling process, images are (for most tiling schemes)
@@ -103,16 +105,16 @@ public class Stripe {
 	 * 
 	 * @param stripe the stripe to join with this stripe
 	 * @param targetFile the file which will hold the result stripe image
-	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
+	 * @param system the ImageProcessingSystem to use (ImageMagick or GraphicsMagick)
 	 * @return the result stripe
 	 * @throws IOException if something goes wrong
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
-	public Stripe merge(Stripe stripe, File targetFile, boolean useGraphicsMagick)
+	public Stripe merge(Stripe stripe, File targetFile, ImageProcessingSystem system)
 			throws IOException, InterruptedException, IM4JavaException {
 	
-		return merge(stripe, null, -1, -1, null, targetFile, useGraphicsMagick);
+		return merge(stripe, null, -1, -1, null, targetFile, system);
 	}
 	
 	/**
@@ -130,14 +132,14 @@ public class Stripe {
 	 * @param yExtent the height of the result stripe canvas
 	 * @param backgroundColor the background color of the canvas
 	 * @param targetFile the file which will hold the result stripe image
-	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
+	 * @param system the ImageProcessingSystem to use (ImageMagick or GraphicsMagick)
 	 * @return the result stripe
 	 * @throws IOException if something goes wrong
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
 	public Stripe merge(Stripe stripe, String gravity, int xExtent, int yExtent,
-			String backgroundColor, File targetFile, boolean useGraphicsMagick) 
+			String backgroundColor, File targetFile, ImageProcessingSystem system) 
 		throws IOException, InterruptedException, IM4JavaException {
 		
 		if (stripe.orientation != orientation) throw new IllegalArgumentException(DIFFERENT_ORIENTATION_ERROR);
@@ -169,7 +171,7 @@ public class Stripe {
 		op.addImage(stripe.getImageFile().getAbsolutePath());
 		op.addImage(targetFile.getAbsolutePath());
 		
-		MontageCmd montage = new MontageCmd(useGraphicsMagick);
+		MontageCmd montage = new MontageCmd(system == ImageProcessingSystem.GRAPHICSMAGICK);
 		montage.run(op);
 
 		return new Stripe(targetFile, w, h, orientation);
@@ -179,16 +181,16 @@ public class Stripe {
 	 * Shrinks this stripe 50% to the resolution of the next zoom level.
 	 * 
 	 * @param targetFile the file which will hold the result stripe image
-	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
+	 * @param system the ImageProcessingSystem to use (ImageMagick or GraphicsMagick)
 	 * @return the result stripe
 	 * @throws IOException if something goes wrong
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
-	public Stripe shrink(File targetFile, boolean useGraphicsMagick) throws IOException,
+	public Stripe shrink(File targetFile, ImageProcessingSystem system) throws IOException,
 			InterruptedException, IM4JavaException {
 		
-		return shrink(null, -1, -1, null, targetFile, useGraphicsMagick);
+		return shrink(null, -1, -1, null, targetFile, system);
 	}
 	
 	/**
@@ -202,14 +204,14 @@ public class Stripe {
 	 * @param yExtent the height of the result stripe canvas
 	 * @param backgroundColor the background color of the canvas
 	 * @param targetFile the file which will hold the result stripe image
-	 * @param useGraphicsMagick flag indicating whether GM should be used for processing
+	 * @param system the ImageProcessingSystem to use (ImageMagick or GraphicsMagick)
 	 * @return the result stripe
 	 * @throws IOException if something goes wrong
 	 * @throws InterruptedException if something goes wrong
 	 * @throws IM4JavaException if something goes wrong
 	 */
 	public Stripe shrink(String gravity, int xExtent, int yExtent, String backgroundColor,
-			File targetFile, boolean useGraphicsMagick) 
+			File targetFile, ImageProcessingSystem system) 
 		throws IOException, InterruptedException, IM4JavaException {
 	
 		IMOperation op = new IMOperation();
@@ -228,7 +230,7 @@ public class Stripe {
 			op.addImage("null:");
 			op.addImage(targetFile.getAbsolutePath());
 			
-			MontageCmd montage = new MontageCmd(useGraphicsMagick);
+			MontageCmd montage = new MontageCmd(system == ImageProcessingSystem.GRAPHICSMAGICK);
 			montage.run(op);
 
 			return new Stripe(targetFile, xExtent, yExtent, orientation);
@@ -237,7 +239,7 @@ public class Stripe {
 			op.addImage(file.getAbsolutePath());
 			op.addImage(targetFile.getAbsolutePath());
 			
-			ConvertCmd convert = new ConvertCmd(useGraphicsMagick);
+			ConvertCmd convert = new ConvertCmd(system == ImageProcessingSystem.GRAPHICSMAGICK);
 			convert.run(op);
 			return new Stripe(targetFile, width / 2, height / 2, orientation);
 		}

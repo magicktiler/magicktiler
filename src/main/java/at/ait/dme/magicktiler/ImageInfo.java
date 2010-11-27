@@ -31,6 +31,8 @@ import org.im4java.core.IMOperation;
 import org.im4java.core.IdentifyCmd;
 import org.im4java.process.OutputConsumer;
 
+import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+
 
 /**
  * Image information for a specified file (currently width and height only).
@@ -60,12 +62,12 @@ public class ImageInfo {
 	 */
 	private int height;
 	
-	public ImageInfo(File image, boolean useGraphicsMagick) throws TilingException {
+	public ImageInfo(File image, ImageProcessingSystem imageProcessingSystem) throws TilingException {
 		this.file = image;
 		
 		final StringBuffer result = new StringBuffer();
 		try {
-			IdentifyCmd identify = new IdentifyCmd(useGraphicsMagick);
+			IdentifyCmd identify = new IdentifyCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
 			identify.setOutputConsumer(new OutputConsumer() {
 				public void consumeOutput(InputStream in) throws IOException {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(in));

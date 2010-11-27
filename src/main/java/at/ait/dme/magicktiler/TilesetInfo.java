@@ -72,7 +72,7 @@ public class TilesetInfo {
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
 		this.format = processor.getTileFormat();
-		this.imgInfo = new ImageInfo(image, processor.isGraphicsMagickUsed());
+		this.imgInfo = new ImageInfo(image, processor.getImageProcessingSystem());
 		
 		// Compute no. of tiles in base layer
 		int xBaseTiles = (int) Math.ceil((float) imgInfo.getWidth() / tileWidth);
