@@ -22,18 +22,18 @@
 package at.ait.dme.magicktiler;
 
 /**
- * Supported tile file formats. Please note that not all tiling schemes
- * may support all tile file formats!
+ * Supported image file formats. Please note that not all tiling schemes
+ * may support all image file formats!
  * 
  * @author magicktiler@gmail.com
  */
-public class TileFormat {
+public class ImageFormat {
 	
 	/**
 	 * Supported tile formats
 	 */
-	public static final TileFormat JPEG = new TileFormat();
-	public static final TileFormat PNG = new TileFormat("image/png", "png");
+	public static final ImageFormat JPEG = new ImageFormat();
+	public static final ImageFormat PNG = new ImageFormat("image/png", "png");
 	
 	/**
 	 * The format mime type (default: image/jpeg)
@@ -45,9 +45,9 @@ public class TileFormat {
 	 */
 	private String extension = "jpg";
 	
-	private TileFormat() { }
+	private ImageFormat() { }
 	
-	private TileFormat(String mimeType, String extension) {
+	private ImageFormat(String mimeType, String extension) {
 		this.mimeType = mimeType;
 		this.extension = extension;
 	}

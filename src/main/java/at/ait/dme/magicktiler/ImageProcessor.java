@@ -21,24 +21,51 @@ public class ImageProcessor {
 	 */
 	public enum ImageProcessingSystem { GRAPHICSMAGICK,	IMAGEMAGICK }
 	
+	/**
+	 * IM/GM gravity String constants
+	 */
 	public static final String GRAVITY_CENTER = "Center";
 	public static final String GRAVITY_SOUTHWEST = "SouthWest";
 	
-	private ImageProcessingSystem imageProcessingSystem = ImageProcessingSystem.GRAPHICSMAGICK;
-	private TileFormat tileFormat;
-	private int quality;
-	private String background;
+	/**
+	 * The processing system used by this ImageProcessor
+	 */
+	private ImageProcessingSystem processingSystem;
+	
+	/**
+	 * The image format this processor will produce as output
+	 */
+	private ImageFormat format;
+	
+	/**
+	 * JPEG compression quality (in case of JPEG image format)
+	 */
+	private int jpegQuality;
+	
+	/**
+	 * The default background color for montage operations
+	 */
+	private String backgroundColor;
+	
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format) {
+		this(processingSystem, format, 75, null);
+	}
+	
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, String backgroundColor) {
+		this(processingSystem, format, 75, backgroundColor);
+	}
+	
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality) {
+		this(processingSystem, format, jpegQuality, null);
+	}
 
-	public ImageProcessor(TileFormat tileFormat) {
-		this.tileFormat = tileFormat;
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality, String backgroundColor) {
+		this.processingSystem = processingSystem;
+		this.format = format;
+		this.jpegQuality = jpegQuality;
+		this.backgroundColor = backgroundColor;
 	}
-	
-	public ImageProcessor(TileFormat tileFormat, String background, int quality) {
-		this(tileFormat);
-		this.quality = quality;
-		this.background = background;
-	}
-	
+
 	/**
 	 * Crops an image using the width and height provided
 	 * 
@@ -60,7 +87,7 @@ public class ImageProcessor {
 		op.p_adjoin();
 		op.addImage(target);
 		
-		ConvertCmd convert = new ConvertCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
+		ConvertCmd convert = new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
 		convert.run(op);
 	}
 	
@@ -80,12 +107,12 @@ public class ImageProcessor {
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
 	 */
-	public void crop(String src, String target, int width, int height, String gravity, 
-			int canvasWidth, int canvasHeight) 
+	public void crop(String src, String target, int width, int height,
+			int canvasWidth, int canvasHeight, String gravity) 
 		throws IOException, InterruptedException, IM4JavaException {
 
 		IMOperation op = createOperation();
-		op.background(background);
+		op.background(backgroundColor);
 		op.crop(width, height);
 		op.p_adjoin();
 		op.addImage(src);
@@ -93,7 +120,7 @@ public class ImageProcessor {
 		op.extent(canvasWidth, canvasHeight);
 		op.addImage(target);
 
-		ConvertCmd convert = new ConvertCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
+		ConvertCmd convert = new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
 		convert.run(op);
 	}
 	
@@ -115,9 +142,9 @@ public class ImageProcessor {
 		op.addImage(src);
 		op.gravity(GRAVITY_CENTER);
 		op.geometry(dim, dim);
-		op.addRawArgs("xc:"+background);
+		op.addRawArgs("xc:" + backgroundColor);
 		op.addImage(target);
-		new CompositeCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+		new CompositeCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 		
 	}
 	
@@ -140,49 +167,47 @@ public class ImageProcessor {
 		op.addImage(src);
 		op.resize(width, height);
 		op.addImage(target);
-		new ConvertCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);		
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);		
 	}
 	
 	private IMOperation createOperation() {
 		IMOperation op = new IMOperation();
-		if (tileFormat == TileFormat.JPEG) op.quality(new Double(quality));
+		if (format == ImageFormat.JPEG) op.quality(new Double(jpegQuality));
 		return op;
 	}
 
 	public ImageProcessingSystem getImageProcessingSystem() {
-		return imageProcessingSystem;
-	}
-
-	public void setImageProcessingSystem(ImageProcessingSystem imageProcessingSystem) {
-		this.imageProcessingSystem = imageProcessingSystem;
+		return processingSystem;
 	}
 	
-	public TileFormat getTileFormat() {
-		return tileFormat;
-	}
-
-	public String getExtension() {
-		return tileFormat.getExtension();
+	public void setImageProcessingSystem(ImageProcessingSystem processingSystem) {
+		this.processingSystem = processingSystem;
 	}
 	
-	public int getQuality() {
-		return quality;
+	public ImageFormat getImageFormat() {
+		return format;
 	}
-
+	
+	public void setImageFormat(ImageFormat format) {
+		this.format = format;
+	}
+	
+	public int getJPEGQuality() {
+		return jpegQuality;
+	}
+	
+	public void setJPEGQuality(int quality) {
+		if (quality < 0) throw new IllegalArgumentException("quality below 0");
+		if (quality > 100) throw new IllegalArgumentException("quality above 100");
+		this.jpegQuality = quality;		
+	}
+	
 	public String getBackground() {
-		return background;
+		return backgroundColor;
 	}
-
-	public void setTileFormat(TileFormat tileFormat) {
-		this.tileFormat = tileFormat;
-	}
-
-	public void setQuality(int quality) {
-		this.quality = quality;
-	}
-
-	public void setBackground(String background) {
-		this.background = background;
+	
+	public void setBackground(String color) {
+		this.backgroundColor = color;
 	}
 	
 }

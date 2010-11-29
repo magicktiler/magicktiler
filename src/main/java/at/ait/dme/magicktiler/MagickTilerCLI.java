@@ -134,7 +134,7 @@ public class MagickTilerCLI {
 			// Tile format
 			String format = cmd.getOptionValue("f");
 			if (format != null && format.equalsIgnoreCase("png")) {
-				tiler.setTileFormat(TileFormat.PNG); 
+				tiler.setTileFormat(ImageFormat.PNG); 
 				consoleOutFormat = TARGET_FMT_PNG;
 			}
 			

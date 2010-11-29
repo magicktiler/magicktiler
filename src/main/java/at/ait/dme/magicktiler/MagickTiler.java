@@ -46,7 +46,7 @@ public abstract class MagickTiler {
 	/**
 	 * Image processor initialized with default values
 	 */
-	protected ImageProcessor processor = new ImageProcessor(TileFormat.JPEG, "white", 75);
+	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK, ImageFormat.JPEG, 75);
 	
 	/**
 	 * Working directory (default: app root)
@@ -160,8 +160,8 @@ public abstract class MagickTiler {
 	 * 
 	 * @param format the tile format
 	 */
-	public void setTileFormat(TileFormat format) {
-		processor.setTileFormat(format);
+	public void setTileFormat(ImageFormat format) {
+		processor.setImageFormat(format);
 	}
 	
 	/**
@@ -182,9 +182,7 @@ public abstract class MagickTiler {
 	 * @param quality the JPEG compression quality
 	 */
 	public void setJPEGCompressionQuality(int quality) {
-		if (quality < 0) throw new IllegalArgumentException("quality below 0");
-		if (quality > 100) throw new IllegalArgumentException("quality above 100");
-		processor.setQuality(quality);
+		processor.setJPEGQuality(quality);		
 	}
 	
 	/**

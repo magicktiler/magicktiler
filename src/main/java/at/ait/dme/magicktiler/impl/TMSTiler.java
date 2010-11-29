@@ -199,7 +199,7 @@ public class TMSTiler extends MagickTiler {
 		int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
 		processor.crop(image.getAbsolutePath(), 
 				workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif", 
-				tileWidth, info.getHeight(), ImageProcessor.GRAVITY_SOUTHWEST, tileWidth, canvasHeight);
+				tileWidth, info.getHeight(), tileWidth, canvasHeight, ImageProcessor.GRAVITY_SOUTHWEST);
 
 		// Assemble the list of Stripes
 		List<Stripe> stripes = new ArrayList<Stripe>();

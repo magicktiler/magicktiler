@@ -49,7 +49,7 @@ public class TilesetInfo {
 	/**
 	 * The tile file format
 	 */
-	private TileFormat format;
+	private ImageFormat format;
 	
 	/**
 	 * Image information
@@ -71,7 +71,7 @@ public class TilesetInfo {
 		
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
-		this.format = processor.getTileFormat();
+		this.format = processor.getImageFormat();
 		this.imgInfo = new ImageInfo(image, processor.getImageProcessingSystem());
 		
 		// Compute no. of tiles in base layer
@@ -107,7 +107,7 @@ public class TilesetInfo {
 		return tileHeight;
 	}
 	
-	public TileFormat getTileFormat() {
+	public ImageFormat getTileFormat() {
 		return format;
 	}
 	
