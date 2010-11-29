@@ -33,6 +33,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.im4java.core.IM4JavaException;
 
+import at.ait.dme.magicktiler.ImageProcessor;
 import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TilesetInfo;
@@ -73,10 +74,6 @@ import at.ait.dme.magicktiler.TilingException;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TMSTiler extends MagickTiler {
-	/**
-	 * Gravity constant for SOUTHWEST gravity orientation
-	 */
-	protected static final String GRAVITY_SOUTH_WEST = "SouthWest";
 
 	/**
 	 * XML descriptor file template 
@@ -202,7 +199,7 @@ public class TMSTiler extends MagickTiler {
 		int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
 		processor.crop(image.getAbsolutePath(), 
 				workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif", 
-				tileWidth, info.getHeight(), GRAVITY_SOUTH_WEST, tileWidth, canvasHeight);
+				tileWidth, info.getHeight(), ImageProcessor.GRAVITY_SOUTHWEST, tileWidth, canvasHeight);
 
 		// Assemble the list of Stripes
 		List<Stripe> stripes = new ArrayList<Stripe>();
@@ -242,7 +239,7 @@ public class TMSTiler extends MagickTiler {
 		
 		if (stripe2 == null) {
 			return stripe1.shrink(
-					GRAVITY_SOUTH_WEST, 
+					ImageProcessor.GRAVITY_SOUTHWEST, 
 					tileWidth, 
 					height,
 					processor.getBackground(),
@@ -251,7 +248,7 @@ public class TMSTiler extends MagickTiler {
 		} else {
 			return stripe1.merge(
 					stripe2,
-					GRAVITY_SOUTH_WEST,
+					ImageProcessor.GRAVITY_SOUTHWEST,
 					tileWidth,
 					height,
 					processor.getBackground(),

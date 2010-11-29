@@ -21,6 +21,9 @@ public class ImageProcessor {
 	 */
 	public enum ImageProcessingSystem { GRAPHICSMAGICK,	IMAGEMAGICK }
 	
+	public static final String GRAVITY_CENTER = "Center";
+	public static final String GRAVITY_SOUTHWEST = "SouthWest";
+	
 	private ImageProcessingSystem imageProcessingSystem = ImageProcessingSystem.GRAPHICSMAGICK;
 	private TileFormat tileFormat;
 	private int quality;
@@ -110,7 +113,7 @@ public class ImageProcessor {
 		
 		IMOperation op = createOperation();
 		op.addImage(src);
-		op.gravity("Center");
+		op.gravity(GRAVITY_CENTER);
 		op.geometry(dim, dim);
 		op.addRawArgs("xc:"+background);
 		op.addImage(target);
