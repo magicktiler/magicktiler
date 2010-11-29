@@ -41,12 +41,13 @@ import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public abstract class MagickTiler {
+	
 	private static Logger log = Logger.getLogger(MagickTiler.class);
 	
 	/**
 	 * Image processor initialized with default values
 	 */
-	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK, ImageFormat.JPEG, 75);
+	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK, ImageFormat.JPEG, 75, "#ffffffff");
 	
 	/**
 	 * Working directory (default: app root)
