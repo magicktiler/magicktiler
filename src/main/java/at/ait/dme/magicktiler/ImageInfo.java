@@ -21,15 +21,7 @@
 
 package at.ait.dme.magicktiler;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.im4java.core.IMOperation;
-import org.im4java.core.IdentifyCmd;
-import org.im4java.process.OutputConsumer;
 
 import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
 
@@ -65,34 +57,19 @@ public class ImageInfo {
 	public ImageInfo(File image, ImageProcessingSystem imageProcessingSystem) throws TilingException {
 		this.file = image;
 		
-		final StringBuffer result = new StringBuffer();
 		try {
-			IdentifyCmd identify = new IdentifyCmd(imageProcessingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
-			identify.setOutputConsumer(new OutputConsumer() {
-				public void consumeOutput(InputStream in) throws IOException {
-					BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-					String line;
-					while ((line = reader.readLine()) != null) {
-						result.append(line);
-					}
-				}
-			});
+			String result = new ImageProcessor(imageProcessingSystem).identify(image.getAbsolutePath());
+			if (result == null || result.length() == 0) throw new TilingException(IDENTIFY_ERROR);
 			
-			IMOperation op = new IMOperation();
-			op.addImage(image.getAbsolutePath());
-			identify.run(op);
+			// Parse console output
+			String[] params = result.toString().split(" ");
+			String size = params[2];
+			if (size.indexOf('+') > -1) size = size.substring(0, size.indexOf('+'));
+			width  = Integer.parseInt(size.substring(0, size.indexOf('x')));
+			height = Integer.parseInt(size.substring(size.indexOf('x') + 1));
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
 		}
-			
-		if (result.length() == 0) throw new TilingException(IDENTIFY_ERROR);
-		
-		// Parse console output
-		String[] params = result.toString().split(" ");
-		String size = params[2];
-		if (size.indexOf('+') > -1) size = size.substring(0, size.indexOf('+'));
-		width  = Integer.parseInt(size.substring(0, size.indexOf('x')));
-		height = Integer.parseInt(size.substring(size.indexOf('x') + 1));
 	}
 	
 	public File getFile() {
@@ -106,5 +83,4 @@ public class ImageInfo {
 	public int getHeight() {
 		return height;
 	}
-	
 }

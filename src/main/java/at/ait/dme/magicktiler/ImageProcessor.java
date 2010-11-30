@@ -21,12 +21,17 @@
 
 package at.ait.dme.magicktiler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
+import org.im4java.core.IdentifyCmd;
+import org.im4java.process.OutputConsumer;
 
 /**
  * A wrapper for all image processing operations used.
@@ -68,6 +73,19 @@ public class ImageProcessor {
 	 */
 	private String backgroundColor;
 	
+	
+	public ImageProcessor(ImageProcessingSystem processingSystem) {
+		this.processingSystem = processingSystem;
+	}
+	
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality, 
+			String backgroundColor) {
+		this(processingSystem);
+		this.format = format;
+		this.jpegQuality = jpegQuality;
+		this.backgroundColor = backgroundColor;
+	}
+
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format) {
 		this(processingSystem, format, 75, null);
 	}
@@ -78,14 +96,6 @@ public class ImageProcessor {
 	
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality) {
 		this(processingSystem, format, jpegQuality, null);
-	}
-
-	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality, 
-			String backgroundColor) {
-		this.processingSystem = processingSystem;
-		this.format = format;
-		this.jpegQuality = jpegQuality;
-		this.backgroundColor = backgroundColor;
 	}
 
 	/**
@@ -192,7 +202,7 @@ public class ImageProcessor {
 	}
 
 	/**
-	 * Converts an image to the target format
+	 * Converts an image to the specified target format
 	 * 
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
@@ -207,6 +217,35 @@ public class ImageProcessor {
 		convert.addImage(target);
 		
 		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(convert);
+	}
+	
+	/**
+	 * Describes the format and characteristics of one or more image files.
+	 * 
+	 * @param src  absolute path to source image
+	 * @return result as String (@see <a href="http://www.graphicsmagick.org/identify.html">docs</a>)
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
+	public String identify(String src) throws IOException, InterruptedException, IM4JavaException {
+		final StringBuffer result = new StringBuffer();
+		IdentifyCmd identify = new IdentifyCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
+		identify.setOutputConsumer(new OutputConsumer() {
+			public void consumeOutput(InputStream in) throws IOException {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					result.append(line);
+				}
+			}
+		});
+
+		IMOperation op = new IMOperation();
+		op.addImage(src);
+		identify.run(op);
+		
+		return result.toString();
 	}
 	
 	private IMOperation createOperation() {
