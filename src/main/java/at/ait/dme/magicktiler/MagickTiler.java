@@ -269,7 +269,6 @@ public abstract class MagickTiler {
 	/**
 	 * Stripes an image
 	 * 
-	 * @param image
 	 * @param image  the image {@link File}
 	 * @param orientation  the {@link Orientation} that should be used for creating the stripes
 	 * @param stripes  the number of stripes
