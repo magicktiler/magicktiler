@@ -33,11 +33,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.im4java.core.IM4JavaException;
 
-import at.ait.dme.magicktiler.ImageInfo;
 import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
+import at.ait.dme.magicktiler.Stripe.Orientation;
 
 /**
  * A tiler that implements the Zoomify tiling scheme.
@@ -114,10 +114,10 @@ public class ZoomifyTiler extends MagickTiler {
 				
 		// Step 1 - stripe the base image
 		log.debug("Striping base image");
-		String basestripePrefix = baseName + "-0-";
 		List<Stripe> baseStripes;
 		try {
-			baseStripes = stripeHorizontally(image, info, basestripePrefix);
+			baseStripes = stripeImage(image, Orientation.HORIZONTAL, 
+					info.getNumberOfYTiles(0), info.getWidth(), tileHeight, baseName + "-0-");
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
 		} 
@@ -188,31 +188,6 @@ public class ZoomifyTiler extends MagickTiler {
 		
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		return info;
-	}
-	
-	private List<Stripe> stripeHorizontally(File image, TilesetInfo info, String outfilePrefix) 
-		throws IOException, InterruptedException, IM4JavaException, TilingException {
-		
-		// Generate stripes
-		processor.crop(image.getAbsolutePath(), 
-				workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif", 
-				info.getWidth(), tileHeight);
-
-		// Assemble the list of Stripes
-		List<Stripe> stripes = new ArrayList<Stripe>();
-		int height = tileHeight;
-		for (int i=0; i<info.getNumberOfYTiles(0); i++) {
-			// The last stripe may have height < tileHeight!
-			if (i == (info.getNumberOfYTiles(0) - 1))
-				height = new ImageInfo(new File(workingDirectory, outfilePrefix + i + ".tif"), 
-						processor.getImageProcessingSystem()).getHeight();
-			
-			stripes.add(new Stripe(
-							new File(workingDirectory, outfilePrefix + i + ".tif"),
-							info.getWidth(), height,
-							Stripe.Orientation.HORIZONTAL));
-		}
-		return stripes;
 	}
 	
 	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber) 

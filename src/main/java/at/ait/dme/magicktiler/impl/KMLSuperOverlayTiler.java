@@ -31,9 +31,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.im4java.core.IM4JavaException;
 
+import at.ait.dme.magicktiler.ImageProcessor;
 import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
+import at.ait.dme.magicktiler.Stripe.Orientation;
 import at.ait.dme.magicktiler.geo.BoundingBox;
 
 /**
@@ -144,7 +146,10 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		String basestripePrefix = baseName + "-0-";
 		List<Stripe> baseStripes;
 		try {
-			baseStripes = stripeVertically(image, info, basestripePrefix);
+			int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
+			baseStripes = stripeImage(image, Orientation.VERTICAL, 
+					info.getNumberOfXTiles(0), tileWidth, info.getHeight(), 
+					tileWidth, canvasHeight, ImageProcessor.GRAVITY_SOUTHWEST, basestripePrefix);
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
 		} 

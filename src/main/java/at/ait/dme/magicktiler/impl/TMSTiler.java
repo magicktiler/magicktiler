@@ -38,6 +38,7 @@ import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
+import at.ait.dme.magicktiler.Stripe.Orientation;
 
 /**
  * A tiler that implements the TMS tiling scheme.
@@ -124,10 +125,12 @@ public class TMSTiler extends MagickTiler {
 		
 		// Step 1 - stripe the base image
 		log.debug("Striping base image");
-		String basestripePrefix = baseName + "-0-";
 		List<Stripe> baseStripes;
 		try {
-			baseStripes = stripeVertically(image, info, basestripePrefix);
+			int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
+			baseStripes = stripeImage(image, Orientation.VERTICAL, 
+					info.getNumberOfXTiles(0), tileWidth, info.getHeight(), 
+					tileWidth, canvasHeight, ImageProcessor.GRAVITY_SOUTHWEST, baseName + "-0-");
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
 		} 
@@ -191,27 +194,6 @@ public class TMSTiler extends MagickTiler {
 
 		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		return info;
-	}
-	
-	protected List<Stripe> stripeVertically(File image, TilesetInfo info, String outfilePrefix)
-			throws IOException, InterruptedException, IM4JavaException {
-	
-		int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
-		processor.crop(image.getAbsolutePath(), 
-				workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif", 
-				tileWidth, info.getHeight(), tileWidth, canvasHeight, ImageProcessor.GRAVITY_SOUTHWEST);
-
-		// Assemble the list of Stripes
-		List<Stripe> stripes = new ArrayList<Stripe>();
-		for (int i=0; i<info.getNumberOfXTiles(0); i++) {
-			// Somewhat risky to not check whether GM has generated all stripes correctly - but checking would take time...
-			stripes.add(new Stripe(
-					new File(workingDirectory, outfilePrefix + i + ".tif"),
-					tileWidth, canvasHeight,
-					Stripe.Orientation.VERTICAL)
-			);
-		}
-		return stripes;
 	}
 	
 	private void generateTMSTiles(Stripe stripe, TilesetInfo info, File targetDir)

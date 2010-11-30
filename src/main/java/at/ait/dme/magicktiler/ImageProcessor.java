@@ -1,3 +1,24 @@
+/*
+ * Copyright 2010 Austrian Institute of Technology
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they
+ * will be approved by the European Commission - subsequent
+ * versions of the EUPL (the "Licence");
+ * you may not use this work except in compliance with the
+ * Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the Licence is
+ * distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.
+ * See the Licence for the specific language governing
+ * permissions and limitations under the Licence.
+ */
+
 package at.ait.dme.magicktiler;
 
 import java.io.IOException;
@@ -59,7 +80,8 @@ public class ImageProcessor {
 		this(processingSystem, format, jpegQuality, null);
 	}
 
-	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality, String backgroundColor) {
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality, 
+			String backgroundColor) {
 		this.processingSystem = processingSystem;
 		this.format = format;
 		this.jpegQuality = jpegQuality;
@@ -145,7 +167,6 @@ public class ImageProcessor {
 		op.addRawArgs("xc:" + backgroundColor);
 		op.addImage(target);
 		new CompositeCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
-		
 	}
 	
 	/**
@@ -168,6 +189,24 @@ public class ImageProcessor {
 		op.resize(width, height);
 		op.addImage(target);
 		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);		
+	}
+
+	/**
+	 * Converts an image to the target format
+	 * 
+	 * @param src  absolute path to source image
+	 * @param target  absolute path to target image
+	 * 
+	 * @throws IM4JavaException 
+	 * @throws InterruptedException 
+	 * @throws IOException 
+	 */
+	public void convert(String src, String target) throws IOException, InterruptedException, IM4JavaException {
+		IMOperation convert = new IMOperation();
+		convert.addImage(src);
+		convert.addImage(target);
+		
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(convert);
 	}
 	
 	private IMOperation createOperation() {
@@ -209,5 +248,4 @@ public class ImageProcessor {
 	public void setBackground(String color) {
 		this.backgroundColor = color;
 	}
-	
 }

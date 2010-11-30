@@ -30,7 +30,9 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
   val generatePreview: CheckBox = new CheckBox("")
 
-  val progressBar: ProgressBar = new ProgressBar() { indeterminate = true; visible = false; preferredSize = new Dimension(300, 20) }
+  val progressBar: ProgressBar = new ProgressBar() {
+    indeterminate = true; visible = false; preferredSize = new Dimension(300, 20)
+  }
 
   val startButton: Button = new Button("Create those tiles, dude!") {
     reactions += {
@@ -64,7 +66,10 @@ class MagickTilerGUI extends SimpleSwingApplication {
       addSeparator();
 
       add(new Label("Background color:"))
-      add(new FlowPanel { contents += backgroundColor; contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')") })
+      add(new FlowPanel {
+        contents += backgroundColor;
+        contents += new Label("(e.g. 'white', 'rgb(255,255,255)', '#FFFFFF')")
+      })
 
       add(new Label("Generate HTML preview:"))
       add(generatePreview)
@@ -112,24 +117,22 @@ class MagickTilerGUI extends SimpleSwingApplication {
       case "PTIF" => tiler = new PTIFConverter()
     }
     tileFormats.value match {
-      case "jpeg" => tiler.setTileFormat(TileFormat.JPEG)
-      case "png" => tiler.setTileFormat(TileFormat.PNG)
+      case "jpeg" => tiler.setTileFormat(ImageFormat.JPEG)
+      case "png" => tiler.setTileFormat(ImageFormat.PNG)
     }
     tiler.setJPEGCompressionQuality(jpegQuality.value)
     tiler.setBackgroundColor(backgroundColor.text)
 
-    if (!output.selection.text.isEmpty)
-      outputFile = new File(output.selection.text)
-
-    if (input.selection.text != null)
-      inputFile = new File(input.selection.text)
+    if (!output.selection.text.isEmpty) outputFile = new File(output.selection.text)
+    if (input.selection.text != null) inputFile = new File(input.selection.text)
 
     tiler.setGeneratePreviewHTML(generatePreview.selected);
     try {
       tiler.convert(inputFile, outputFile)
-      // display the result (either the dir or the preview)
+      
+      // display the result (either the directory or the HTML preview)
       var result = tiler.getTilesetRootDir().getAbsolutePath();
-      if (generatePreview.selected) result+=File.separator+"preview.html";
+      if (generatePreview.selected) result += File.separator + "preview.html";
       Desktop.getDesktop.open(new File(result));
     } catch {
       case e =>

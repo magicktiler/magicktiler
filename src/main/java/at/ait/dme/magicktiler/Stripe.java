@@ -31,7 +31,6 @@ import org.im4java.core.MontageCmd;
 
 import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
 
-
 /**
  * To speed up the MagickTiler tiling process, images are (for most tiling schemes)
  * first split into a sequence of 'stripes'. Depending on the tiling scheme, striping

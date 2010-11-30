@@ -69,7 +69,8 @@ public class GoogleMapsTiler extends MagickTiler {
 				
 				// Step 3: create a base image for this zoomlevel
 				int dim = 256*(int)Math.pow(2, z);
-				baseImageFileName = tilesetRootDir.getAbsolutePath()+File.separator+"base"+z+"."+processor.getImageFormat().getExtension();
+				baseImageFileName = tilesetRootDir.getAbsolutePath()+File.separator+"base"+z+"."+
+					processor.getImageFormat().getExtension();
 				resizeImage(squaredImage.getFile().getAbsolutePath(), baseImageFileName, dim, dim);
 				File baseImageFile = new File(baseImageFileName);
 				TilesetInfo baseInfo = 

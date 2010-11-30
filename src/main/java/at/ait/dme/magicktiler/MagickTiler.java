@@ -25,13 +25,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+import at.ait.dme.magicktiler.Stripe.Orientation;
 
 
 /**
@@ -47,7 +48,8 @@ public abstract class MagickTiler {
 	/**
 	 * Image processor initialized with default values
 	 */
-	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK, ImageFormat.JPEG, 75, "#ffffffff");
+	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK, 
+			ImageFormat.JPEG, 75, "#ffffffff");
 	
 	/**
 	 * Working directory (default: app root)
@@ -74,58 +76,6 @@ public abstract class MagickTiler {
 	 */
 	protected boolean generatePreview = false;
 	
-	/**
-	 * Generate a new tile set from the specified image file.
-	 * The tileset will be produced in the same directory as the
-	 * image, in a folder named the same as the image.
-	 * 
-	 * @param image the image file
-	 * @return some information about the generated tileset
-	 * @throws TilingException if anything goes wrong
-	 */
-	public TilesetInfo convert(File image) throws TilingException {
-		return convert(image, tilesetRootDir);
-	}
-	
-	/**
-	 * Generate a new tile set from the specified image file.
-	 * The tileset will be produced into the specified directory. 
-	 * 
-	 * @param image the image file
-	 * @param target the target directory for the tileset
-	 * @return some information about the generated tileset
-	 * @throws TilingException if anything goes wrong
-	 */
-	public TilesetInfo convert(File image, File target) throws TilingException {
-		TilesetInfo info = null;
-		tilesetRootDir = target;
-		
-		if (!workingDirectory.exists()) createDir(workingDirectory);
-		String baseName = image.getName().substring(0, image.getName().lastIndexOf('.'));
-		createTargetDir(baseName);
-
-		if (image.getAbsolutePath().endsWith("jp2")) {
-			try {
-				long startTime = System.currentTimeMillis();
-				log.info("JPEG 2000 - Converting to intermediate TIF for faster processing");
-				File tif = convertToTIF(image); 
-				log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
-				
-				info = convert(tif, new TilesetInfo(tif, tileWidth, tileHeight, processor));
-				
-				if(!tif.delete()) log.error("Failed to delete TIF file:"+tif);
-			} catch (Exception e) {
-				throw new TilingException(e.getMessage());
-			}
-		} else {
-			info = convert(image, new TilesetInfo(image, tileWidth, tileHeight, processor));
-		}
-		
-		return info;
-	}
-	
-	protected abstract TilesetInfo convert(File image, TilesetInfo info) throws TilingException;
-
 	/**
 	 * get the tileset root directory
 	 * 
@@ -196,6 +146,58 @@ public abstract class MagickTiler {
 	}
 	
 	/**
+	 * Generate a new tile set from the specified image file.
+	 * The tileset will be produced in the same directory as the
+	 * image, in a folder named the same as the image.
+	 * 
+	 * @param image the image file
+	 * @return some information about the generated tileset
+	 * @throws TilingException if anything goes wrong
+	 */
+	public TilesetInfo convert(File image) throws TilingException {
+		return convert(image, tilesetRootDir);
+	}
+	
+	/**
+	 * Generate a new tile set from the specified image file.
+	 * The tileset will be produced into the specified directory. 
+	 * 
+	 * @param image the image file
+	 * @param target the target directory for the tileset
+	 * @return some information about the generated tileset
+	 * @throws TilingException if anything goes wrong
+	 */
+	public TilesetInfo convert(File image, File target) throws TilingException {
+		TilesetInfo info = null;
+		tilesetRootDir = target;
+		
+		if (!workingDirectory.exists()) createDir(workingDirectory);
+		String baseName = image.getName().substring(0, image.getName().lastIndexOf('.'));
+		createTargetDir(baseName);
+
+		if (image.getAbsolutePath().endsWith("jp2")) {
+			try {
+				long startTime = System.currentTimeMillis();
+				log.info("JPEG 2000 - Converting to intermediate TIF for faster processing");
+				File tif = convertToTIF(image); 
+				log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+				
+				info = convert(tif, new TilesetInfo(tif, tileWidth, tileHeight, processor));
+				
+				if(!tif.delete()) log.error("Failed to delete TIF file:"+tif);
+			} catch (Exception e) {
+				throw new TilingException(e.getMessage());
+			}
+		} else {
+			info = convert(image, new TilesetInfo(image, tileWidth, tileHeight, processor));
+		}
+		
+		return info;
+	}
+	
+	protected abstract TilesetInfo convert(File image, TilesetInfo info) throws TilingException;
+	
+	/**
 	 * Create the target tileset root directory
 	 * 
 	 * @param baseName
@@ -242,6 +244,81 @@ public abstract class MagickTiler {
 	}
 	
 	/**
+	 * Stripe an image
+	 * 
+	 * @param image  the image {@link File}
+	 * @param orientation  the {@link Orientation} that should be used for creating the stripes
+	 * @param stripes  the number of stripes
+	 * @param width  the width of a stripe
+	 * @param height  the height of a stripe
+	 * @param outfilePrefix  the prefix of the output files
+	 * @return the list of {@link Stripe}s
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 * @throws TilingException
+	 */
+	protected List<Stripe> stripeImage(File image, Orientation orientation, int stripes, int width, int height, 
+			String outfilePrefix)
+		throws IOException, InterruptedException, IM4JavaException, TilingException {
+			
+		return stripeImage(image, orientation, stripes, width, height, width, height, "", outfilePrefix);
+	}
+	
+	/**
+	 * Stripes an image
+	 * 
+	 * @param image
+	 * @param image  the image {@link File}
+	 * @param orientation  the {@link Orientation} that should be used for creating the stripes
+	 * @param stripes  the number of stripes
+	 * @param width  the width of a stripe
+	 * @param height  the height of a stripe
+	 * @param canvasWidth  the width of the canvas
+	 * @param canvasHeight  the height of the canvas
+	 * @param gravity  the gravity specifies the location of the image on the canvas
+	 * @param outfilePrefix  the prefix of the output files
+	 * @return the list of {@link Stripe}s
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 * @throws TilingException
+	 */
+	protected List<Stripe> stripeImage(File image, Orientation orientation, int stripes, int width, int height, 
+			int canvasWidth, int canvasHeight, String gravity, String outfilePrefix) 
+		throws IOException, InterruptedException, IM4JavaException, TilingException {
+		
+		String targetPattern = workingDirectory.getAbsolutePath() + File.separator + outfilePrefix + "%d.tif";
+		if(canvasHeight == height && canvasWidth == width) {
+			processor.crop(image.getAbsolutePath(), targetPattern, width, height);
+		} else {
+			processor.crop(image.getAbsolutePath(), targetPattern, width, height, canvasWidth, canvasHeight, gravity);
+		}
+
+		// Assemble the list of Stripes
+		List<Stripe> resultStripes = new ArrayList<Stripe>();
+		int h = canvasHeight;
+		int w = canvasWidth;
+		for (int i=0; i<stripes; i++) {
+			// in case the last stripe has a different width or height
+			if (i == (stripes - 1)) {
+				ImageInfo lastStripe = 
+					new ImageInfo(new File(workingDirectory, outfilePrefix + i + ".tif"), 
+							processor.getImageProcessingSystem());
+				h = lastStripe.getHeight();
+				w = lastStripe.getWidth();
+			}
+			
+			// Somewhat risky to not check whether GM has generated all stripes correctly - but checking would take time...
+			resultStripes.add(new Stripe(
+					new File(workingDirectory, outfilePrefix + i + ".tif"), w, h, orientation)
+			);
+		}
+		return resultStripes;
+	}
+	
+	/**
 	 * Utility method that converts any supported input
 	 * file to TIF. This makes sense e.g. for JPEG 2000, since
 	 * handling of JP2 in GraphicsMagick is so incredibly slow
@@ -258,12 +335,7 @@ public abstract class MagickTiler {
 		String inFile = file.getAbsolutePath();
 		String outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".tif";
 	
-		IMOperation convert = new IMOperation();
-		convert.addImage(inFile);
-		convert.addImage(outFile);
-		
-		ConvertCmd convertCmd = new ConvertCmd(processor.getImageProcessingSystem() == ImageProcessingSystem.GRAPHICSMAGICK);
-		convertCmd.run(convert);
+		processor.convert(inFile, outFile);
 		
 		File out = new File(outFile);
 		if (out.exists()) 
