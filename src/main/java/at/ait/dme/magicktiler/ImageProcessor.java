@@ -175,7 +175,12 @@ public class ImageProcessor {
 		op.addImage(src);
 		op.gravity(GRAVITY_CENTER);
 		op.geometry(dim, dim);
-		op.addRawArgs("xc:" + backgroundColor);
+		
+		String color = backgroundColor;
+		if(color.startsWith("#")) {
+			color=color.substring(0,7);
+		}
+		op.addRawArgs("xc:" + color);
 		op.addImage(target);
 		
 		new CompositeCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
