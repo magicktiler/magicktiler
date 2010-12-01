@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
 
 import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.TilesetInfo;
@@ -83,24 +81,14 @@ public class PTIFConverter extends MagickTiler {
 		try {
 	        // Step 1 - compute pyramid
 			log.debug("Computing pyramid");
-			IMOperation merge = new IMOperation();
-			merge.adjoin();
-			merge.define("tiff:tile-geometry=" + TILE_SIZE + "x" + TILE_SIZE);
-			merge.compress("jpeg");
+			List<String> levels = computePyramid(info);
 			
-			List<String> pyramid = computePyramid(info);
-			for (String level : pyramid) {
-				merge.addImage(level);
-			}
-     
-	        // Step 2 - merge
+			// Step 2 - merge
 			log.debug("Merging");
 			File tempFile = new File(image.getParent(), "tmp.tif");
-			merge.addImage(tempFile.getAbsolutePath());
-			
-			ConvertCmd mergeCmd = new ConvertCmd(true);
-			mergeCmd.run(merge);
-			
+			levels.add(tempFile.getAbsolutePath());
+			processor.merge(levels, "tiff:tile-geometry=" + TILE_SIZE + "x" + TILE_SIZE, "jpeg");
+
 			// Step 3 - rename
 			if (tilesetRootDir.exists()) {
 				if(!tilesetRootDir.delete()) 
@@ -110,8 +98,8 @@ public class PTIFConverter extends MagickTiler {
 				throw new TilingException("Failed to rename directory:"+tempFile);
 			
 			// Step 4 - remove temporary files
-			for (int i=1; i<pyramid.size(); i++) {
-				tempFile = new File(pyramid.get(i));
+			for (int i=1; i<levels.size()-1; i++) {
+				tempFile = new File(levels.get(i));
 				if(!tempFile.delete())
 					log.error("Failed to delete temp file:"+tempFile);
 			}
@@ -142,15 +130,7 @@ public class PTIFConverter extends MagickTiler {
 			h /= 2;
 			thisLevel = tempFilePrefix + "-" + i + ".tif";
 
-			IMOperation scale = new IMOperation();
-			scale.size(w, h);
-			scale.scale(w, h);
-			scale.addImage(previousLevel);
-			scale.addImage(thisLevel);
-
-			ConvertCmd scaleCmd = new ConvertCmd(true);
-			scaleCmd.run(scale);
-
+			processor.scale(previousLevel, thisLevel, w, h);
 			pyramid.add(thisLevel);
 			previousLevel = thisLevel;
 		}

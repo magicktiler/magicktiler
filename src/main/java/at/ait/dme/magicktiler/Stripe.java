@@ -23,11 +23,12 @@ package at.ait.dme.magicktiler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
-import org.im4java.core.MontageCmd;
 
 import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
 
@@ -143,35 +144,31 @@ public class Stripe {
 		
 		if (stripe.orientation != orientation) throw new IllegalArgumentException(DIFFERENT_ORIENTATION_ERROR);
 
-		IMOperation op = new IMOperation();
-
-		if (orientation == Orientation.HORIZONTAL) {
-			op.tile(1, 2);
-		} else {
-			op.tile(2, 1);
+		List<String> srcs = new ArrayList<String>();
+		srcs.add(file.getAbsolutePath());
+		srcs.add(stripe.getImageFile().getAbsolutePath());
+	
+		int xTiles=1,yTiles=2;
+		if (orientation == Orientation.VERTICAL) {
+			xTiles=2;yTiles=1;
 		}
 
 		int w, h;
 		if ((xExtent > -1) && (yExtent > -1)) {
-			op.gravity(gravity);
-			op.background(backgroundColor);
 			w = xExtent;
 			h = yExtent;
-			op.geometry(w / 2, h);
+			w = w / 2;
+			new ImageProcessor(system).montage(srcs, targetFile.getAbsolutePath(), xTiles, yTiles, 
+					w, h, backgroundColor, gravity);
 		} else {
 			w = (orientation == Orientation.HORIZONTAL) ? width / 2 : (width  + stripe.getWidth()) / 2;
 			h = (orientation == Orientation.HORIZONTAL) ? (height + stripe.getHeight()) / 4 : height / 2;
 			
-			op.addRawArgs("-geometry", "+0+0");
-			op.addRawArgs("-resize", "50%x50%");
+			Map<String, String>  rawArgs = new HashMap<String, String>();
+			rawArgs.put("-geometry", "+0+0");
+			rawArgs.put("-resize", "50%x50%");
+			new ImageProcessor(system).montage(srcs, targetFile.getAbsolutePath(), xTiles, yTiles, rawArgs);
 		}
-
-		op.addImage(file.getAbsolutePath());
-		op.addImage(stripe.getImageFile().getAbsolutePath());
-		op.addImage(targetFile.getAbsolutePath());
-		
-		MontageCmd montage = new MontageCmd(system == ImageProcessingSystem.GRAPHICSMAGICK);
-		montage.run(op);
 
 		return new Stripe(targetFile, w, h, orientation);
 	}
@@ -212,34 +209,27 @@ public class Stripe {
 	public Stripe shrink(String gravity, int xExtent, int yExtent, String backgroundColor,
 			File targetFile, ImageProcessingSystem system) 
 		throws IOException, InterruptedException, IM4JavaException {
-	
-		IMOperation op = new IMOperation();
-		if (xExtent > -1 && yExtent > -1){
-			op.gravity(gravity);
-			op.background(backgroundColor);
-			
-			if (orientation == Orientation.HORIZONTAL) {
-				op.tile(1, 2);
-			} else {
-				op.tile(2, 1); 
+
+		List<String> srcs = new ArrayList<String>();
+		if (xExtent > -1 && yExtent > -1) {
+			srcs.add(file.getAbsolutePath());
+			srcs.add("null:");
+
+			int xTiles=1,yTiles=2;
+			if (orientation == Orientation.VERTICAL) {
+				xTiles=2;yTiles=1;
 			}
 			
-			op.geometry(xExtent / 2, yExtent);
-			op.addImage(file.getAbsolutePath());
-			op.addImage("null:");
-			op.addImage(targetFile.getAbsolutePath());
+			new ImageProcessor(system).montage(srcs, targetFile.getAbsolutePath(), xTiles, yTiles, 
+					xExtent / 2, yExtent, backgroundColor, gravity);
 			
-			MontageCmd montage = new MontageCmd(system == ImageProcessingSystem.GRAPHICSMAGICK);
-			montage.run(op);
-
 			return new Stripe(targetFile, xExtent, yExtent, orientation);
 		} else {
-			op.addRawArgs("-scale", "50%x50%");
-			op.addImage(file.getAbsolutePath());
-			op.addImage(targetFile.getAbsolutePath());
+			Map<String, String>  rawArgs = new HashMap<String, String>();
+			rawArgs.put("-scale", "50%x50%");
 			
-			ConvertCmd convert = new ConvertCmd(system == ImageProcessingSystem.GRAPHICSMAGICK);
-			convert.run(op);
+			new ImageProcessor(system).convert(file.getAbsolutePath(), targetFile.getAbsolutePath(), rawArgs);
+
 			return new Stripe(targetFile, width / 2, height / 2, orientation);
 		}
 	}

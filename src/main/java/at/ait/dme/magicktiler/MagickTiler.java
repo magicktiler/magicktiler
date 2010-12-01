@@ -49,7 +49,7 @@ public abstract class MagickTiler {
 	 * Image processor initialized with default values
 	 */
 	protected ImageProcessor processor = new ImageProcessor(ImageProcessingSystem.GRAPHICSMAGICK, 
-			ImageFormat.JPEG, 75, "#ffffffff");
+			ImageFormat.JPEG, "#ffffffff");
 	
 	/**
 	 * Working directory (default: app root)
@@ -334,7 +334,7 @@ public abstract class MagickTiler {
 		String inFile = file.getAbsolutePath();
 		String outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".tif";
 	
-		processor.convert(inFile, outFile);
+		processor.convert(inFile, outFile, null);
 		
 		File out = new File(outFile);
 		if (out.exists()) 

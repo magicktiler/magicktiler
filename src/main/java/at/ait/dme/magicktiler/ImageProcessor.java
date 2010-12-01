@@ -25,12 +25,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Map;
 
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.core.IdentifyCmd;
+import org.im4java.core.MontageCmd;
 import org.im4java.process.OutputConsumer;
 
 /**
@@ -64,9 +67,9 @@ public class ImageProcessor {
 	private ImageFormat format;
 	
 	/**
-	 * JPEG compression quality (in case of JPEG image format)
+	 * JPEG compression quality (in case of JPEG image format), default=75
 	 */
-	private int jpegQuality;
+	private int jpegQuality = 75;
 	
 	/**
 	 * The default background color for montage operations
@@ -78,24 +81,24 @@ public class ImageProcessor {
 		this.processingSystem = processingSystem;
 	}
 	
-	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality, 
-			String backgroundColor) {
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format) {
 		this(processingSystem);
 		this.format = format;
-		this.jpegQuality = jpegQuality;
-		this.backgroundColor = backgroundColor;
-	}
-
-	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format) {
-		this(processingSystem, format, 75, null);
 	}
 	
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, String backgroundColor) {
-		this(processingSystem, format, 75, backgroundColor);
+		this(processingSystem, format);
+		this.backgroundColor = backgroundColor;
 	}
+
+	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, String backgroundColor, int jpegQuality) {
+		this(processingSystem, format, backgroundColor);
+		this.jpegQuality = jpegQuality;
+	}
+
 	
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality) {
-		this(processingSystem, format, jpegQuality, null);
+		this(processingSystem, format, null, jpegQuality);
 	}
 
 	/**
@@ -119,8 +122,7 @@ public class ImageProcessor {
 		op.p_adjoin();
 		op.addImage(target);
 		
-		ConvertCmd convert = new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
-		convert.run(op);
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 	}
 	
 	/**
@@ -152,8 +154,7 @@ public class ImageProcessor {
 		op.extent(canvasWidth, canvasHeight);
 		op.addImage(target);
 
-		ConvertCmd convert = new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
-		convert.run(op);
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 	}
 	
 	/**
@@ -176,6 +177,7 @@ public class ImageProcessor {
 		op.geometry(dim, dim);
 		op.addRawArgs("xc:" + backgroundColor);
 		op.addImage(target);
+		
 		new CompositeCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 	}
 	
@@ -206,17 +208,24 @@ public class ImageProcessor {
 	 * 
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
+	 * @param rawArgs  args passed to graphics/imagemagick
 	 * 
 	 * @throws IM4JavaException 
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
-	public void convert(String src, String target) throws IOException, InterruptedException, IM4JavaException {
-		IMOperation convert = new IMOperation();
-		convert.addImage(src);
-		convert.addImage(target);
+	public void convert(String src, String target, Map<String, String> rawArgs) 
+		throws IOException, InterruptedException, IM4JavaException {
 		
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(convert);
+		IMOperation op = new IMOperation();
+		op.addImage(src);
+		if(rawArgs!=null) {
+			for(String rawArg : rawArgs.keySet())
+			op.addRawArgs(rawArg, rawArgs.get(rawArg));
+		}
+		op.addImage(target);
+		
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 	}
 	
 	/**
@@ -246,6 +255,114 @@ public class ImageProcessor {
 		identify.run(op);
 		
 		return result.toString();
+	}
+	
+	/**
+	 * Merges multiple images
+	 * 
+	 * @param srcs  list of source file images
+	 * @param definition  definition for coders and decoders to use while reading and writing image data
+	 * @param compression  compressions of the resulting image
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
+	public void merge(List<String> srcs, String definition, String compression) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
+		IMOperation op = createOperation();
+		op.adjoin();
+		op.define(definition);
+		op.compress(compression);
+		for (String src : srcs) {
+			op.addImage(src);
+		}
+ 		
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+	}
+	
+	/**
+	 * Scales an image to the given size
+	 * 
+	 * @param src  absolute path to source image
+	 * @param target  absolute path to target image
+	 * @param width  width of the resulting image
+	 * @param height  height of the resulting image
+	 * 
+	 * @throws IM4JavaException 
+	 * @throws InterruptedException 
+	 * @throws IOException 
+	 */
+	public void scale(String src, String target, int width, int height) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
+		IMOperation op = createOperation();
+		op.size(width, height);
+		op.scale(width, height);
+		op.addImage(src);
+		op.addImage(target);
+
+		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+	}
+	
+	/**
+	 * Creates a montage of the given images
+	 * 
+	 * @param srcs  list of source file images
+	 * @param target  absolute path to target image
+	 * @param xTiles  number of x tiles
+	 * @param yTiles  number of y tiles
+	 * @param rawArgs  raw args passed to graphics/imagemagick
+	 * 
+	 * @throws IM4JavaException
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	public void montage(List<String> srcs, String target, int xTiles, int yTiles, Map<String, String> rawArgs) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
+		IMOperation op = createOperation();
+		op.tile(xTiles, yTiles);
+		if(rawArgs!=null) {
+			for(String rawArg : rawArgs.keySet())
+			op.addRawArgs(rawArg, rawArgs.get(rawArg));
+		}
+		op.addImage(srcs.toArray(new String[srcs.size()]));
+		op.addImage(target);
+		
+		new MontageCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+	}
+	
+	/**
+	 * Creates a montage of the given images
+	 * 
+	 * @param srcs  list of source file images
+	 * @param target  absolute path to target image
+	 * @param xTiles  number of x tiles
+	 * @param yTiles  number of y tiles
+	 * @param width  width of target image
+	 * @param height  height of target image
+	 * @param backgroundColor  the background color to use
+	 * @param gravity  the gravity specifies the location of the image on the canvas
+	 * 
+	 * @throws IM4JavaException
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	public void montage(List<String> srcs, String target, int xTiles, int yTiles, int width, int height, 
+			String backgroundColor, String gravity) 
+		throws IOException, InterruptedException, IM4JavaException {
+		
+		IMOperation op = createOperation();
+		op.tile(xTiles, yTiles);
+		op.gravity(gravity);
+		op.background(backgroundColor);
+		op.geometry(width, height);
+		op.addImage(srcs.toArray(new String[srcs.size()]));
+		op.addImage(target);
+		
+		new MontageCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
 	}
 	
 	private IMOperation createOperation() {
