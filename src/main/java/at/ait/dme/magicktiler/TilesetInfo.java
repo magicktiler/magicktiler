@@ -74,9 +74,15 @@ public class TilesetInfo {
 		this.format = processor.getImageFormat();
 		this.imgInfo = new ImageInfo(image, processor.getImageProcessingSystem());
 		
+		setDimension(imgInfo.getWidth(), imgInfo.getHeight());
+	}
+	
+	public void setDimension(int width, int height) {
+		zoomlevels.clear();
+		
 		// Compute no. of tiles in base layer
-		int xBaseTiles = (int) Math.ceil((float) imgInfo.getWidth() / tileWidth);
-		int yBaseTiles = (int) Math.ceil((float) imgInfo.getHeight() / tileHeight);
+		int xBaseTiles = (int) Math.ceil((float) width / tileWidth);
+		int yBaseTiles = (int) Math.ceil((float) height / tileHeight);
 		zoomlevels.add(new Dimension(xBaseTiles, yBaseTiles));
 		
 		// Compute no. of zoom levels
@@ -93,6 +99,9 @@ public class TilesetInfo {
 			tilesTotal += x * y;
 			zoomlevels.add(new Dimension((int) x, (int) y));
 		}
+		
+		imgInfo.setWidth(width);
+		imgInfo.setHeight(height);
 	}
 		
 	public File getImageFile() {
@@ -150,6 +159,5 @@ public class TilesetInfo {
 			this.y = y;
 		}
 		
-	}
-	
+	}	
 }
