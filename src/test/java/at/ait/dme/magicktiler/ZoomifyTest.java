@@ -46,8 +46,8 @@ public class ZoomifyTest extends BaseTest {
 		TilesetInfo info = t.convert(new File("src/test/resources/OrteliusWorldMap1570.jpg"));
 		
 		// Check if image metadata was read correctly
-		assertEquals("Wrong width calculated for the Zoomify tileset!", 5816, info.getWidth());
-		assertEquals("Wrong height calculated for the Zoomify tileset!", 3961, info.getHeight());
+		assertEquals("Wrong width calculated for the Zoomify tileset!", 5816, info.getImageWidth());
+		assertEquals("Wrong height calculated for the Zoomify tileset!", 3961, info.getImageHeight());
 		
 		// Check if tileset properties were computed correctly
 		assertEquals("Wrong number of x-basetiles calculated for the Zoomify tileset!", 23, info.getNumberOfXTiles(0));

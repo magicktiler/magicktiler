@@ -74,7 +74,7 @@ public class PTIFConverter extends MagickTiler {
 	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating PTIF for file " + image.getName() + ": " +
-                info.getWidth() + "x" + info.getHeight() + ", " +
+                info.getImageWidth() + "x" + info.getImageHeight() + ", " +
                 info.getZoomLevels() + " zoom levels"
 		);
         
@@ -119,8 +119,8 @@ public class PTIFConverter extends MagickTiler {
 
 		String tempFilePrefix = inputFile.substring(0, inputFile.lastIndexOf('.'));
 
-		int w = info.getWidth();
-		int h = info.getHeight();
+		int w = info.getImageWidth();
+		int h = info.getImageHeight();
 		
 		String previousLevel = inputFile;
 		String thisLevel;

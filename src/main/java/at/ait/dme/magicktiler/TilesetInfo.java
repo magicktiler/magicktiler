@@ -120,11 +120,11 @@ public class TilesetInfo {
 		return format;
 	}
 	
-	public int getWidth() {
+	public int getImageWidth() {
 		return imgInfo.getWidth();
 	}
 	
-	public int getHeight() {
+	public int getImageHeight() {
 		return imgInfo.getHeight();
 	}
 	

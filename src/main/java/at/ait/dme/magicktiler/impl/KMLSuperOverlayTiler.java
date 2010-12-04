@@ -133,7 +133,7 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		
 		long startTime = System.currentTimeMillis();
 		log.info("Generating KML Superoverlay for file " + image.getName() + ": " +
-                info.getWidth() + "x" + info.getHeight() + ", " +
+                info.getImageWidth() + "x" + info.getImageHeight() + ", " +
                 info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
                 info.getZoomLevels() + " zoom levels, " +
                 info.getTotalNumberOfTiles() + " tiles total"
@@ -146,9 +146,9 @@ public class KMLSuperOverlayTiler extends TMSTiler {
 		String basestripePrefix = baseName + "-0-";
 		List<Stripe> baseStripes;
 		try {
-			int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
+			int canvasHeight = info.getImageHeight() + tileHeight - (info.getImageHeight() % tileHeight);
 			baseStripes = stripeImage(image, Orientation.VERTICAL, 
-					info.getNumberOfXTiles(0), tileWidth, info.getHeight(), 
+					info.getNumberOfXTiles(0), tileWidth, info.getImageHeight(), 
 					tileWidth, canvasHeight, ImageProcessor.GRAVITY_SOUTHWEST, basestripePrefix);
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());

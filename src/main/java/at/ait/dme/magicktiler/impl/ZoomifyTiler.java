@@ -104,7 +104,7 @@ public class ZoomifyTiler extends MagickTiler {
 	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating Zoomify tiles for file " + image.getName() + ": " +
-				info.getWidth() + "x" + info.getHeight() + ", " +
+				info.getImageWidth() + "x" + info.getImageHeight() + ", " +
                 info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
                 info.getZoomLevels() + " zoom levels, " +
                 info.getTotalNumberOfTiles() + " tiles total"
@@ -117,7 +117,7 @@ public class ZoomifyTiler extends MagickTiler {
 		List<Stripe> baseStripes;
 		try {
 			baseStripes = stripeImage(image, Orientation.HORIZONTAL, 
-					info.getNumberOfYTiles(0), info.getWidth(), tileHeight, baseName + "-0-");
+					info.getNumberOfYTiles(0), info.getImageWidth(), tileHeight, baseName + "-0-");
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
 		} 
@@ -227,8 +227,8 @@ public class ZoomifyTiler extends MagickTiler {
 	
 	private void generateImagePropertiesXML(TilesetInfo info) {
 		String metadata = METADATA_TEMPLATE
-			.replace("@width@", Integer.toString(info.getWidth()))
-			.replace("@height@", Integer.toString(info.getHeight()))
+			.replace("@width@", Integer.toString(info.getImageWidth()))
+			.replace("@height@", Integer.toString(info.getImageHeight()))
 			.replace("@numtiles@", Integer.toString(info.getTotalNumberOfTiles()))
 			.replace("@tilesize@", Integer.toString(tileHeight));
 		

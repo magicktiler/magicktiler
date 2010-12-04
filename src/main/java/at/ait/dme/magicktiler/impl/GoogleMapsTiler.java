@@ -35,9 +35,10 @@ import at.ait.dme.magicktiler.Stripe.Orientation;
  * <br><br>
  * The implemented tiling algorithm works as follows:
  * <ol>
- * <li>For performance reasons, the base image is cut into horizontal or vertical stripes (depending on the format). 
- * Thereby the image is also squared adding background-color buffer so that the new dimension 
- * is a multiple of 256 and the power of 2.</li>
+ * <li>Resize the image to the closest multiple of 256 and the power of 2</li>
+ * <li>For performance reasons, the base image is cut into vertical or 
+ * horizontal stripes (depending on the image orientation). Thereby the image 
+ * is squared adding background-color buffer to the stripes where necessary.</li>
  * <li>For all zoomlevels, the stripes of the zoom level beneath (if any) are merged and are then cut to 
  * tiles (The number of tiles per zoomlevel is 4^zoomlevel)</li>
  * <li>The HTML preview file is generated (if requested).</li>
@@ -53,24 +54,28 @@ public class GoogleMapsTiler extends MagickTiler {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating Google Map tiles for file " + image.getName());	
 		
+		List<Stripe> allStripes = new ArrayList<Stripe>();
 		try {
-			log.debug("Striping base image");
+			log.debug("Resizing base image");
+			// Step 1: resize to the closest multiple of 256 and the power of 2
+			String src = tilesetRootDir.getAbsolutePath()+"/gmapbase."+processor.getImageFormat().getExtension();
+			info=resizeBaseImage(image, info, src);
 			
-			// Step 1: cut the image into stripes, thereby creating a squared result image 
-			// with a dimension of the closest multiple of 256 and the power of 2
+			log.debug("Striping base image");
+			// Step 2: cut the image into stripes, thereby creating a squared result image 
 			List<Stripe> stripes=stripeBaseImage(info);
-			List<Stripe> allStripes = stripes;
+			allStripes.addAll(stripes);
+			
 			for(int z=info.getZoomLevels()-1;z>=0;z--) {
 				log.debug("Tiling level " + z);
 				
-				// Step 2: create the tiles for this zoom level
-				String tilesBaseFileName = tilesetRootDir.getAbsolutePath()+File.separator+z;
+				// Step 3: create the tiles for this zoom level
+				String tileBase = tilesetRootDir.getAbsolutePath()+File.separator+z;
 				for (int s=0; s<stripes.size(); s++) {
 					Stripe stripe = stripes.get(s);
 					processor.crop(stripe.getImageFile().getAbsolutePath(), 
-							tilesBaseFileName+"_"+"%d"+"."+processor.getImageFormat().getExtension(), 
-							tileWidth, 
-							tileHeight);
+							tileBase+"_"+"%d"+"."+processor.getImageFormat().getExtension(), 
+							tileWidth, tileHeight);
 					
 					int tiles=(stripe.getOrientation()==Orientation.HORIZONTAL)?
 							stripe.getWidth()/tileWidth : stripe.getHeight()/tileHeight;
@@ -79,25 +84,26 @@ public class GoogleMapsTiler extends MagickTiler {
 						int column = (stripe.getOrientation()==Orientation.HORIZONTAL)?t:s;
 						int row = (stripe.getOrientation()==Orientation.HORIZONTAL)?s:t;
 						
-						File fOld = new File(tilesBaseFileName+"_"+t+"."+processor.getImageFormat().getExtension());
-						File fNew = new File(tilesBaseFileName+"_"+column+"_"+row+"."+processor.getImageFormat().getExtension());
+						File fOld = new File(tileBase+"_"+t+"."+processor.getImageFormat().getExtension());
+						File fNew = new File(tileBase+"_"+column+"_"+row+"."+processor.getImageFormat().getExtension());
 						if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
 					}
 				}
-				
 				stripes=createStripesForNextZoomLevel(stripes, image.getName(), info.getZoomLevels()-z);
 				allStripes.addAll(stripes);
 			}
-			for(Stripe s : allStripes)
-				if(!s.getImageFile().delete()) log.error("Could not delete file:"+s.getImageFile());
-				
+		
 			//step 3: optionally create preview.html
 			if(generatePreview) generatePreview(info);
 			log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		} catch (Exception e) {
 			log.error("Failed to tile image", e);
 			throw new TilingException(e.getMessage());
-		} 
+		} finally {
+			// clean up
+			for(Stripe s : allStripes)
+				if(!s.getImageFile().delete()) log.error("Could not delete stripe:"+s.getImageFile());
+		}
 		
 		return info;
 	}
@@ -108,57 +114,77 @@ public class GoogleMapsTiler extends MagickTiler {
 		String prefix = info.getImageFile().getName().substring(0, 
 				info.getImageFile().getName().lastIndexOf('.'))+"-0-";
 		
-		// find the closest multiple of 256 and the power of 2
-		int maxDim = Math.max(info.getWidth(), info.getHeight());
-		int newMaxDim=0,prevMaxDim=0;
-		for(int pow=0; newMaxDim<maxDim; pow++) {
-			prevMaxDim = newMaxDim;
-			newMaxDim = 256 * (int)(Math.pow(2, pow));
-		}
-		if(Math.abs(maxDim-prevMaxDim) < Math.abs(maxDim-newMaxDim)) newMaxDim = prevMaxDim;
-		
 		Orientation orientation;
-		int tileWidth, tileHeight, canvasWidth, canvasHeight, stripes;
-		if(info.getWidth()>info.getHeight()){
+		int stripeWidth, stripeHeight, canvasWidth, canvasHeight, stripes;
+		if(info.getImageWidth()>info.getImageHeight()){
 			orientation=Orientation.VERTICAL;
-			tileWidth=canvasWidth=this.tileWidth;
-			stripes = newMaxDim / tileWidth;
-			tileHeight=info.getHeight();
-			canvasHeight = newMaxDim;
+			stripeWidth=canvasWidth=this.tileWidth;
+			stripes = info.getImageWidth() / stripeWidth;
+			stripeHeight=info.getImageHeight();
+			// square the image
+			canvasHeight = info.getImageWidth();
+			info.setDimension(canvasHeight, canvasHeight);
 		} else {
 			orientation=Orientation.HORIZONTAL;
-			tileHeight=canvasHeight=this.tileHeight;
-			stripes = newMaxDim / tileHeight;
-			tileWidth=info.getWidth();
-			canvasWidth=newMaxDim;
+			stripeHeight=canvasHeight=this.tileHeight;
+			stripes = info.getImageHeight() / stripeHeight;
+			stripeWidth=info.getImageWidth();
+			// square the image
+			canvasWidth=info.getImageHeight();
+			info.setDimension(canvasWidth, canvasWidth);
 		}
 	
-		info.setDimension(newMaxDim, newMaxDim);
 		return stripeImage(info.getImageFile(), orientation, stripes, 
-				tileWidth, tileHeight, canvasWidth, canvasHeight, ImageProcessor.GRAVITY_CENTER, prefix);
+				stripeWidth, stripeHeight, canvasWidth, canvasHeight, ImageProcessor.GRAVITY_CENTER, prefix);
 	}
 
 	private List<Stripe> createStripesForNextZoomLevel(List<Stripe> stripes, String baseFileName, int z) 
 		throws IOException, InterruptedException, IM4JavaException {
 	
-		String baseName = baseFileName.substring(0, baseFileName.lastIndexOf('.'));
+		String baseName = workingDirectory.getAbsolutePath() + File.separator + 
+			baseFileName.substring(0, baseFileName.lastIndexOf('.'));
 	
 		List<Stripe> nextLevel = new ArrayList<Stripe>();
 		for(int i=0; i<Math.ceil((double)stripes.size() / 2); i++) {
-			File targetStripe = 
-				new File(workingDirectory.getAbsolutePath() + File.separator + baseName + "-" + z + "-" + i + ".tif");
+			File targetStripe = new File(baseName + "-" + z + "-" + i + ".tif");
 			Stripe stripe1 = stripes.get(i * 2);
 			Stripe stripe2 = ((i * 2 + 1) < stripes.size()) ? stripes.get(i * 2 + 1) : null;
 			
-			Stripe result = null;
-			if(stripe2==null) {
-				result=stripe1.shrink(targetStripe, processor.getImageProcessingSystem());
-			} else {
-				result=stripe1.merge(stripe2, targetStripe, processor.getImageProcessingSystem());
+			// we will always have an even number of stripes
+			if(stripe2!=null) {
+				Stripe result=stripe1.merge(stripe2, targetStripe, processor.getImageProcessingSystem());
+				nextLevel.add(result);
 			}
-			nextLevel.add(result);
 		}
 		return nextLevel;
+	}
+
+	private TilesetInfo resizeBaseImage(File image, TilesetInfo info, String targetFileName) 
+		throws IOException, InterruptedException, IM4JavaException, TilingException {
+
+		// find the closest multiple of 256 and the power of 2
+		int maxDim = Math.max(info.getImageWidth(), info.getImageHeight());
+		int newMaxDim = 0, prevMaxDim = 0;
+		for (int pow = 0; newMaxDim < maxDim; pow++) {
+			prevMaxDim = newMaxDim;
+			newMaxDim = 256 * (int) (Math.pow(2, pow));
+		}
+		if (Math.abs(maxDim - prevMaxDim) < Math.abs(maxDim - newMaxDim))
+			newMaxDim = prevMaxDim;
+
+		// calculate the new height and width
+		int newHeight = 0, newWidth = 0;
+		if (maxDim == info.getImageHeight()) {
+			newHeight = newMaxDim;
+			newWidth = newHeight * (int) Math.ceil(((float) info.getImageWidth() / info.getImageHeight()));
+		} else {
+			newWidth = newMaxDim;
+			newHeight = newWidth * (int) Math.ceil(((float) info.getImageWidth() / info.getImageHeight()));
+		}
+
+		processor.resize(image.getAbsolutePath(), targetFileName, newWidth, newHeight);
+		return new TilesetInfo(new File(targetFileName), tileWidth, tileHeight, processor);
+
 	}
 	
 	private void generatePreview(TilesetInfo info) throws IOException {

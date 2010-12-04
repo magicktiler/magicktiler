@@ -28,8 +28,8 @@ public class PTIFTest extends TestCase {
 		);
 		
 		// Check if image metadata was read correctly
-		assertEquals("Wrong width calculated for the PTIF tileset!", 4670, info.getWidth());
-		assertEquals("Wrong height calculated for the PTIF tileset!", 2000, info.getHeight());
+		assertEquals("Wrong width calculated for the PTIF tileset!", 4670, info.getImageWidth());
+		assertEquals("Wrong height calculated for the PTIF tileset!", 2000, info.getImageHeight());
 		
 		// Check if tileset properties were computed correctly
 		assertEquals("Wrong number of zoom levels calculated for the PTIF tileset!", 6, info.getZoomLevels());

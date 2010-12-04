@@ -50,7 +50,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
       add(new Label("Input File or Directory:"))
       add(input)
-
+     
       add(new Label("Output File or Directory:"))
       add(output)
       addSeparator();
@@ -100,6 +100,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
       }
     }
     contents = gridPanel
+    input.button.requestFocus();
   }
 
   def startTiler() {

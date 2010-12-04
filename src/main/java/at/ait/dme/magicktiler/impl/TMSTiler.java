@@ -115,7 +115,7 @@ public class TMSTiler extends MagickTiler {
 	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating TMS tiles for file " + image.getName() + ": " +
-                info.getWidth() + "x" + info.getHeight() + ", " +
+                info.getImageWidth() + "x" + info.getImageHeight() + ", " +
                 info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
                 info.getZoomLevels() + " zoom levels, " +
                 info.getTotalNumberOfTiles() + " tiles total"
@@ -127,9 +127,9 @@ public class TMSTiler extends MagickTiler {
 		log.debug("Striping base image");
 		List<Stripe> baseStripes;
 		try {
-			int canvasHeight = info.getHeight() + tileHeight - (info.getHeight() % tileHeight);
+			int canvasHeight = info.getImageHeight() + tileHeight - (info.getImageHeight() % tileHeight);
 			baseStripes = stripeImage(image, Orientation.VERTICAL, 
-					info.getNumberOfXTiles(0), tileWidth, info.getHeight(), 
+					info.getNumberOfXTiles(0), tileWidth, info.getImageHeight(), 
 					tileWidth, canvasHeight, ImageProcessor.GRAVITY_SOUTHWEST, baseName + "-0-");
 		} catch (Exception e) {
 			throw new TilingException(e.getMessage());
@@ -250,8 +250,8 @@ public class TMSTiler extends MagickTiler {
 		
 		String metadata = METADATA_TEMPLATE
 			.replace("@title@", info.getImageFile().getName())
-			.replace("@width@", Integer.toString(info.getWidth()))
-			.replace("@height@", Integer.toString(info.getHeight()))
+			.replace("@width@", Integer.toString(info.getImageWidth()))
+			.replace("@height@", Integer.toString(info.getImageHeight()))
 			.replace("@tilewidth@", Integer.toString(tileWidth))
 			.replace("@tileheight@", Integer.toString(tileHeight))
 			.replace("@mimetype@", info.getTileFormat().getMimeType())
@@ -288,8 +288,8 @@ public class TMSTiler extends MagickTiler {
 			
 			String html = sb.toString()
 				.replace("@title@", info.getImageFile().getName())
-				.replace("@width@", Integer.toString(info.getWidth()))
-				.replace("@height@", Integer.toString(info.getHeight()))
+				.replace("@width@", Integer.toString(info.getImageWidth()))
+				.replace("@height@", Integer.toString(info.getImageHeight()))
 				.replace("@maxZoom@", Integer.toString(info.getZoomLevels() - 1))
 				.replace("@maxResolution@", Integer.toString((int) Math.pow(2, info.getZoomLevels() - 1)))
 				.replace("@numZoomLevels@", Integer.toString(info.getZoomLevels()))

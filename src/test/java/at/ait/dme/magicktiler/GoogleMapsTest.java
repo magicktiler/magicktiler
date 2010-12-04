@@ -29,6 +29,10 @@ public class GoogleMapsTest extends BaseTest {
 		t.setGeneratePreviewHTML(true);
 		TilesetInfo info = t.convert(new File("src/test/resources/Hong_Kong_Night_Skyline.jpg"));
 		
+		// Check if image was resized correctly
+		assertEquals("Wrong width calculated for the TMS tileset!", 4096, info.getImageWidth());
+		assertEquals("Wrong height calculated for the TMS tileset!", 4096, info.getImageHeight());
+		
 		// Check if tileset files were generated correctly
 		File tilesetRoot = new File(workingDir, "Hong_Kong_Night_Skyline");
 		assertTrue("Tileset root directory not found!", tilesetRoot.exists());
