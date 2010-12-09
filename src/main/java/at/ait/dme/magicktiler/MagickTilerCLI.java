@@ -38,11 +38,10 @@ import at.ait.dme.magicktiler.gmaps.GoogleMapsTiler;
 import at.ait.dme.magicktiler.ptif.PTIFConverter;
 import at.ait.dme.magicktiler.tms.TMSTiler;
 import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
+import at.ait.dme.magicktiler.zoomify.ZoomifyValidator;
 import at.ait.dme.magicktiler.image.ImageFormat;
 
 import scala.actors.threadpool.Arrays;
-
-
 
 /**
  * MagickTiler Command-line interface.
@@ -97,6 +96,7 @@ public class MagickTilerCLI {
 		addOption(new Option("g", null, "displays the GUI (ignores all other parameters)", false));
 		addOption(new Option("h", null, "displays this help text", false));
 		addOption(new Option("l", null, "writes reporting information to a log file", false));
+		addOption(new Option("v", null, "validate the input instead of generating a tileset", false));
 	}};
 	
 	private static final Logger logger = Logger.getLogger(MagickTilerCLI.class);
@@ -104,94 +104,153 @@ public class MagickTilerCLI {
 	public static void main(String... args) throws IOException {
 		if(showGui(args)) return;
 		
-		MagickTiler tiler = null;
-		String consoleOutScheme = null;
-		String consoleOutFormat = "";
-		
 		try {
 			CommandLine cmd = new BasicParser().parse(options, args);
+			
 			// Help
 			if(cmd.hasOption("h")) {
 				printUsage(options);
 				return;
 			}
 			
-			// Tiling scheme
-			String scheme = cmd.getOptionValue("s");
-			if (scheme.equalsIgnoreCase("tms")) {
-				tiler = new TMSTiler();
-				consoleOutScheme = TARGET_SCHEME_TMS;
-				consoleOutFormat = TARGET_FMT_JPEG;
-			} else if (scheme.equalsIgnoreCase("zoomify")) {
-				tiler = new ZoomifyTiler();
-				consoleOutScheme = TARGET_SCHEME_ZOOMIFY;
-				consoleOutFormat = TARGET_FMT_JPEG;
-			} else if (scheme.equalsIgnoreCase("gmap")) {
-				tiler = new GoogleMapsTiler();
-				consoleOutScheme = TARGET_SCHEME_GMAP;
-				consoleOutFormat = TARGET_FMT_JPEG;
-			} else if (scheme.equalsIgnoreCase("ptif")) {
-				tiler = new PTIFConverter();
-				consoleOutScheme = TARGET_SCHEME_PTIF;
+			// Convert or validate
+			if(cmd.hasOption("v")) {
+				validate(cmd);
+			} else {
+				convert(cmd);
 			}
-			if (tiler == null) {
-				System.out.println("Unsupported tiling scheme: " + scheme);
-				return;
-			}
-			
-			// Tile format
-			String format = cmd.getOptionValue("f");
-			if (format != null && format.equalsIgnoreCase("png")) {
-				tiler.setTileFormat(ImageFormat.PNG); 
-				consoleOutFormat = TARGET_FMT_PNG;
-			}
-			
-			// JPEG compression quality
-			String quality = cmd.getOptionValue("q");
-			if (quality != null) {
-				try {
-					int q = Integer.parseInt(quality);
-					if ((q<0) || (q>100)) {
-						System.out.println("Invalid JPEG compression setting: " + q + " (must be in the range 0 - 100)");
-						return;
-					}
-					tiler.setJPEGCompressionQuality(q);
-				} catch (NumberFormatException e) {
-					System.out.println("Invalid JPEG compression setting: " + quality);
-					return;
-				}
-			}
-			
-			// Background color
-			String background = cmd.getOptionValue("b");
-			if (background != null) tiler.setBackgroundColor(background);
-			
-			// Destination
-			File destination = null;
-			if (cmd.hasOption("o")) {
-				destination = new File(cmd.getOptionValue("o"));
-			}
-			
-			// HTML Preview
-			tiler.setGeneratePreviewHTML(cmd.hasOption("p"));
-			
-			// Input filename
-			File file = new File(cmd.getOptionValue("i"));
-			if (!file.exists()) {
-				System.out.println("File not found: " + file.getName());
-				return;
-			}
-			
-			// Log on/off
-			if (cmd.hasOption("l")) {
-				logger.addAppender(new FileAppender(new PatternLayout(), "log.txt", false));
-				logger.setLevel(Level.DEBUG);
-			}
-			
-			generateTiles(tiler, file, destination, consoleOutScheme, consoleOutFormat);
 		} catch (ParseException e) {
 			System.err.println("Failed to parse command line arguments: " + e.getMessage());
 			printUsage(options);
+		}
+	}
+	
+	private static void convert(CommandLine cmd) throws IOException {
+		MagickTiler tiler = null;
+		String consoleOutScheme = null;
+		String consoleOutFormat = "";
+		
+		// Tiling scheme
+		String scheme = cmd.getOptionValue("s");
+		if (scheme.equalsIgnoreCase("tms")) {
+			tiler = new TMSTiler();
+			consoleOutScheme = TARGET_SCHEME_TMS;
+			consoleOutFormat = TARGET_FMT_JPEG;
+		} else if (scheme.equalsIgnoreCase("zoomify")) {
+			tiler = new ZoomifyTiler();
+			consoleOutScheme = TARGET_SCHEME_ZOOMIFY;
+			consoleOutFormat = TARGET_FMT_JPEG;
+		} else if (scheme.equalsIgnoreCase("gmap")) {
+			tiler = new GoogleMapsTiler();
+			consoleOutScheme = TARGET_SCHEME_GMAP;
+			consoleOutFormat = TARGET_FMT_JPEG;
+		} else if (scheme.equalsIgnoreCase("ptif")) {
+			tiler = new PTIFConverter();
+			consoleOutScheme = TARGET_SCHEME_PTIF;
+		}
+		if (tiler == null) {
+			System.out.println("Unsupported tiling scheme: " + scheme);
+			return;
+		}
+		
+		// Tile format
+		String format = cmd.getOptionValue("f");
+		if (format != null && format.equalsIgnoreCase("png")) {
+			tiler.setTileFormat(ImageFormat.PNG); 
+			consoleOutFormat = TARGET_FMT_PNG;
+		}
+		
+		// JPEG compression quality
+		String quality = cmd.getOptionValue("q");
+		if (quality != null) {
+			try {
+				int q = Integer.parseInt(quality);
+				if ((q<0) || (q>100)) {
+					System.out.println("Invalid JPEG compression setting: " + q + " (must be in the range 0 - 100)");
+					return;
+				}
+				tiler.setJPEGCompressionQuality(q);
+			} catch (NumberFormatException e) {
+				System.out.println("Invalid JPEG compression setting: " + quality);
+				return;
+			}
+		}
+		
+		// Background color
+		String background = cmd.getOptionValue("b");
+		if (background != null) tiler.setBackgroundColor(background);
+		
+		// Destination
+		File destination = null;
+		if (cmd.hasOption("o")) {
+			destination = new File(cmd.getOptionValue("o"));
+		}
+		
+		// HTML Preview
+		tiler.setGeneratePreviewHTML(cmd.hasOption("p"));
+		
+		// Input filename
+		File file = new File(cmd.getOptionValue("i"));
+		if (!file.exists()) {
+			System.out.println("File not found: " + file.getName());
+			return;
+		}
+		
+		// Log on/off
+		if (cmd.hasOption("l")) {
+			logger.addAppender(new FileAppender(new PatternLayout(), "log.txt", false));
+			logger.setLevel(Level.DEBUG);
+		}
+		
+		generateTiles(tiler, file, destination, consoleOutScheme, consoleOutFormat);
+	}
+	
+	private static void validate(CommandLine cmd) {
+		Validator validator = null;
+		boolean includeFiles = true;
+		
+		// Tiling scheme
+		String scheme = cmd.getOptionValue("s");
+		if (scheme.equalsIgnoreCase("zoomify")) {
+			validator = new ZoomifyValidator();
+			includeFiles = false; // Zoomify is directory-based -> don't include files in validation
+		} 
+		
+		if (validator == null) {
+			System.out.println("No validation support for tiling scheme: " + scheme);
+			return;
+		}
+		
+		// Input filename
+		File file = new File(cmd.getOptionValue("i"));
+		if (!file.exists()) {
+			System.out.println("File not found: " + file.getName());
+			return;
+		}
+		
+		if (validator.isTilesetDir(file)) {
+			// Validate single tileset
+			if (file.isDirectory() || includeFiles) {
+				try {
+					validator.validate(file);
+					logger.info("[OK] (ZOOMIFY) " + file.getName());
+				} catch (ValidationFailedException e) {
+					logger.info("[CORRUPT] (ZOOMIFY) " + file.getName() + ": "+ e.getMessage());
+				}
+			}
+		} else {
+			// Try children
+			File[] children = file.listFiles();
+			for (int i=0; i<children.length; i++) {
+				if (children[i].isDirectory() || includeFiles) {
+					try {
+						validator.validate(children[i]);
+						logger.info("[OK] (ZOOMIFY) " + children[i].getName());
+					} catch (ValidationFailedException e) {
+						logger.info("[CORRUPT] (ZOOMIFY) " + children[i].getName() + ": "+ e.getMessage());
+					}
+				}
+			}
 		}
 	}
 		
