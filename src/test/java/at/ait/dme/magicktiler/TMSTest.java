@@ -7,7 +7,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.ait.dme.magicktiler.impl.TMSTiler;
+import at.ait.dme.magicktiler.tms.TMSTiler;
 
 /**
  * TMS tiling tests

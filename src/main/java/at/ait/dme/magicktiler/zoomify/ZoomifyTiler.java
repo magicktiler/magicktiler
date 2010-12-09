@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler.impl;
+package at.ait.dme.magicktiler.zoomify;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

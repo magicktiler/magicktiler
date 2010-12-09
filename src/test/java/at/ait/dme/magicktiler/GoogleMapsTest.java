@@ -5,7 +5,7 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.ait.dme.magicktiler.impl.GoogleMapsTiler;
+import at.ait.dme.magicktiler.gmaps.GoogleMapsTiler;
 
 /**
  * Google Maps tiling tests

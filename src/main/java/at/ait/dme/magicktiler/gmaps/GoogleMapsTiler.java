@@ -1,4 +1,4 @@
-package at.ait.dme.magicktiler.impl;
+package at.ait.dme.magicktiler.gmaps;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler.impl;
+package at.ait.dme.magicktiler.ptif;
 
 import java.io.File;
 import java.io.IOException;

@@ -10,7 +10,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.ait.dme.magicktiler.impl.ZoomifyTiler;
+import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
 
 /**
  * Zoomify tiling tests
