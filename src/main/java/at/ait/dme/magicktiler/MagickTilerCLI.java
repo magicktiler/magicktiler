@@ -113,6 +113,12 @@ public class MagickTilerCLI {
 				return;
 			}
 			
+			// Log on/off
+			if (cmd.hasOption("l")) {
+				logger.addAppender(new FileAppender(new PatternLayout(), "log.txt", false));
+				logger.setLevel(Level.DEBUG);
+			}
+			
 			// Convert or validate
 			if(cmd.hasOption("v")) {
 				validate(cmd);
@@ -194,12 +200,6 @@ public class MagickTilerCLI {
 		if (!file.exists()) {
 			System.out.println("File not found: " + file.getName());
 			return;
-		}
-		
-		// Log on/off
-		if (cmd.hasOption("l")) {
-			logger.addAppender(new FileAppender(new PatternLayout(), "log.txt", false));
-			logger.setLevel(Level.DEBUG);
 		}
 		
 		generateTiles(tiler, file, destination, consoleOutScheme, consoleOutFormat);
