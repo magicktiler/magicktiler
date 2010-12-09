@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler;
+package at.ait.dme.magicktiler.image;
 
 /**
  * Supported image file formats. Please note that not all tiling schemes

@@ -34,11 +34,15 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import scala.actors.threadpool.Arrays;
 import at.ait.dme.magicktiler.gmaps.GoogleMapsTiler;
 import at.ait.dme.magicktiler.ptif.PTIFConverter;
 import at.ait.dme.magicktiler.tms.TMSTiler;
 import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
+import at.ait.dme.magicktiler.image.ImageFormat;
+
+import scala.actors.threadpool.Arrays;
+
+
 
 /**
  * MagickTiler Command-line interface.

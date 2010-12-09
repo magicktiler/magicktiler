@@ -30,7 +30,8 @@ import java.util.Map;
 
 import org.im4java.core.IM4JavaException;
 
-import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+import at.ait.dme.magicktiler.image.ImageProcessor;
+import at.ait.dme.magicktiler.image.ImageProcessor.ImageProcessingSystem;
 
 /**
  * To speed up the MagickTiler tiling process, images are (for most tiling schemes)

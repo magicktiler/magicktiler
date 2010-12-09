@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler;
+package at.ait.dme.magicktiler.image;
 
 import java.io.BufferedReader;
 import java.io.IOException;

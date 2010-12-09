@@ -31,7 +31,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.im4java.core.IM4JavaException;
 
-import at.ait.dme.magicktiler.ImageProcessor;
+import at.ait.dme.magicktiler.image.ImageProcessor;
 import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;

@@ -19,11 +19,12 @@
  * permissions and limitations under the Licence.
  */
 
-package at.ait.dme.magicktiler;
+package at.ait.dme.magicktiler.image;
 
 import java.io.File;
 
-import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+import at.ait.dme.magicktiler.TilingException;
+import at.ait.dme.magicktiler.image.ImageProcessor.ImageProcessingSystem;
 
 
 /**

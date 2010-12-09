@@ -31,7 +31,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.im4java.core.IM4JavaException;
 
-import at.ait.dme.magicktiler.ImageProcessor.ImageProcessingSystem;
+import at.ait.dme.magicktiler.image.ImageInfo;
+import at.ait.dme.magicktiler.image.ImageFormat;
+import at.ait.dme.magicktiler.image.ImageProcessor;
+import at.ait.dme.magicktiler.image.ImageProcessor.ImageProcessingSystem;
 import at.ait.dme.magicktiler.Stripe.Orientation;
 
 

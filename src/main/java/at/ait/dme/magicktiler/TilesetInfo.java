@@ -24,6 +24,9 @@ package at.ait.dme.magicktiler;
 import java.io.File;
 import java.util.ArrayList;
 
+import at.ait.dme.magicktiler.image.ImageInfo;
+import at.ait.dme.magicktiler.image.ImageFormat;
+import at.ait.dme.magicktiler.image.ImageProcessor;
 
 /**
  * Tileset data for a specified image file.

@@ -7,6 +7,7 @@ import scala.swing.event._
 import scala.actors.Actor
 
 import at.ait.dme.magicktiler._
+import at.ait.dme.magicktiler.image._
 import at.ait.dme.magicktiler.gmaps._
 import at.ait.dme.magicktiler.kml._
 import at.ait.dme.magicktiler.ptif._
