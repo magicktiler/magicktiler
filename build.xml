@@ -3,7 +3,7 @@
 <project name="magicktiler" default="info" basedir=".">
 
 	<!-- App version and Website -->
-	<property name="app.version" value="0.1-SNAPSHOT" />
+	<property name="app.version" value="0.9" />
 	<property name="app.website" value="http://code.google.com/p/magicktiler" />
 	
 	<!-- Source directory paths -->

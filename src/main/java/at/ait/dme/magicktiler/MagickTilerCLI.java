@@ -72,7 +72,7 @@ public class MagickTilerCLI {
 	private static final String TARGET_FMT_JPEG = "(JPEG tiles)";
 	private static final String TARGET_FMT_PNG = "(PNG tiles)";
 	
-	private static final String VERSION = "Version 0.1-SNAPSHOT";
+	private static final String VERSION = "Version 0.9";
 	private static final String WEBSITE = "http://code.google.com/p/magicktiler";
 	
 	private static final String USAGE_HEADER =
