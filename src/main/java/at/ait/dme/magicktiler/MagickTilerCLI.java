@@ -21,6 +21,7 @@
 package at.ait.dme.magicktiler;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.cli.BasicParser;
@@ -28,6 +29,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import scala.actors.threadpool.Arrays;
 import at.ait.dme.magicktiler.impl.GoogleMapsTiler;
@@ -74,7 +79,7 @@ public class MagickTilerCLI {
 		"See " + WEBSITE + " for details.\n";
 	private static final String USAGE_FOOTER = 
 		"Example: java -jar magicktiler.jar -s tms -f jpeg -i image.tif -p";
-	
+		
 	private static final Options options = new Options(){
 		private static final long serialVersionUID = 8442627813822171704L;
 	{
@@ -87,13 +92,12 @@ public class MagickTilerCLI {
 		addOption(new Option("p", null, "generate an HTML preview file", false));
 		addOption(new Option("g", null, "displays the GUI (ignores all other parameters)", false));
 		addOption(new Option("h", null, "displays this help text", false));
+		addOption(new Option("l", null, "writes reporting information to a log file", false));
 	}};
 	
-	/**
-	 * @param args
-	 * @throws TilingException 
-	 */
-	public static void main(String... args) throws TilingException {
+	private static final Logger logger = Logger.getLogger(MagickTilerCLI.class);
+	
+	public static void main(String... args) throws IOException {
 		if(showGui(args)) return;
 		
 		MagickTiler tiler = null;
@@ -167,11 +171,17 @@ public class MagickTilerCLI {
 			// HTML Preview
 			tiler.setGeneratePreviewHTML(cmd.hasOption("p"));
 			
-			// input filename
+			// Input filename
 			File file = new File(cmd.getOptionValue("i"));
 			if (!file.exists()) {
 				System.out.println("File not found: " + file.getName());
 				return;
+			}
+			
+			// Log on/off
+			if (cmd.hasOption("l")) {
+				logger.addAppender(new FileAppender(new PatternLayout(), "log.txt", false));
+				logger.setLevel(Level.DEBUG);
 			}
 			
 			generateTiles(tiler, file, destination, consoleOutScheme, consoleOutFormat);
@@ -182,7 +192,7 @@ public class MagickTilerCLI {
 	}
 		
 	private static void generateTiles(MagickTiler tiler, File input, File destination, 
-			String consoleOutScheme, String consoleOutFormat) throws TilingException {
+			String consoleOutScheme, String consoleOutFormat) {
 		
 		long startTime = System.currentTimeMillis();
 		System.out.println("Generating " + consoleOutScheme + " from file " + 
@@ -193,17 +203,39 @@ public class MagickTilerCLI {
 		
 		if (input.isFile()) {
 			// Tile single file
-			tiler.convert(input, destination);
+			try {
+				tiler.convert(input, destination);
+			} catch (TilingException e) {
+				System.out.println(e.getMessage());
+			}
 		} else {
 			// Tile folder full of files
+			long ctrFiles = 0;
+			long ctrTilesets = 0;
 			tiler.setWorkingDirectory(input);
 			String files[] = input.list();
+			logger.info(files.length + " files/subdirs in folder");
+			logger.info("--------------------------------------------------------------");
 			for (int i=0; i<files.length; i++) {
 				File child = new File(input, files[i]);
-				if (child.isFile()) tiler.convert(child, destination);
+				try {
+					if (child.isFile()) {
+						long tileStartTime = System.currentTimeMillis();
+						ctrFiles++;
+						tiler.convert(child, destination);
+						ctrTilesets++;
+						logger.info("[DONE] " + child.getName() + " (" + (System.currentTimeMillis() - tileStartTime) + " ms)");
+					}
+				} catch (TilingException e) {
+					logger.info("[SKIPPED] " + child.getName() + " - " + e.getMessage());
+				}
 			}
+			
+			long duration = (System.currentTimeMillis() - startTime) / 60000;
+			logger.info("--------------------------------------------------------------");
+			logger.info(ctrFiles + " files processed");
+			logger.info(ctrTilesets + " tilesets created (" + duration + " min)");
 		}
-		System.out.println("Done. Took " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 	
 	private static boolean showGui(String... args) {
