@@ -58,8 +58,10 @@ import scala.actors.threadpool.Arrays;
  * -b   background color<br>
  * -i	input file or directory<br>
  * -o   output directory (for tilesets) or file (for PTIF)<br>
- * -q   JPEG compression quality (0 - 100)
- * -p   generate an HTML preview file
+ * -q   JPEG compression quality (0 - 100)<br>
+ * -p   generate an HTML preview file<br>
+ * -l   writes reporting information to a log file<br>
+ * -v   validate the input instead of generating a tileset
  * 
  * @author magicktiler@gmail.com
  * @author Christian Sadilek <christian.sadilek@gmail.com>
@@ -233,9 +235,9 @@ public class MagickTilerCLI {
 			if (file.isDirectory() || includeFiles) {
 				try {
 					validator.validate(file);
-					logger.info("[OK] (ZOOMIFY) " + file.getName());
+					logger.info("[OK] ("+scheme+") " + file.getName());
 				} catch (ValidationFailedException e) {
-					logger.info("[CORRUPT] (ZOOMIFY) " + file.getName() + ": "+ e.getMessage());
+					logger.info("[CORRUPT] ("+scheme+") " + file.getName() + ": "+ e.getMessage());
 				}
 			}
 		} else {
@@ -245,9 +247,9 @@ public class MagickTilerCLI {
 				if (children[i].isDirectory() || includeFiles) {
 					try {
 						validator.validate(children[i]);
-						logger.info("[OK] (ZOOMIFY) " + children[i].getName());
+						logger.info("[OK] ("+scheme+") " + children[i].getName());
 					} catch (ValidationFailedException e) {
-						logger.info("[CORRUPT] (ZOOMIFY) " + children[i].getName() + ": "+ e.getMessage());
+						logger.info("[CORRUPT] ("+scheme+") " + children[i].getName() + ": "+ e.getMessage());
 					}
 				}
 			}
@@ -287,7 +289,8 @@ public class MagickTilerCLI {
 						ctrFiles++;
 						tiler.convert(child, destination);
 						ctrTilesets++;
-						logger.info("[DONE] " + child.getName() + " (" + (System.currentTimeMillis() - tileStartTime) + " ms)");
+						logger.info("[DONE] " + child.getName() + " (" + 
+								(System.currentTimeMillis() - tileStartTime) + " ms)");
 					}
 				} catch (TilingException e) {
 					logger.info("[SKIPPED] " + child.getName() + " - " + e.getMessage());

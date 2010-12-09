@@ -150,7 +150,7 @@ public class GoogleMapsTiler extends MagickTiler {
 			Stripe stripe1 = stripes.get(i * 2);
 			Stripe stripe2 = ((i * 2 + 1) < stripes.size()) ? stripes.get(i * 2 + 1) : null;
 			
-			// we will always have an even number of stripes
+			// we should always have an even number of stripes
 			if(stripe2!=null) {
 				Stripe result=stripe1.merge(stripe2, targetStripe, processor.getImageProcessingSystem());
 				nextLevel.add(result);
@@ -184,7 +184,6 @@ public class GoogleMapsTiler extends MagickTiler {
 
 		processor.resize(image.getAbsolutePath(), targetFileName, newWidth, newHeight);
 		return new TilesetInfo(new File(targetFileName), tileWidth, tileHeight, processor);
-
 	}
 	
 	private void generatePreview(TilesetInfo info) throws IOException {
