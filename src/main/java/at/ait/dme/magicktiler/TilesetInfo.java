@@ -147,6 +147,13 @@ public class TilesetInfo {
 		return tilesTotal;
 	}
 	
+	@Override
+	public String toString() {
+		return "TilesetInfo [format=" + format + ", imgInfo=" + imgInfo + ", tileHeight="
+				+ tileHeight + ", tileWidth=" + tileWidth + ", tilesTotal=" + tilesTotal
+				+ ", zoomlevels=" + zoomlevels + "]";
+	}
+
 	/**
 	 * Simple wrapper for the 'dimension' of a zoomlevel (i.e. number of
 	 * tiles in X/Y directions)
