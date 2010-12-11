@@ -35,7 +35,7 @@ import at.ait.dme.magicktiler.Stripe.Orientation;
  * <br><br>
  * The implemented tiling algorithm works as follows:
  * <ol>
- * <li>Resize the image to the closest multiple of 256 and the power of 2</li>
+ * <li>Resize the image so that the longest dimension equals the closest 256*n^2</li>
  * <li>For performance reasons, the base image is cut into vertical or 
  * horizontal stripes (depending on the image orientation). Thereby the image 
  * is squared adding background-color buffer to the stripes where necessary.</li>
@@ -57,7 +57,7 @@ public class GoogleMapsTiler extends MagickTiler {
 		List<Stripe> allStripes = new ArrayList<Stripe>();
 		try {
 			log.debug("Resizing base image");
-			// Step 1: resize to the closest multiple of 256 and the power of 2
+			// Step 1: resize to the closest 256*n^2
 			String src = tilesetRootDir.getAbsolutePath()+"/gmapbase."+processor.getImageFormat().getExtension();
 			info=resizeBaseImage(image, info, src);
 			
