@@ -190,7 +190,7 @@ public class GoogleMapsTiler extends MagickTiler {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(this.getClass()
-						.getResourceAsStream("gmap-template.html")));
+						.getResourceAsStream("gmaps-template.html")));
 	
 			StringBuffer sb = new StringBuffer();
 			String line;

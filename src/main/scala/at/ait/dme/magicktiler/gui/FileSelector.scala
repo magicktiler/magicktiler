@@ -15,15 +15,15 @@ import scala.swing.event._
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 class FileSelector(cols:Int, buttonText:String, selectionMode:FileChooser.SelectionMode.Value,
-   validate:Boolean) extends FlowPanel {
+   open:Boolean) extends FlowPanel {
 
-  def this(cols:Int, validate:Boolean) =
-    this(cols, "Browse", FileChooser.SelectionMode.FilesAndDirectories, validate)
+  def this(cols:Int, open:Boolean) =
+    this(cols, "Browse", FileChooser.SelectionMode.FilesAndDirectories, open)
 
   val selection = new TextField {
     columns = cols;
     reactions += {
-      case EditDone(selection) => if (validate) validate()
+      case EditDone(selection) => if (open) validate()
       case ValueChanged(selection) =>
         errorPopup.setVisible(false)
         background = Color.WHITE
@@ -40,12 +40,12 @@ class FileSelector(cols:Int, buttonText:String, selectionMode:FileChooser.Select
         
         val input = new FileChooser
         input.fileSelectionMode = selectionMode
-        if (input.showDialog(this, "") == FileChooser.Result.Approve) {
+        val result = if(open) input.showOpenDialog(this) else input.showSaveDialog(this)
+        if (result == FileChooser.Result.Approve) {
           selection.text = input.selectedFile.toString
           selection.requestFocusInWindow
-        } else {
-          selection.text = ""
-        }
+        } 
+        if (open) validate()
     }
   }
 
