@@ -78,8 +78,8 @@ class MagickTilerGUI extends SimpleSwingApplication {
 
       add(new Label("Generate HTML preview:"))
       add(generatePreview)
-
       addSeparator();
+      
       add(startButton)
       add(progressBar)
 
@@ -101,7 +101,7 @@ class MagickTilerGUI extends SimpleSwingApplication {
         constraints.gridwidth = cols;
 
         add(new Separator(), constraints)
-        y = y + 1
+        y += 1 
       }
     }
     contents = gridPanel
