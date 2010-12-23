@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * Interface for file and tiling scheme validators. 
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public interface Validator {

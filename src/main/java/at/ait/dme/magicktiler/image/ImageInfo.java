@@ -30,7 +30,7 @@ import at.ait.dme.magicktiler.image.ImageProcessor.ImageProcessingSystem;
 /**
  * Image information for a specified file (currently width and height only).
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ImageInfo {

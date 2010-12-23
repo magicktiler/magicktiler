@@ -34,7 +34,7 @@ import at.ait.dme.magicktiler.image.ImageProcessor;
  * TODO add methods that provide information about 
  * individual zoom levels (xTiles, yTiles)
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TilesetInfo {
@@ -158,7 +158,7 @@ public class TilesetInfo {
 	 * Simple wrapper for the 'dimension' of a zoomlevel (i.e. number of
 	 * tiles in X/Y directions)
 	 * 
-	 * @author magicktiler@gmail.com
+	 * @author Rainer Simon <magicktiler@gmail.com>
 	 */
 	private static class Dimension {
 	

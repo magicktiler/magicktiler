@@ -71,7 +71,7 @@ import at.ait.dme.magicktiler.Stripe.Orientation;
  * <li>HTML preview file is generated (if requested).</li>
  * </ol>
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TMSTiler extends MagickTiler {

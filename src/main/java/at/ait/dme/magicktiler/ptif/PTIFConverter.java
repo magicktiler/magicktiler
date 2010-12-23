@@ -55,7 +55,7 @@ import at.ait.dme.magicktiler.TilingException;
  * <li>Temporary files are deleted.</li>
  * </ol>
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class PTIFConverter extends MagickTiler {

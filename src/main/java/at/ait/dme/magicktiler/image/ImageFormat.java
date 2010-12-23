@@ -25,7 +25,7 @@ package at.ait.dme.magicktiler.image;
  * Supported image file formats. Please note that not all tiling schemes
  * may support all image file formats!
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  */
 public class ImageFormat {
 	

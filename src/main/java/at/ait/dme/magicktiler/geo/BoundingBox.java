@@ -25,7 +25,7 @@ package at.ait.dme.magicktiler.geo;
  * A BoundingBox consisting of a north and south latitude, and
  * an east and west longitude value. 
  *
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  */
 public class BoundingBox {
 

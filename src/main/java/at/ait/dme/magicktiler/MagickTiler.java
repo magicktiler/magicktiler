@@ -41,7 +41,7 @@ import at.ait.dme.magicktiler.Stripe.Orientation;
 /**
  * The base class for all supported tile scheme implementations.
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public abstract class MagickTiler {

@@ -39,7 +39,7 @@ import at.ait.dme.magicktiler.image.ImageProcessor.ImageProcessingSystem;
  * is done either vertically or horizontally. This class is a utility class for handling
  * and manipulating image stripes.
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class Stripe {

@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * KML tiling tests
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class KMLTest extends BaseTest {

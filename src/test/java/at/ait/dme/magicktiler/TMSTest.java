@@ -12,7 +12,7 @@ import at.ait.dme.magicktiler.tms.TMSTiler;
 /**
  * TMS tiling tests
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TMSTest extends BaseTest {

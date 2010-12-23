@@ -5,7 +5,7 @@ package at.ait.dme.magicktiler;
  * shall throw this exception when validation fails, and provide an
  * end-user-compatible message explaining the reason.
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  */
 public class ValidationFailedException extends Exception {
 

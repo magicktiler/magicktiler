@@ -25,7 +25,7 @@ package at.ait.dme.magicktiler;
  * An all-purpose exception that is thrown when something goes wrong
  * during the tile-generation process.
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  */
 public class TilingException extends Exception {
 

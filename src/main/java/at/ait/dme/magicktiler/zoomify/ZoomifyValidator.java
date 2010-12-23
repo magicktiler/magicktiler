@@ -19,7 +19,7 @@ import at.ait.dme.magicktiler.Validator;
  * adapted from Zoomify unit test.
  * 
  * @author Christian Sadilek <christian.sadilek@gmail.com>
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  */
 public class ZoomifyValidator implements Validator {
 	

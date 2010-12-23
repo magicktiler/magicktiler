@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 /**
  * PTIF tiling tests
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class PTIFTest extends TestCase {

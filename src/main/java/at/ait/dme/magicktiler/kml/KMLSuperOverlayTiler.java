@@ -54,7 +54,7 @@ import at.ait.dme.magicktiler.tms.TMSTiler;
  * <br><br>
  * TODO finish this implementation!
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class KMLSuperOverlayTiler extends TMSTiler {

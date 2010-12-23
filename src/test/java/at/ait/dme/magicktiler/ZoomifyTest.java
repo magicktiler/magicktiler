@@ -15,7 +15,7 @@ import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
 /**
  * Zoomify tiling tests
  * 
- * @author magicktiler@gmail.com
+ * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ZoomifyTest extends BaseTest {
