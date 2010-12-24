@@ -126,7 +126,7 @@ public class ZoomifyValidator implements Validator {
 			endIdx = xml.indexOf("\"", beginIdx + 1);
 			tileSize = Integer.parseInt(xml.substring(beginIdx, endIdx));
 			
-			tileGroups = (int) Math.ceil((double) numtiles / tileSize);
+			tileGroups = (int) Math.ceil((double) numtiles / ZoomifyTiler.MAX_TILES_PER_GROUP);
 			tilesInLastGroup = (int) ((double) numtiles % tileSize);
 
 			double xBaseTiles = (int) Math.ceil((float) width / tileSize);
@@ -163,23 +163,24 @@ public class ZoomifyValidator implements Validator {
 					// check for max tiles per group
 					if (tiles.length < tileSize)
 						throw new ValidationFailedException(
-							"Missing tiles in directory " + children[i] + " (" + tiles.length + " instead of 256)");
+							"Missing tiles in directory " + children[i] + " (" + tiles.length + " instead of " + 
+								ZoomifyTiler.MAX_TILES_PER_GROUP + ")");
 				} else {
 					// check for the remainder of the tiles in the last group
 					if (tiles.length < tilesInLastGroup)
 						throw new ValidationFailedException(
-							"Missing tiles in directory " + children[i] + " (" + tiles.length + " instead of " + tilesInLastGroup + ")");
+							"Missing tiles in directory " + children[i] + " (" + tiles.length + " instead of " + 
+								tilesInLastGroup + ")");
 				}
 				allTiles.put(tileGroup, Arrays.asList(tiles));
 			}
 		}
-		
-		checkEachTile(allTiles);
+		checkForEachTile(allTiles);
 	}
 	
-	private void checkEachTile(Map<Integer, Collection<String>> allTiles) throws ValidationFailedException {	
+	private void checkForEachTile(Map<Integer, Collection<String>> allTiles) throws ValidationFailedException {	
 		int tile = 0;
-		for (int zoomLevel=zoomLevels - 1; zoomLevel>=0; zoomLevel--) {
+		for (int zoomLevel=zoomLevels-1; zoomLevel>=0; zoomLevel--) {
 			for (int row=0; row<yTiles.get(zoomLevel); row++) {
 				for(int col=0; col<xTiles.get(zoomLevel); col++,tile++) {
 					String tileName = (zoomLevels - 1 - zoomLevel) + "-" + col + "-" + row + ".jpg";
@@ -191,5 +192,4 @@ public class ZoomifyValidator implements Validator {
 			}
 		}
 	}
-
 }

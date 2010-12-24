@@ -93,7 +93,7 @@ public class GoogleMapsTiler extends MagickTiler {
 				allStripes.addAll(stripes);
 			}
 		
-			//step 3: optionally create preview.html
+			//step 3: optionally create the preview.html
 			if(generatePreview) generatePreview(info);
 			log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		} catch (Exception e) {
