@@ -105,12 +105,12 @@ class MagickTilerGUI extends SimpleSwingApplication {
       }
     }
     contents = gridPanel
-    input.button.requestFocus();
+    input.button.requestFocus()
   }
 
   def startTiler() {
-    startButton.enabled = false;
-    progressBar.visible = true;
+    startButton.enabled = false
+    progressBar.visible = true
 
     var tiler: MagickTiler = null
     var inputFile: File = null
@@ -137,14 +137,14 @@ class MagickTilerGUI extends SimpleSwingApplication {
       tiler.convert(inputFile, outputFile)
       
       // display the result (either the directory or the HTML preview)
-      var result = tiler.getTilesetRootDir().getAbsolutePath();
+      var result = tiler.getTilesetRootDir().getAbsolutePath()
       if (generatePreview.selected) result += File.separator + "preview.html";
-      Desktop.getDesktop.open(new File(result));
+      Desktop.getDesktop.open(new File(result))
     } catch {
       case e =>
         JOptionPane.showMessageDialog(null, "Sorry, something went wrong here. " +
           "For now we only have these details:\n" + e.getMessage,
-          "Error", JOptionPane.ERROR_MESSAGE);
+          "Error", JOptionPane.ERROR_MESSAGE)
     }
     finally {
       progressBar.visible = false;
