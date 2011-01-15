@@ -15,8 +15,7 @@ import at.ait.dme.magicktiler.ValidationFailedException;
 import at.ait.dme.magicktiler.Validator;
 
 /**
- * Validation class for the Zoomify tiling scheme. Validation code
- * adapted from Zoomify unit test.
+ * Validation class for the Zoomify tiling scheme.
  * 
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  * @author Rainer Simon <magicktiler@gmail.com>

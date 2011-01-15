@@ -154,6 +154,12 @@ public class TilesetInfo {
 				+ ", zoomlevels=" + zoomlevels + "]";
 	}
 
+	public String getFileExtension() {
+		if(!getImageFile().getName().contains(".")) 
+			throw new RuntimeException("can't determine file extension of source image");
+		return getImageFile().getName().split("\\.")[1];
+	}
+	
 	/**
 	 * Simple wrapper for the 'dimension' of a zoomlevel (i.e. number of
 	 * tiles in X/Y directions)
@@ -167,7 +173,6 @@ public class TilesetInfo {
 		Dimension(int x, int y) {
 			this.x = x;
 			this.y = y;
-		}
-		
+		}	
 	}	
 }

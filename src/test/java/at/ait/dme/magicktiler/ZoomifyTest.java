@@ -29,7 +29,7 @@ public class ZoomifyTest extends BaseTest {
 	}
 	
 	@Test 
-	public void testZoomifyTiling() throws Exception {	
+	public void testZoomifyTiling() throws TilingException, ValidationFailedException  {	
 		// Generate a Zoomify tileset from the test image
 		MagickTiler t = new ZoomifyTiler();
 		t.setWorkingDirectory(workingDir);

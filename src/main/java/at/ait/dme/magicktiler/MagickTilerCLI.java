@@ -34,14 +34,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import scala.actors.threadpool.Arrays;
 import at.ait.dme.magicktiler.gmaps.GoogleMapsTiler;
+import at.ait.dme.magicktiler.gmaps.GoogleMapsValidator;
+import at.ait.dme.magicktiler.image.ImageFormat;
 import at.ait.dme.magicktiler.ptif.PTIFConverter;
 import at.ait.dme.magicktiler.tms.TMSTiler;
 import at.ait.dme.magicktiler.zoomify.ZoomifyTiler;
 import at.ait.dme.magicktiler.zoomify.ZoomifyValidator;
-import at.ait.dme.magicktiler.image.ImageFormat;
-
-import scala.actors.threadpool.Arrays;
 
 /**
  * MagickTiler Command-line interface.
@@ -216,7 +216,9 @@ public class MagickTilerCLI {
 		if (scheme.equalsIgnoreCase("zoomify")) {
 			validator = new ZoomifyValidator();
 			includeFiles = false; // Zoomify is directory-based -> don't include files in validation
-		} 
+		} else if (scheme.equalsIgnoreCase("gmap")) {
+			validator = new GoogleMapsValidator();
+		}
 		
 		if (validator == null) {
 			System.out.println("No validation support for tiling scheme: " + scheme);

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.ait.dme.magicktiler.gmaps.GoogleMapsTiler;
+import at.ait.dme.magicktiler.gmaps.GoogleMapsValidator;
 
 /**
  * Google Maps tiling tests
@@ -22,7 +23,7 @@ public class GoogleMapsTest extends BaseTest {
 	}
 	
 	@Test 
-	public void testGoogleMapsTiling() throws TilingException {
+	public void testGoogleMapsTiling() throws TilingException, ValidationFailedException {
 		// Generate a Google Maps tileset from the test image
 		MagickTiler t = new GoogleMapsTiler();
 		t.setWorkingDirectory(workingDir);
@@ -40,17 +41,9 @@ public class GoogleMapsTest extends BaseTest {
 		assertEquals("Wrong number of y-basetiles calculated for the GMAP tileset!", 16, info.getNumberOfYTiles(0));
 		assertEquals("Wrong number of zoom levels calculated for the GMAP tileset!", 5, info.getZoomLevels());
 		
-		int filesVerified = 0;
-		for(int z=0; z<info.getZoomLevels(); z++) {
-			for (int x=0; x<info.getNumberOfXTiles(info.getZoomLevels()-1-z); x++) {
-				for (int y=0; y<info.getNumberOfYTiles(info.getZoomLevels()-1-z); y++) {
-					String tile = z+"_"+x+"_"+y+"."+getFileExtension(info);
-					assertTrue("Files missing for zoom level " + z, new File(tilesetRoot,tile).exists());
-					filesVerified++;
-				}
-			}
-		}
-		assertEquals(filesVerified, info.getTotalNumberOfTiles());
+		// execute the validator
+		new GoogleMapsValidator().validate(tilesetRoot);
+		
 		assertTrue("Preview was not generated!" , new File(tilesetRoot,"preview.html").exists());
 	}
 }

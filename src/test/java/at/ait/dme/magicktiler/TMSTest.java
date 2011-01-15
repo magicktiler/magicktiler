@@ -65,8 +65,6 @@ public class TMSTest extends BaseTest {
 	}
 	
 	private boolean checkZoomLevel(TilesetInfo info, File zoomlevelRoot, int xTiles, int yTiles) {
-		String ext = getFileExtension(info);
-		
 		String files[] = zoomlevelRoot.list();
 		if (files.length != xTiles) return false;
 		for (int col=0; col<xTiles; col++) {
@@ -75,7 +73,7 @@ public class TMSTest extends BaseTest {
 			String[] tiles = colDir.list();
 			if (tiles.length != yTiles) return false;
 			for (int row=0; row<yTiles; row++) {
-				File tile = new File(colDir, Integer.toString(row)+"."+ext);
+				File tile = new File(colDir, Integer.toString(row)+"."+info.getFileExtension());
 				if (!tile.exists()) return false;
 			}
 		}

@@ -2,6 +2,7 @@ package at.ait.dme.magicktiler.gmaps;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -10,12 +11,15 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.im4java.core.IM4JavaException;
 
-import at.ait.dme.magicktiler.image.ImageProcessor;
 import at.ait.dme.magicktiler.MagickTiler;
 import at.ait.dme.magicktiler.Stripe;
 import at.ait.dme.magicktiler.TilesetInfo;
 import at.ait.dme.magicktiler.TilingException;
 import at.ait.dme.magicktiler.Stripe.Orientation;
+import at.ait.dme.magicktiler.image.ImageProcessor;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * A tiler that implements the Google Maps tiling scheme
@@ -40,14 +44,16 @@ import at.ait.dme.magicktiler.Stripe.Orientation;
  * horizontal stripes (depending on the image orientation). Thereby the image 
  * is squared adding background-color buffer to the stripes where necessary.</li>
  * <li>For all zoomlevels, the stripes of the zoom level beneath (if any) are merged and are then cut to 
- * tiles (The number of tiles per zoomlevel is 4^zoomlevel)</li>
+ * tiles (The number of tiles per zoomlevel is 4^zoomlevel).</li>
  * <li>The HTML preview file is generated (if requested).</li>
+ * <li>The metadata file is written.</li>
  * </ol>
  
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class GoogleMapsTiler extends MagickTiler {
 	private static Logger log = Logger.getLogger(GoogleMapsTiler.class);
+	protected static final String METADATA_FILE = "gmap_tileset.info";
 
 	@Override
 	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
@@ -95,6 +101,10 @@ public class GoogleMapsTiler extends MagickTiler {
 		
 			//step 3: optionally create the preview.html
 			if(generatePreview) generatePreview(info);
+			
+			//step 4: write the metadata file
+			new XStream(new DomDriver()).toXML(info, new FileOutputStream(tilesetRootDir+"/"+METADATA_FILE));
+			
 			log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		} catch (Exception e) {
 			log.error("Failed to tile image", e);
@@ -107,7 +117,7 @@ public class GoogleMapsTiler extends MagickTiler {
 		
 		return info;
 	}
-	
+
 	private List<Stripe> stripeBaseImage(TilesetInfo info) 
 		throws IOException, InterruptedException, IM4JavaException, TilingException {
 		
