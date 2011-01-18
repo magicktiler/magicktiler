@@ -3,6 +3,9 @@ package at.ait.dme.magicktiler.gmaps;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
 
 import scala.actors.threadpool.Arrays;
 import at.ait.dme.magicktiler.TilesetInfo;
@@ -18,6 +21,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class GoogleMapsValidator implements Validator {
+	private static Logger log = Logger.getLogger(GoogleMapsValidator.class);
 
 	@Override
 	public boolean isTilesetDir(File dir) {
@@ -30,12 +34,19 @@ public class GoogleMapsValidator implements Validator {
 		if(!isTilesetDir(dir)) throw new ValidationFailedException("Not a MagickTiler Google Maps tileset, " +
 				"validation can not be continued.");
 		
-		TilesetInfo info;
+		TilesetInfo info = null;
+		FileInputStream metadata = null;
 		try {
-			info = (TilesetInfo) new XStream(new DomDriver()).fromXML(
-					new FileInputStream(dir.getAbsolutePath()+"/"+GoogleMapsTiler.METADATA_FILE));
+			metadata = new FileInputStream(dir.getAbsolutePath()+"/"+GoogleMapsTiler.METADATA_FILE);
+			info = (TilesetInfo) new XStream(new DomDriver()).fromXML(metadata);
 		} catch (FileNotFoundException e) {
 			throw new ValidationFailedException("Metadata file not found!");
+		} finally {
+				try {
+					if(metadata!=null) metadata.close();
+				} catch (IOException e) {
+					log.error("Could not close metadata file!");
+				}
 		}
 		
 		int filesVerified = 0;
@@ -50,6 +61,7 @@ public class GoogleMapsValidator implements Validator {
 				}
 			}
 		}
+		
 		if(filesVerified != info.getTotalNumberOfTiles()) 
 			throw new ValidationFailedException("Not enough files generated for Tileset!");
 	}

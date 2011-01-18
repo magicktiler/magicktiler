@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,7 @@ public class GoogleMapsTiler extends MagickTiler {
 		long startTime = System.currentTimeMillis();
 		log.info("Generating Google Map tiles for file " + image.getName());	
 		
+		OutputStream metadata = null;
 		List<Stripe> allStripes = new ArrayList<Stripe>();
 		try {
 			log.debug("Resizing base image");
@@ -74,7 +76,6 @@ public class GoogleMapsTiler extends MagickTiler {
 			
 			for(int z=info.getZoomLevels()-1;z>=0;z--) {
 				log.debug("Tiling level " + z);
-				
 				// Step 3: create the tiles for this zoom level
 				String tileBase = tilesetRootDir.getAbsolutePath()+File.separator+z;
 				for (int s=0; s<stripes.size(); s++) {
@@ -103,7 +104,8 @@ public class GoogleMapsTiler extends MagickTiler {
 			if(generatePreview) generatePreview(info);
 			
 			//step 4: write the metadata file
-			new XStream(new DomDriver()).toXML(info, new FileOutputStream(tilesetRootDir+"/"+METADATA_FILE));
+			metadata = new FileOutputStream(tilesetRootDir+"/"+METADATA_FILE);
+			new XStream(new DomDriver()).toXML(info, metadata);
 			
 			log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
 		} catch (Exception e) {
@@ -113,8 +115,13 @@ public class GoogleMapsTiler extends MagickTiler {
 			// clean up
 			for(Stripe s : allStripes)
 				if(!s.getImageFile().delete()) log.error("Could not delete stripe:"+s.getImageFile());
+			
+			try {
+				if(metadata!=null) metadata.close();
+			} catch (IOException e) {
+				log.error("Could not close metadata file");
+			}
 		}
-		
 		return info;
 	}
 
