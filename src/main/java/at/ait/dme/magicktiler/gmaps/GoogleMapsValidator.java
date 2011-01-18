@@ -34,20 +34,8 @@ public class GoogleMapsValidator implements Validator {
 		if(!isTilesetDir(dir)) throw new ValidationFailedException("Not a MagickTiler Google Maps tileset, " +
 				"validation can not be continued.");
 		
-		TilesetInfo info = null;
-		FileInputStream metadata = null;
-		try {
-			metadata = new FileInputStream(dir.getAbsolutePath()+"/"+GoogleMapsTiler.METADATA_FILE);
-			info = (TilesetInfo) new XStream(new DomDriver()).fromXML(metadata);
-		} catch (FileNotFoundException e) {
-			throw new ValidationFailedException("Metadata file not found!");
-		} finally {
-				try {
-					if(metadata!=null) metadata.close();
-				} catch (IOException e) {
-					log.error("Could not close metadata file!");
-				}
-		}
+		TilesetInfo info = readMetadata(dir);
+		if(info==null) throw new ValidationFailedException("Failed to read metadata");
 		
 		int filesVerified = 0;
 		for(int z=0; z<info.getZoomLevels(); z++) {
@@ -64,5 +52,23 @@ public class GoogleMapsValidator implements Validator {
 		
 		if(filesVerified != info.getTotalNumberOfTiles()) 
 			throw new ValidationFailedException("Not enough files generated for Tileset!");
+	}
+	
+	private TilesetInfo readMetadata(File dir) throws ValidationFailedException {
+		TilesetInfo info = null;
+		FileInputStream metadata = null;
+		try {
+			metadata = new FileInputStream(dir.getAbsolutePath()+"/"+GoogleMapsTiler.METADATA_FILE);
+			info = (TilesetInfo) new XStream(new DomDriver()).fromXML(metadata);
+		} catch (FileNotFoundException e) {
+			throw new ValidationFailedException("Metadata file not found!");
+		} finally {
+			try {
+				if(metadata!=null) metadata.close();
+			} catch (IOException e) {
+				log.error("Could not close metadata file!");
+			}
+		}
+		return info;
 	}
 }
