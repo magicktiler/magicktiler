@@ -175,7 +175,8 @@ public abstract class MagickTiler {
 		tilesetRootDir = target;
 		
 		if (!workingDirectory.exists()) createDir(workingDirectory);
-		String baseName = image.getName().substring(0, image.getName().lastIndexOf('.'));
+        String name = image.getName();
+        String baseName = name.indexOf('.') > -1 ? name.substring(0, name.lastIndexOf('.')) : name;
 		createTargetDir(baseName);
 
 		if (image.getAbsolutePath().endsWith("jp2")) {
