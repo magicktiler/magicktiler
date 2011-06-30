@@ -33,59 +33,60 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.core.IdentifyCmd;
+import org.im4java.core.ImageCommand;
 import org.im4java.core.MontageCmd;
 import org.im4java.process.OutputConsumer;
 
 /**
  * A wrapper for all image processing operations used.
- * 
+ *
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ImageProcessor {
-	
+
 	/**
 	 * Supported image processing systems: GraphicsMagick or ImageMagick.
 	 * Please note that there are currently some issues with ImageMagick though.
 	 * It is highly recommended to use this software with GraphicsMagick!
 	 */
 	public enum ImageProcessingSystem { GRAPHICSMAGICK,	IMAGEMAGICK }
-	
+
 	/**
 	 * IM/GM gravity String constants
 	 */
 	public static final String GRAVITY_CENTER = "Center";
 	public static final String GRAVITY_SOUTHWEST = "SouthWest";
-	
+
 	/**
 	 * The processing system used by this ImageProcessor
 	 */
 	private ImageProcessingSystem processingSystem;
-	
+
 	/**
 	 * The image format this processor will produce as output
 	 */
 	private ImageFormat format;
-	
+
 	/**
 	 * JPEG compression quality (in case of JPEG image format), default=75
 	 */
 	private int jpegQuality = 75;
-	
+
 	/**
 	 * The default background color for montage operations
 	 */
 	private String backgroundColor;
-	
-	
+
+
 	public ImageProcessor(ImageProcessingSystem processingSystem) {
 		this.processingSystem = processingSystem;
 	}
-	
+
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format) {
 		this(processingSystem);
 		this.format = format;
 	}
-	
+
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, String backgroundColor) {
 		this(processingSystem, format);
 		this.backgroundColor = backgroundColor;
@@ -96,39 +97,39 @@ public class ImageProcessor {
 		this.jpegQuality = jpegQuality;
 	}
 
-	
+
 	public ImageProcessor(ImageProcessingSystem processingSystem, ImageFormat format, int jpegQuality) {
 		this(processingSystem, format, null, jpegQuality);
 	}
 
 	/**
 	 * Crops an image using the width and height provided
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
 	 * @param width  the width of the resulting image
 	 * @param height  the height of the resulting image
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
 	 */
-	public void crop(String src, String target, int width, int height) 
+	public void crop(String src, String target, int width, int height)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.addImage(src);
 		op.crop(width, height);
 		op.p_adjoin();
 		op.addImage(target);
-		
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+
+		getCommand(CmdType.CONVERT).run(op);
 	}
-	
+
 	/**
 	 * Crops an image using the width and height provided and places it on a
 	 * canvas with the specified gravity, width and height.
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
 	 * @param width  the width of the resulting image
@@ -136,13 +137,13 @@ public class ImageProcessor {
 	 * @param gravity  the gravity specifies the location of the image on the canvas
 	 * @param canvasWidth  the width of the canvas
 	 * @param canvasHeight the height of the canvas
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
 	 */
 	public void crop(String src, String target, int width, int height,
-			int canvasWidth, int canvasHeight, String gravity) 
+			int canvasWidth, int canvasHeight, String gravity)
 		throws IOException, InterruptedException, IM4JavaException {
 
 		IMOperation op = createOperation();
@@ -154,74 +155,74 @@ public class ImageProcessor {
 		op.extent(canvasWidth, canvasHeight);
 		op.addImage(target);
 
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+        getCommand(CmdType.CONVERT).run(op);
 	}
-	
+
 	/**
 	 * Squares an image using the specified dimension
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
 	 * @param dim  dimension of the new image
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
 	 */
-	public void square(String src, String target, int dim) 
+	public void square(String src, String target, int dim)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.addImage(src);
 		op.gravity(GRAVITY_CENTER);
 		op.geometry(dim, dim);
-		
+
 		String color = backgroundColor;
 		if(color.startsWith("#")) {
 			color=color.substring(0,7);
 		}
 		op.addRawArgs("xc:" + color);
 		op.addImage(target);
-		
-		new CompositeCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+
+        getCommand(CmdType.COMPOSITE).run(op);
 	}
-	
+
 	/**
 	 * Resizes as image to the specified width and height
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
 	 * @param width  the width of the resulting image
 	 * @param height  the height of the resulting image
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
 	 */
-	public void resize(String src, String target, int width, int height) 
+	public void resize(String src, String target, int width, int height)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.addImage(src);
 		op.resize(width, height);
 		op.addImage(target);
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);		
+        getCommand(CmdType.CONVERT).run(op);
 	}
 
 	/**
 	 * Converts an image to the specified target format
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
 	 * @param rawArgs  args passed to graphics/imagemagick
-	 * 
-	 * @throws IM4JavaException 
-	 * @throws InterruptedException 
-	 * @throws IOException 
+	 *
+	 * @throws IM4JavaException
+	 * @throws InterruptedException
+	 * @throws IOException
 	 */
-	public void convert(String src, String target, Map<String, String> rawArgs) 
+	public void convert(String src, String target, Map<String, String> rawArgs)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = new IMOperation();
 		op.addImage(src);
 		if(rawArgs!=null) {
@@ -229,13 +230,13 @@ public class ImageProcessor {
 			op.addRawArgs(rawArg, rawArgs.get(rawArg));
 		}
 		op.addImage(target);
-		
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+
+        getCommand(CmdType.CONVERT).run(op);
 	}
-	
+
 	/**
 	 * Describes the format and characteristics of one or more image files.
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @return result as String (@see <a href="http://www.graphicsmagick.org/identify.html">docs</a>)
 	 * @throws IOException
@@ -244,7 +245,7 @@ public class ImageProcessor {
 	 */
 	public String identify(String src) throws IOException, InterruptedException, IM4JavaException {
 		final StringBuffer result = new StringBuffer();
-		IdentifyCmd identify = new IdentifyCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK);
+		ImageCommand identify = getCommand(CmdType.IDENTIFY);
 		identify.setOutputConsumer(new OutputConsumer() {
 			public void consumeOutput(InputStream in) throws IOException {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -258,24 +259,24 @@ public class ImageProcessor {
 		IMOperation op = new IMOperation();
 		op.addImage(src);
 		identify.run(op);
-		
+
 		return result.toString();
 	}
-	
+
 	/**
 	 * Merges multiple images
-	 * 
+	 *
 	 * @param srcs  list of source file images
 	 * @param definition  definition for coders and decoders to use while reading and writing image data
 	 * @param compression  compressions of the resulting image
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
 	 */
-	public void merge(List<String> srcs, String definition, String compression) 
+	public void merge(List<String> srcs, String definition, String compression)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.adjoin();
 		op.define(definition);
@@ -283,50 +284,50 @@ public class ImageProcessor {
 		for (String src : srcs) {
 			op.addImage(src);
 		}
- 		
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+
+        getCommand(CmdType.CONVERT).run(op);
 	}
-	
+
 	/**
 	 * Scales an image to the given size
-	 * 
+	 *
 	 * @param src  absolute path to source image
 	 * @param target  absolute path to target image
 	 * @param width  width of the resulting image
 	 * @param height  height of the resulting image
-	 * 
-	 * @throws IM4JavaException 
-	 * @throws InterruptedException 
-	 * @throws IOException 
+	 *
+	 * @throws IM4JavaException
+	 * @throws InterruptedException
+	 * @throws IOException
 	 */
-	public void scale(String src, String target, int width, int height) 
+	public void scale(String src, String target, int width, int height)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.size(width, height);
 		op.scale(width, height);
 		op.addImage(src);
 		op.addImage(target);
 
-		new ConvertCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+        getCommand(CmdType.CONVERT).run(op);
 	}
-	
+
 	/**
 	 * Creates a montage of the given images
-	 * 
+	 *
 	 * @param srcs  list of source file images
 	 * @param target  absolute path to target image
 	 * @param xTiles  number of x tiles
 	 * @param yTiles  number of y tiles
 	 * @param rawArgs  raw args passed to graphics/imagemagick
-	 * 
+	 *
 	 * @throws IM4JavaException
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void montage(List<String> srcs, String target, int xTiles, int yTiles, Map<String, String> rawArgs) 
+	public void montage(List<String> srcs, String target, int xTiles, int yTiles, Map<String, String> rawArgs)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.tile(xTiles, yTiles);
 		if(rawArgs!=null) {
@@ -335,13 +336,13 @@ public class ImageProcessor {
 		}
 		op.addImage(srcs.toArray(new String[srcs.size()]));
 		op.addImage(target);
-		
-		new MontageCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+
+        getCommand(CmdType.MONTAGE).run(op);
 	}
-	
+
 	/**
 	 * Creates a montage of the given images
-	 * 
+	 *
 	 * @param srcs  list of source file images
 	 * @param target  absolute path to target image
 	 * @param xTiles  number of x tiles
@@ -350,15 +351,15 @@ public class ImageProcessor {
 	 * @param height  height of target image
 	 * @param backgroundColor  the background color to use
 	 * @param gravity  the gravity specifies the location of the image on the canvas
-	 * 
+	 *
 	 * @throws IM4JavaException
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void montage(List<String> srcs, String target, int xTiles, int yTiles, int width, int height, 
-			String backgroundColor, String gravity) 
+	public void montage(List<String> srcs, String target, int xTiles, int yTiles, int width, int height,
+			String backgroundColor, String gravity)
 		throws IOException, InterruptedException, IM4JavaException {
-		
+
 		IMOperation op = createOperation();
 		op.tile(xTiles, yTiles);
 		op.gravity(gravity);
@@ -366,10 +367,10 @@ public class ImageProcessor {
 		op.geometry(width, height);
 		op.addImage(srcs.toArray(new String[srcs.size()]));
 		op.addImage(target);
-		
-		new MontageCmd(processingSystem == ImageProcessingSystem.GRAPHICSMAGICK).run(op);
+
+        getCommand(CmdType.MONTAGE).run(op);
 	}
-	
+
 	private IMOperation createOperation() {
 		IMOperation op = new IMOperation();
 		if (format == ImageFormat.JPEG) op.quality(new Double(jpegQuality));
@@ -379,34 +380,82 @@ public class ImageProcessor {
 	public ImageProcessingSystem getImageProcessingSystem() {
 		return processingSystem;
 	}
-	
+
 	public void setImageProcessingSystem(ImageProcessingSystem processingSystem) {
 		this.processingSystem = processingSystem;
 	}
-	
+
 	public ImageFormat getImageFormat() {
 		return format;
 	}
-	
+
 	public void setImageFormat(ImageFormat format) {
 		this.format = format;
 	}
-	
+
 	public int getJPEGQuality() {
 		return jpegQuality;
 	}
-	
+
 	public void setJPEGQuality(int quality) {
 		if (quality < 0) throw new IllegalArgumentException("quality below 0");
 		if (quality > 100) throw new IllegalArgumentException("quality above 100");
-		this.jpegQuality = quality;		
+		this.jpegQuality = quality;
 	}
-	
+
 	public String getBackground() {
 		return backgroundColor;
 	}
-	
+
 	public void setBackground(String color) {
 		this.backgroundColor = color;
 	}
+
+    private enum CmdType { CONVERT, COMPOSITE, IDENTIFY, MONTAGE}
+
+    /**
+     * Returns a command of the given type
+     * @param type the {@link CmdType} to use
+     * @return a command, possibly using the GM command set via the system property "magicktiler.gm.command"
+     */
+    private ImageCommand getCommand(CmdType type) {
+        final boolean useGm = processingSystem == ImageProcessingSystem.GRAPHICSMAGICK;
+        final String gmCommand = System.getProperty("magicktiler.gm.command");
+        final boolean useGmCommand = gmCommand != null;
+
+        ImageCommand command = null;
+        switch(type) {
+            case CONVERT:
+                if(useGmCommand) {
+                    command = new ImageCommand(gmCommand, "convert");
+                } else {
+                    command = new ConvertCmd(useGm);
+                }
+                break;
+            case COMPOSITE:
+                if(useGmCommand) {
+                    command = new ImageCommand(gmCommand, "composite");
+                } else {
+                    command = new CompositeCmd(useGm);
+                }
+                break;
+            case IDENTIFY:
+                if(useGmCommand) {
+                    command = new ImageCommand(gmCommand, "identify");
+                } else {
+                    command = new IdentifyCmd(useGm);
+                }
+                break;
+            case MONTAGE:
+                if(useGmCommand) {
+                    command = new ImageCommand(gmCommand, "montage");
+                } else {
+                    command = new MontageCmd(useGm);
+                }
+                break;
+            default:
+                throw new RuntimeException("Should not be here.");
+        }
+        return command;
+    }
 }
