@@ -28,36 +28,37 @@ package at.ait.dme.magicktiler.image;
  * @author Rainer Simon <magicktiler@gmail.com>
  */
 public class ImageFormat {
-	
-	/**
-	 * Supported tile formats
-	 */
-	public static final ImageFormat JPEG = new ImageFormat();
-	public static final ImageFormat PNG = new ImageFormat("image/png", "png");
-	
-	/**
-	 * The format mime type (default: image/jpeg)
-	 */
-	private String mimeType = "image/jpeg";
-	
-	/**
-	 * The format extension (default: jpg)
-	 */
-	private String extension = "jpg";
-	
-	private ImageFormat() { }
-	
-	private ImageFormat(String mimeType, String extension) {
-		this.mimeType = mimeType;
-		this.extension = extension;
-	}
-	
-	public String getMimeType() {
-		return mimeType;
-	}
-	
-	public String getExtension() {
-		return extension;
-	}
+
+  /**
+   * Supported tile formats
+   */
+  public static final ImageFormat JPEG = new ImageFormat();
+  public static final ImageFormat PNG = new ImageFormat("image/png", "png");
+
+  /**
+   * The format mime type (default: image/jpeg)
+   */
+  private String mimeType = "image/jpeg";
+
+  /**
+   * The format extension (default: jpg)
+   */
+  private String extension = "jpg";
+
+  private ImageFormat() {
+  }
+
+  private ImageFormat(String mimeType, String extension) {
+    this.mimeType = mimeType;
+    this.extension = extension;
+  }
+
+  public String getMimeType() {
+    return mimeType;
+  }
+
+  public String getExtension() {
+    return extension;
+  }
 
 }

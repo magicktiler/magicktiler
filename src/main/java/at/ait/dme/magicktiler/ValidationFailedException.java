@@ -9,10 +9,10 @@ package at.ait.dme.magicktiler;
  */
 public class ValidationFailedException extends Exception {
 
-	private static final long serialVersionUID = 2419151493105137582L;
+  private static final long serialVersionUID = 2419151493105137582L;
 
-	public ValidationFailedException(String message) {
-		super(message);
-	}
-	
+  public ValidationFailedException(String message) {
+    super(message);
+  }
+
 }

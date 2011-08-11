@@ -14,17 +14,17 @@ import org.junit.Ignore;
 @Ignore
 public abstract class BaseTest extends TestCase {
 
-	protected void deleteDir(File path) {
-	    if(path.exists()) {
-	      File[] files = path.listFiles();
-	      for (int i=0; i<files.length; i++) {
-	         if(files[i].isDirectory()) {
-	        	 deleteDir(files[i]);
-	         } else {
-	           files[i].delete();
-	         }
-	      }
-	    }
-	    path.delete();
-	}
+  protected void deleteDir(File path) {
+    if (path.exists()) {
+      File[] files = path.listFiles();
+      for (int i = 0; i < files.length; i++) {
+        if (files[i].isDirectory()) {
+          deleteDir(files[i]);
+        } else {
+          files[i].delete();
+        }
+      }
+    }
+    path.delete();
+  }
 }

@@ -59,81 +59,79 @@ import at.ait.dme.magicktiler.TilingException;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class PTIFConverter extends MagickTiler {
-	
-	/**
-	 * Standard tile width and height for PTIF files = 256
-	 */
-	private static final int TILE_SIZE = 256;
-	
-	/**
-	 * Log4j logger
-	 */
-	private static Logger log = Logger.getLogger(PTIFConverter.class);
-	
-	@Override
-	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
-		long startTime = System.currentTimeMillis();
-		log.info("Generating PTIF for file " + image.getName() + ": " +
-                info.getImageWidth() + "x" + info.getImageHeight() + ", " +
-                info.getZoomLevels() + " zoom levels"
-		);
-        
-		try {
-	        // Step 1 - compute pyramid
-			log.debug("Computing pyramid");
-			List<String> levels = computePyramid(info);
-			
-			// Step 2 - merge
-			log.debug("Merging");
-			File tempFile = new File(image.getParent(), "tmp.tif");
-			levels.add(tempFile.getAbsolutePath());
-			processor.merge(levels, "tiff:tile-geometry=" + TILE_SIZE + "x" + TILE_SIZE, "jpeg");
 
-			// Step 3 - rename
-			if (tilesetRootDir.exists()) {
-				if(!tilesetRootDir.delete()) 
-					throw new TilingException("Failed to delete directory:"+tilesetRootDir);
-			}
-			if(!tempFile.renameTo(tilesetRootDir))
-				throw new TilingException("Failed to rename directory:"+tempFile);
-			
-			// Step 4 - remove temporary files
-			for (int i=1; i<levels.size()-1; i++) {
-				tempFile = new File(levels.get(i));
-				if(!tempFile.delete())
-					log.error("Failed to delete temp file:"+tempFile);
-			}
-		} catch (Exception e) {
-			throw new TilingException(e.getMessage());
-		}
-		
-		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
-		return info;
-	}
-	
-	private List<String> computePyramid(TilesetInfo info) throws IOException, InterruptedException, IM4JavaException {
-		ArrayList<String> pyramid = new ArrayList<String>();
-		
-		String inputFile = info.getImageFile().getAbsolutePath();
-		pyramid.add(inputFile);
+  /**
+   * Standard tile width and height for PTIF files = 256
+   */
+  private static final int TILE_SIZE = 256;
 
-		String tempFilePrefix = inputFile.substring(0, inputFile.lastIndexOf('.'));
+  /**
+   * Log4j logger
+   */
+  private static Logger log = Logger.getLogger(PTIFConverter.class);
 
-		int w = info.getImageWidth();
-		int h = info.getImageHeight();
-		
-		String previousLevel = inputFile;
-		String thisLevel;
-        
-		for (int i = 1; i < info.getZoomLevels(); i++) {
-			w /= 2;
-			h /= 2;
-			thisLevel = tempFilePrefix + "-" + i + ".tif";
+  @Override
+  protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
+    long startTime = System.currentTimeMillis();
+    log.info("Generating PTIF for file " + image.getName() + ": " + info.getImageWidth() + "x" + info.getImageHeight()
+        + ", " + info.getZoomLevels() + " zoom levels");
 
-			processor.scale(previousLevel, thisLevel, w, h);
-			pyramid.add(thisLevel);
-			previousLevel = thisLevel;
-		}
-		return pyramid;
-	}
+    try {
+      // Step 1 - compute pyramid
+      log.debug("Computing pyramid");
+      List<String> levels = computePyramid(info);
+
+      // Step 2 - merge
+      log.debug("Merging");
+      File tempFile = new File(image.getParent(), "tmp.tif");
+      levels.add(tempFile.getAbsolutePath());
+      processor.merge(levels, "tiff:tile-geometry=" + TILE_SIZE + "x" + TILE_SIZE, "jpeg");
+
+      // Step 3 - rename
+      if (tilesetRootDir.exists()) {
+        if (!tilesetRootDir.delete())
+          throw new TilingException("Failed to delete directory:" + tilesetRootDir);
+      }
+      if (!tempFile.renameTo(tilesetRootDir))
+        throw new TilingException("Failed to rename directory:" + tempFile);
+
+      // Step 4 - remove temporary files
+      for (int i = 1; i < levels.size() - 1; i++) {
+        tempFile = new File(levels.get(i));
+        if (!tempFile.delete())
+          log.error("Failed to delete temp file:" + tempFile);
+      }
+    } catch (Exception e) {
+      throw new TilingException(e.getMessage());
+    }
+
+    log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+    return info;
+  }
+
+  private List<String> computePyramid(TilesetInfo info) throws IOException, InterruptedException, IM4JavaException {
+    ArrayList<String> pyramid = new ArrayList<String>();
+
+    String inputFile = info.getImageFile().getAbsolutePath();
+    pyramid.add(inputFile);
+
+    String tempFilePrefix = inputFile.substring(0, inputFile.lastIndexOf('.'));
+
+    int w = info.getImageWidth();
+    int h = info.getImageHeight();
+
+    String previousLevel = inputFile;
+    String thisLevel;
+
+    for (int i = 1; i < info.getZoomLevels(); i++) {
+      w /= 2;
+      h /= 2;
+      thisLevel = tempFilePrefix + "-" + i + ".tif";
+
+      processor.scale(previousLevel, thisLevel, w, h);
+      pyramid.add(thisLevel);
+      previousLevel = thisLevel;
+    }
+    return pyramid;
+  }
 }

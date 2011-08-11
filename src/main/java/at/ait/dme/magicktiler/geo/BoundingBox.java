@@ -29,37 +29,37 @@ package at.ait.dme.magicktiler.geo;
  */
 public class BoundingBox {
 
-	private double north, south, east, west;
+  private double north, south, east, west;
 
-	public BoundingBox(double north, double south, double east, double west) {
-		this.north = north;
-		this.south = south;
-		this.east = east;
-		this.west = west;
-	}
-	
-	public double getNorth() {
-		return north;
-	}
+  public BoundingBox(double north, double south, double east, double west) {
+    this.north = north;
+    this.south = south;
+    this.east = east;
+    this.west = west;
+  }
 
-	public double getSouth() {
-		return south;
-	}
+  public double getNorth() {
+    return north;
+  }
 
-	public double getEast() {
-		return east;
-	}
+  public double getSouth() {
+    return south;
+  }
 
-	public double getWest() {
-		return west;
-	}
-	
-	public double getLatExtent() {
-		return Math.abs(north - south);
-	}	
-	
-	public double getLonExtent() {
-		return Math.abs(east - west);
-	}
-	
+  public double getEast() {
+    return east;
+  }
+
+  public double getWest() {
+    return west;
+  }
+
+  public double getLatExtent() {
+    return Math.abs(north - south);
+  }
+
+  public double getLonExtent() {
+    return Math.abs(east - west);
+  }
+
 }

@@ -29,10 +29,10 @@ package at.ait.dme.magicktiler;
  */
 public class TilingException extends Exception {
 
-	private static final long serialVersionUID = -8695762848535179685L;
-	
-	public TilingException(String message) {
-		super(message);
-	}
+  private static final long serialVersionUID = -8695762848535179685L;
+
+  public TilingException(String message) {
+    super(message);
+  }
 
 }

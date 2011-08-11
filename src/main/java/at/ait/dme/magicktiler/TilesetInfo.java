@@ -38,141 +38,139 @@ import at.ait.dme.magicktiler.image.ImageProcessor;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class TilesetInfo {
-	
-	/**
-	 * Tile width for this tileset
-	 */
-	private int tileWidth;
-	
-	/**
-	 * Tile height for this tileset
-	 */
-	private int tileHeight;
-	
-	/**
-	 * The tile file format
-	 */
-	private ImageFormat format;
-	
-	/**
-	 * Image information
-	 */
-	private ImageInfo imgInfo;
-	
-	/**
-	 * Zoomlevel dimensions (starting with highest-resolution level)
-	 */
-	private ArrayList<Dimension> zoomlevels = new ArrayList<Dimension>();
-		
-	/**
-	 * Total number of tiles in this set
-	 */
-	private int tilesTotal;
-	
-	public TilesetInfo(File image, int tileWidth, int tileHeight, ImageProcessor processor) 
-		throws TilingException {
-		
-		this.tileWidth = tileWidth;
-		this.tileHeight = tileHeight;
-		this.format = processor.getImageFormat();
-		this.imgInfo = new ImageInfo(image, processor.getImageProcessingSystem());
-		
-		setDimension(imgInfo.getWidth(), imgInfo.getHeight());
-	}
-	
-	public void setDimension(int width, int height) {
-		zoomlevels.clear();
-		
-		// Compute no. of tiles in base layer
-		int xBaseTiles = (int) Math.ceil((float) width / tileWidth);
-		int yBaseTiles = (int) Math.ceil((float) height / tileHeight);
-		zoomlevels.add(new Dimension(xBaseTiles, yBaseTiles));
-		
-		// Compute no. of zoom levels
-		double maxTiles = (xBaseTiles > yBaseTiles) ? xBaseTiles : yBaseTiles;
-		int numberOfZoomlevels = (int) Math.ceil(Math.log(maxTiles) / Math.log(2)) + 1;
-		
-		// Compute zoomlevel dimensions and total amount of tiles
-		double x = xBaseTiles;
-		double y = yBaseTiles;
-		tilesTotal = xBaseTiles * yBaseTiles;
-		for (int i=1; i<numberOfZoomlevels; i++) {
-			x = Math.ceil(x / 2);
-			y = Math.ceil(y / 2);
-			tilesTotal += x * y;
-			zoomlevels.add(new Dimension((int) x, (int) y));
-		}
-		
-		imgInfo.setWidth(width);
-		imgInfo.setHeight(height);
-	}
-		
-	public File getImageFile() {
-		return imgInfo.getFile();
-	}
-	
-	public int getTileWidth() {
-		return tileWidth;
-	}
-	
-	public int getTileHeight() {
-		return tileHeight;
-	}
-	
-	public ImageFormat getTileFormat() {
-		return format;
-	}
-	
-	public int getImageWidth() {
-		return imgInfo.getWidth();
-	}
-	
-	public int getImageHeight() {
-		return imgInfo.getHeight();
-	}
-	
-	public int getNumberOfXTiles(int zoomlevel) {
-		return zoomlevels.get(zoomlevel).x;
-	}
-	
-	public int getNumberOfYTiles(int zoomlevel) {
-		return zoomlevels.get(zoomlevel).y;
-	}
 
-	public int getZoomLevels() {
-		return zoomlevels.size();
-	}
-	
-	public int getTotalNumberOfTiles() {
-		return tilesTotal;
-	}
-	
-	@Override
-	public String toString() {
-		return "TilesetInfo [format=" + format + ", imgInfo=" + imgInfo + ", tileHeight="
-				+ tileHeight + ", tileWidth=" + tileWidth + ", tilesTotal=" + tilesTotal
-				+ ", zoomlevels=" + zoomlevels + "]";
-	}
+  /**
+   * Tile width for this tileset
+   */
+  private int tileWidth;
 
-	public String getFileExtension() {
-		if(!getImageFile().getName().contains(".")) 
-			throw new RuntimeException("can't determine file extension of source image");
-		return getImageFile().getName().split("\\.")[1];
-	}
-	
-	/**
-	 * Simple wrapper for the 'dimension' of a zoomlevel (i.e. number of
-	 * tiles in X/Y directions)
-	 * 
-	 * @author Rainer Simon <magicktiler@gmail.com>
-	 */
-	private static class Dimension {
-	
-		int x,y;
-		
-		Dimension(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}	
-	}	
+  /**
+   * Tile height for this tileset
+   */
+  private int tileHeight;
+
+  /**
+   * The tile file format
+   */
+  private ImageFormat format;
+
+  /**
+   * Image information
+   */
+  private ImageInfo imgInfo;
+
+  /**
+   * Zoomlevel dimensions (starting with highest-resolution level)
+   */
+  private ArrayList<Dimension> zoomlevels = new ArrayList<Dimension>();
+
+  /**
+   * Total number of tiles in this set
+   */
+  private int tilesTotal;
+
+  public TilesetInfo(File image, int tileWidth, int tileHeight, ImageProcessor processor) throws TilingException {
+
+    this.tileWidth = tileWidth;
+    this.tileHeight = tileHeight;
+    this.format = processor.getImageFormat();
+    this.imgInfo = new ImageInfo(image, processor.getImageProcessingSystem());
+
+    setDimension(imgInfo.getWidth(), imgInfo.getHeight());
+  }
+
+  public void setDimension(int width, int height) {
+    zoomlevels.clear();
+
+    // Compute no. of tiles in base layer
+    int xBaseTiles = (int) Math.ceil((float) width / tileWidth);
+    int yBaseTiles = (int) Math.ceil((float) height / tileHeight);
+    zoomlevels.add(new Dimension(xBaseTiles, yBaseTiles));
+
+    // Compute no. of zoom levels
+    double maxTiles = (xBaseTiles > yBaseTiles) ? xBaseTiles : yBaseTiles;
+    int numberOfZoomlevels = (int) Math.ceil(Math.log(maxTiles) / Math.log(2)) + 1;
+
+    // Compute zoomlevel dimensions and total amount of tiles
+    double x = xBaseTiles;
+    double y = yBaseTiles;
+    tilesTotal = xBaseTiles * yBaseTiles;
+    for (int i = 1; i < numberOfZoomlevels; i++) {
+      x = Math.ceil(x / 2);
+      y = Math.ceil(y / 2);
+      tilesTotal += x * y;
+      zoomlevels.add(new Dimension((int) x, (int) y));
+    }
+
+    imgInfo.setWidth(width);
+    imgInfo.setHeight(height);
+  }
+
+  public File getImageFile() {
+    return imgInfo.getFile();
+  }
+
+  public int getTileWidth() {
+    return tileWidth;
+  }
+
+  public int getTileHeight() {
+    return tileHeight;
+  }
+
+  public ImageFormat getTileFormat() {
+    return format;
+  }
+
+  public int getImageWidth() {
+    return imgInfo.getWidth();
+  }
+
+  public int getImageHeight() {
+    return imgInfo.getHeight();
+  }
+
+  public int getNumberOfXTiles(int zoomlevel) {
+    return zoomlevels.get(zoomlevel).x;
+  }
+
+  public int getNumberOfYTiles(int zoomlevel) {
+    return zoomlevels.get(zoomlevel).y;
+  }
+
+  public int getZoomLevels() {
+    return zoomlevels.size();
+  }
+
+  public int getTotalNumberOfTiles() {
+    return tilesTotal;
+  }
+
+  @Override
+  public String toString() {
+    return "TilesetInfo [format=" + format + ", imgInfo=" + imgInfo + ", tileHeight=" + tileHeight + ", tileWidth="
+        + tileWidth + ", tilesTotal=" + tilesTotal + ", zoomlevels=" + zoomlevels + "]";
+  }
+
+  public String getFileExtension() {
+    if (!getImageFile().getName().contains("."))
+      throw new RuntimeException("can't determine file extension of source image");
+    return getImageFile().getName().split("\\.")[1];
+  }
+
+  /**
+   * Simple wrapper for the 'dimension' of a zoomlevel (i.e. number of
+   * tiles in X/Y directions)
+   * 
+   * @author Rainer Simon <magicktiler@gmail.com>
+   */
+  private static class Dimension {
+
+    int x, y;
+
+    Dimension(int x, int y) {
+      this.x = x;
+      this.y = y;
+    }
+  }
 }

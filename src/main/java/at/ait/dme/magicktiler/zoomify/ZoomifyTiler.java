@@ -81,194 +81,182 @@ import at.ait.dme.magicktiler.Stripe.Orientation;
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class ZoomifyTiler extends MagickTiler {
-	public static final int MAX_TILES_PER_GROUP = 256;
+  public static final int MAX_TILES_PER_GROUP = 256;
 
-	/**
-	 * TileGroup string constant
-	 */
-	public static final String TILEGROUP = "TileGroup";
-	
-	/**
-	 * XML descriptor file template 
-	 */
-	private static final String METADATA_TEMPLATE = 
-		"<IMAGE_PROPERTIES WIDTH=\"@width@\" HEIGHT=\"@height@\" NUMTILES=\"@numtiles@\"" +
-		" NUMIMAGES=\"1\" VERSION=\"1.8\" TILESIZE=\"@tilesize@\" />";
+  /**
+   * TileGroup string constant
+   */
+  public static final String TILEGROUP = "TileGroup";
 
-	/**
-	 * Log4j logger
-	 */
-	private static Logger log = Logger.getLogger(ZoomifyTiler.class);
-	
-	@Override
-	protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
-		long startTime = System.currentTimeMillis();
-		log.info("Generating Zoomify tiles for file " + image.getName() + ": " +
-				info.getImageWidth() + "x" + info.getImageHeight() + ", " +
-                info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, " +
-                info.getZoomLevels() + " zoom levels, " +
-                info.getTotalNumberOfTiles() + " tiles total"
-		);
-		
-		String baseName = image.getName().substring(0, image.getName().lastIndexOf('.'));
-				
-		// Step 1 - stripe the base image
-		log.debug("Striping base image");
-		List<Stripe> baseStripes;
-		try {
-			baseStripes = stripeImage(image, Orientation.HORIZONTAL, 
-					info.getNumberOfYTiles(0), info.getImageWidth(), tileHeight, baseName + "-0-");
-		} catch (Exception e) {
-			throw new TilingException(e.getMessage());
-		} 
-		
-		// Step 2 - tile base image stripes
-		log.debug("Tiling level 1");
-		int zoomlevelStartIdx = info.getTotalNumberOfTiles() - info.getNumberOfXTiles(0) * info.getNumberOfYTiles(0);
-		int offset = zoomlevelStartIdx;
-		for (int i=0; i<baseStripes.size(); i++) {
-			try {
-				generateZoomifyTiles(baseStripes.get(i), 
-						info.getZoomLevels() - 1,
-						info.getNumberOfXTiles(0),
-						offset,
-						i);
-				offset += info.getNumberOfXTiles(0);
-			} catch (Exception e) {
-				throw new TilingException(e.getMessage());
-			}
-		}
-		
-		// Step 3 - compute the pyramid
-		List<Stripe> levelBeneath = baseStripes;
-		List<Stripe> thisLevel = new ArrayList<Stripe>();
- 
-		for (int i=1; i<info.getZoomLevels(); i++) {
-			log.debug("Tiling level " + (i + 1));
-			zoomlevelStartIdx -= info.getNumberOfXTiles(i) * info.getNumberOfYTiles(i);
-			offset = zoomlevelStartIdx;
-			for(int j=0; j<Math.ceil((double)levelBeneath.size() / 2); j++) {
-				try {
-					// Step 3a - merge stripes from level beneath
-					Stripe stripe1 = levelBeneath.get(j * 2);
-					Stripe stripe2 = ((j * 2 + 1) < levelBeneath.size()) ? levelBeneath.get(j * 2 + 1) : null;
-					Stripe result = mergeStripes(stripe1, stripe2, baseName + "-" + i + "-" + j + ".tif");
-					thisLevel.add(result);
-					
-					// Step 3b - tile result stripe
-					generateZoomifyTiles(result,
-							info.getZoomLevels() - i -1, 
-							info.getNumberOfXTiles(i),
-							offset,
-							j);
-					offset += info.getNumberOfXTiles(i);
-				} catch (Exception e) {
-					throw new TilingException(e.getMessage());
-				}
-			}
-			
-			for (Stripe s: levelBeneath) s.delete();
-			levelBeneath = thisLevel;
-			thisLevel = new ArrayList<Stripe>();
-		}
+  /**
+   * XML descriptor file template 
+   */
+  private static final String METADATA_TEMPLATE = "<IMAGE_PROPERTIES WIDTH=\"@width@\" HEIGHT=\"@height@\" NUMTILES=\"@numtiles@\""
+      + " NUMIMAGES=\"1\" VERSION=\"1.8\" TILESIZE=\"@tilesize@\" />";
 
-		for (Stripe s : levelBeneath) s.delete();
-		
-		// Step 4 - generate ImageProperties.xml file
-		generateImagePropertiesXML(info);
-		
-		// Step 5 (optional) - generate OpenLayers preview
-		if (generatePreview) {
-			try {
-				generatePreview(info);
-			} catch (IOException e) {
-				throw new TilingException("Error writing preview HTML: " + e.getMessage());
-			}
-		}
-		
-		log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
-		return info;
-	}
-	
-	private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber) 
-			throws IOException, InterruptedException, IM4JavaException, TilingException {
-		
-		String filenamePattern = tilesetRootDir + File.separator + "tmp-%d.jpg";
-		processor.crop(stripe.getImageFile().getAbsolutePath(), filenamePattern, tileWidth, tileHeight);
+  /**
+   * Log4j logger
+   */
+  private static Logger log = Logger.getLogger(ZoomifyTiler.class);
 
-		// Rename result files (not nice, but seems to be the fastest way to do it)
-		for (int idx=0; idx<xTiles; idx++) {
-			int tileGroup = (startIdx + idx) / MAX_TILES_PER_GROUP;
-			File tileGroupDir = new File(tilesetRootDir.getAbsolutePath() + File.separator + TILEGROUP + tileGroup);
-			if (!tileGroupDir.exists()) createDir(tileGroupDir);
-			
-			File fOld = new File(filenamePattern.replace("%d", Integer.toString(idx)));
-			
-			File fNew = new File(filenamePattern.replace("tmp-%d", 
-					TILEGROUP + tileGroup + 
-					File.separator + 
-					Integer.toString(zoomlevel) + "-" + (idx % xTiles) + "-" + rowNumber));
+  @Override
+  protected TilesetInfo convert(File image, TilesetInfo info) throws TilingException {
+    long startTime = System.currentTimeMillis();
+    log.info("Generating Zoomify tiles for file " + image.getName() + ": " + info.getImageWidth() + "x"
+        + info.getImageHeight() + ", " + info.getNumberOfXTiles(0) + "x" + info.getNumberOfYTiles(0) + " basetiles, "
+        + info.getZoomLevels() + " zoom levels, " + info.getTotalNumberOfTiles() + " tiles total");
 
-			if(!fOld.renameTo(fNew)) throw new TilingException("Failed to rename file:"+fOld);
-		}
-	}
-	
-	private Stripe mergeStripes(Stripe stripe1, Stripe stripe2, String targetFile) 
-		throws IOException, InterruptedException, IM4JavaException {
-		
-		if (stripe2 == null) {
-			return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					processor.getImageProcessingSystem());
-		} else {
-			return stripe1.merge(stripe2, new File(workingDirectory.getAbsolutePath() + File.separator + targetFile), 
-					processor.getImageProcessingSystem());
-		}
-	}
-	
-	private void generateImagePropertiesXML(TilesetInfo info) {
-		String metadata = METADATA_TEMPLATE
-			.replace("@width@", Integer.toString(info.getImageWidth()))
-			.replace("@height@", Integer.toString(info.getImageHeight()))
-			.replace("@numtiles@", Integer.toString(info.getTotalNumberOfTiles()))
-			.replace("@tilesize@", Integer.toString(tileHeight));
-		
-		// Write to file
-		BufferedWriter out = null;
-		try {
-			out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "ImageProperties.xml")));
-			out.write(metadata);
-		} catch (IOException e) {
-			log.error("Error writing metadata XML: " + e.getMessage());
-		} finally {
-			if(out!=null)
-				try {
-					out.close();
-				} catch (IOException e) {
-					log.error("Error closing stream: " + e.getMessage());
-				}
-		}
-	}
-	
-	private void generatePreview(TilesetInfo info) throws IOException {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(this.getClass()
-						.getResourceAsStream("zoomify-template.html")));
-		
-			StringBuffer sb = new StringBuffer();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-			
-			String html = sb.toString()
-				.replace("@title@", info.getImageFile().getName())
-				.replace("@tileset@", ".")
-				.replace("@playerPath@", "file://" + System.getProperty("user.dir").replace("\\", "/") + "/zoomify/");
-			
-			writeHtmlPreview(html);
-		} finally {
-			if(reader!=null) reader.close();
-		}
-	}
+    String baseName = image.getName().substring(0, image.getName().lastIndexOf('.'));
+
+    // Step 1 - stripe the base image
+    log.debug("Striping base image");
+    List<Stripe> baseStripes;
+    try {
+      baseStripes = stripeImage(image, Orientation.HORIZONTAL, info.getNumberOfYTiles(0), info.getImageWidth(),
+          tileHeight, baseName + "-0-");
+    } catch (Exception e) {
+      throw new TilingException(e.getMessage());
+    }
+
+    // Step 2 - tile base image stripes
+    log.debug("Tiling level 1");
+    int zoomlevelStartIdx = info.getTotalNumberOfTiles() - info.getNumberOfXTiles(0) * info.getNumberOfYTiles(0);
+    int offset = zoomlevelStartIdx;
+    for (int i = 0; i < baseStripes.size(); i++) {
+      try {
+        generateZoomifyTiles(baseStripes.get(i), info.getZoomLevels() - 1, info.getNumberOfXTiles(0), offset, i);
+        offset += info.getNumberOfXTiles(0);
+      } catch (Exception e) {
+        throw new TilingException(e.getMessage());
+      }
+    }
+
+    // Step 3 - compute the pyramid
+    List<Stripe> levelBeneath = baseStripes;
+    List<Stripe> thisLevel = new ArrayList<Stripe>();
+
+    for (int i = 1; i < info.getZoomLevels(); i++) {
+      log.debug("Tiling level " + (i + 1));
+      zoomlevelStartIdx -= info.getNumberOfXTiles(i) * info.getNumberOfYTiles(i);
+      offset = zoomlevelStartIdx;
+      for (int j = 0; j < Math.ceil((double) levelBeneath.size() / 2); j++) {
+        try {
+          // Step 3a - merge stripes from level beneath
+          Stripe stripe1 = levelBeneath.get(j * 2);
+          Stripe stripe2 = ((j * 2 + 1) < levelBeneath.size()) ? levelBeneath.get(j * 2 + 1) : null;
+          Stripe result = mergeStripes(stripe1, stripe2, baseName + "-" + i + "-" + j + ".tif");
+          thisLevel.add(result);
+
+          // Step 3b - tile result stripe
+          generateZoomifyTiles(result, info.getZoomLevels() - i - 1, info.getNumberOfXTiles(i), offset, j);
+          offset += info.getNumberOfXTiles(i);
+        } catch (Exception e) {
+          throw new TilingException(e.getMessage());
+        }
+      }
+
+      for (Stripe s : levelBeneath)
+        s.delete();
+      levelBeneath = thisLevel;
+      thisLevel = new ArrayList<Stripe>();
+    }
+
+    for (Stripe s : levelBeneath)
+      s.delete();
+
+    // Step 4 - generate ImageProperties.xml file
+    generateImagePropertiesXML(info);
+
+    // Step 5 (optional) - generate OpenLayers preview
+    if (generatePreview) {
+      try {
+        generatePreview(info);
+      } catch (IOException e) {
+        throw new TilingException("Error writing preview HTML: " + e.getMessage());
+      }
+    }
+
+    log.info("Took " + (System.currentTimeMillis() - startTime) + " ms.");
+    return info;
+  }
+
+  private void generateZoomifyTiles(Stripe stripe, int zoomlevel, int xTiles, int startIdx, int rowNumber)
+      throws IOException, InterruptedException, IM4JavaException, TilingException {
+
+    String filenamePattern = tilesetRootDir + File.separator + "tmp-%d.jpg";
+    processor.crop(stripe.getImageFile().getAbsolutePath(), filenamePattern, tileWidth, tileHeight);
+
+    // Rename result files (not nice, but seems to be the fastest way to do it)
+    for (int idx = 0; idx < xTiles; idx++) {
+      int tileGroup = (startIdx + idx) / MAX_TILES_PER_GROUP;
+      File tileGroupDir = new File(tilesetRootDir.getAbsolutePath() + File.separator + TILEGROUP + tileGroup);
+      if (!tileGroupDir.exists())
+        createDir(tileGroupDir);
+
+      File fOld = new File(filenamePattern.replace("%d", Integer.toString(idx)));
+
+      File fNew = new File(
+          filenamePattern.replace("tmp-%d", TILEGROUP + tileGroup + File.separator + Integer.toString(zoomlevel) + "-"
+              + (idx % xTiles) + "-" + rowNumber));
+
+      if (!fOld.renameTo(fNew))
+        throw new TilingException("Failed to rename file:" + fOld);
+    }
+  }
+
+  private Stripe mergeStripes(Stripe stripe1, Stripe stripe2, String targetFile) throws IOException,
+      InterruptedException, IM4JavaException {
+
+    if (stripe2 == null) {
+      return stripe1.shrink(new File(workingDirectory.getAbsolutePath() + File.separator + targetFile),
+          processor.getImageProcessingSystem());
+    } else {
+      return stripe1.merge(stripe2, new File(workingDirectory.getAbsolutePath() + File.separator + targetFile),
+          processor.getImageProcessingSystem());
+    }
+  }
+
+  private void generateImagePropertiesXML(TilesetInfo info) {
+    String metadata = METADATA_TEMPLATE.replace("@width@", Integer.toString(info.getImageWidth()))
+        .replace("@height@", Integer.toString(info.getImageHeight()))
+        .replace("@numtiles@", Integer.toString(info.getTotalNumberOfTiles()))
+        .replace("@tilesize@", Integer.toString(tileHeight));
+
+    // Write to file
+    BufferedWriter out = null;
+    try {
+      out = new BufferedWriter(new FileWriter(new File(tilesetRootDir, "ImageProperties.xml")));
+      out.write(metadata);
+    } catch (IOException e) {
+      log.error("Error writing metadata XML: " + e.getMessage());
+    } finally {
+      if (out != null)
+        try {
+          out.close();
+        } catch (IOException e) {
+          log.error("Error closing stream: " + e.getMessage());
+        }
+    }
+  }
+
+  private void generatePreview(TilesetInfo info) throws IOException {
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("zoomify-template.html")));
+
+      StringBuffer sb = new StringBuffer();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line + "\n");
+      }
+
+      String html = sb.toString().replace("@title@", info.getImageFile().getName()).replace("@tileset@", ".")
+          .replace("@playerPath@", "file://" + System.getProperty("user.dir").replace("\\", "/") + "/zoomify/");
+
+      writeHtmlPreview(html);
+    } finally {
+      if (reader != null)
+        reader.close();
+    }
+  }
 }
