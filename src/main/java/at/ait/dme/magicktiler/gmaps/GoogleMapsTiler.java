@@ -30,8 +30,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * don't need to understand how it works internally - <b>just 
  * ignore this section!</b></em>
  * <br><br>
- * The Google Maps tiling scheme
- * arranges tiles in the following folder/file structure:
+ * The Google Maps tiling scheme arranges tiles in the following folder/file structure:
  * <br><br>
  * /tileset-root/[zoomlevel]-[column]-[row].jpg (or .png)
  * <br><br>
@@ -83,8 +82,8 @@ public class GoogleMapsTiler extends MagickTiler {
           processor.crop(stripe.getImageFile().getAbsolutePath(), tileBase + "_" + "%d" + "."
               + processor.getImageFormat().getExtension(), tileWidth, tileHeight);
 
-          int tiles = (stripe.getOrientation() == Orientation.HORIZONTAL) ? stripe.getWidth() / tileWidth : stripe
-              .getHeight() / tileHeight;
+          int tiles = (stripe.getOrientation() == Orientation.HORIZONTAL) ? 
+          		stripe.getWidth() / tileWidth : stripe.getHeight() / tileHeight;
 
           for (int t = 0; t < tiles; t++) {
             int column = (stripe.getOrientation() == Orientation.HORIZONTAL) ? t : s;

@@ -87,7 +87,8 @@ public class TMSTiler extends MagickTiler {
       + "  <BoundingBox minx=\"-@height@.00000000000000\" miny=\"0.00000000000000\" maxx=\"0.00000000000000\" maxy=\"@width@.00000000000000\"/>\n"
       + "  <Origin x=\"-@height@.00000000000000\" y=\"0.00000000000000\"/>\n"
       + "  <TileFormat width=\"@tilewidth@\" height=\"@tileheight@\" mime-type=\"@mimetype@\" extension=\"@ext@\"/>\n"
-      + "  <TileSets profile=\"raster\">\n" + "@tilesets@" + "  </TileSets>\n" + "</TileMap>\n";
+      + "  <TileSets profile=\"raster\">\n" + "@tilesets@" + "  </TileSets>\n" 
+      + "</TileMap>\n";
 
   /**
    * XML tileset element template
