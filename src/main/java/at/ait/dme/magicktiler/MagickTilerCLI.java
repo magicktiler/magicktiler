@@ -56,7 +56,7 @@ import at.ait.dme.magicktiler.zoomify.ZoomifyValidator;
  * -s   tiling scheme ('tms', 'zoomify', 'gmap' or 'ptif')<br>
  * -f   tile format ('jpeg' or 'png')<br>
  * -b   background color<br>
- * -i	  input file or directory<br>
+ * -i	input file or directory<br>
  * -o   output directory (for tilesets) or file (for PTIF)<br>
  * -q   JPEG compression quality (0 - 100)<br>
  * -p   generate an HTML preview file<br>

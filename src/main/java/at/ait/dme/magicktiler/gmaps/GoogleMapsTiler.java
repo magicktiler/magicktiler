@@ -44,8 +44,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * <li>For performance reasons, the base image is cut into vertical or 
  * horizontal stripes (depending on the image orientation). Thereby the image 
  * is squared adding background-color buffer to the stripes where necessary.</li>
- * <li>For all zoomlevels, the stripes of the zoom level beneath (if any) are merged and are then cut to 
- * tiles (The number of tiles per zoomlevel is 4^zoomlevel).</li>
+ * <li>For all zoomlevels, the stripes of the zoom level beneath (if any) are merged 
+ * and are then cut to tiles (The number of tiles per zoomlevel is 4^zoomlevel).</li>
  * <li>The HTML preview file is generated (if requested).</li>
  * <li>The metadata file is written.</li>
  * </ol>
