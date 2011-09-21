@@ -43,7 +43,7 @@ MagickTiler can be used from the command line prompt using the command
 
 Example:
 
-	java -jar magicktiler.jar -s tms -f jpeg -p images
+	java -jar magicktiler.jar -s tms -f jpeg -p -i images
 
 The example command will create TMS tilesets (with JPEG tiles) for each file
 in the folder 'images'. A preview HTML file will be added to each tileset. 
