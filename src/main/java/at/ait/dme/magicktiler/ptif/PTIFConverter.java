@@ -88,6 +88,10 @@ public class PTIFConverter extends MagickTiler {
       processor.merge(levels, "tiff:tile-geometry=" + TILE_SIZE + "x" + TILE_SIZE, "jpeg");
 
       // Step 3 - rename
+      if (!tilesetRootDir.getName().endsWith(".tif") && !tilesetRootDir.getName().endsWith(".ptif")) {
+    	  tilesetRootDir = new File(tilesetRootDir.getAbsolutePath() + ".tif");
+      }
+    	  
       if (tilesetRootDir.exists()) {
         if (!tilesetRootDir.delete())
           throw new TilingException("Failed to delete directory:" + tilesetRootDir);
