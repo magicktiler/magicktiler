@@ -277,6 +277,8 @@ public class MagickTilerCLI {
       }
     } else {
       // Tile folder full of files
+      // Note: by convention, we'll assume the output file ('-o' parameter) also represents a folder name
+      // in case the input file is a folder
       long ctrFiles = 0;
       long ctrTilesets = 0;
       tiler.setWorkingDirectory(input);
@@ -289,7 +291,7 @@ public class MagickTilerCLI {
           if (child.isFile()) {
             long tileStartTime = System.currentTimeMillis();
             ctrFiles++;
-            tiler.convert(child, destination);
+            tiler.convert(child, new File(destination, child.getName()));
             ctrTilesets++;
             logger.info("[DONE] " + child.getName() + " (" + (System.currentTimeMillis() - tileStartTime) + " ms)");
           }
