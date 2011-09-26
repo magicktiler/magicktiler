@@ -279,6 +279,7 @@ public class MagickTilerCLI {
       // Tile folder full of files
       // Note: by convention, we'll assume the output file ('-o' parameter) also represents a folder name
       // in case the input file is a folder
+      destination.mkdir();
       long ctrFiles = 0;
       long ctrTilesets = 0;
       tiler.setWorkingDirectory(input);

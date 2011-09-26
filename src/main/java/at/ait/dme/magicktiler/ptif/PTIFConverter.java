@@ -88,7 +88,9 @@ public class PTIFConverter extends MagickTiler {
       processor.merge(levels, "tiff:tile-geometry=" + TILE_SIZE + "x" + TILE_SIZE, "jpeg");
 
       // Step 3 - rename
+      File emptyDir = null;
       if (!tilesetRootDir.getName().endsWith(".tif") && !tilesetRootDir.getName().endsWith(".ptif")) {
+    	  emptyDir = new File(tilesetRootDir.getAbsolutePath());
     	  tilesetRootDir = new File(tilesetRootDir.getAbsolutePath() + ".tif");
       }
     	  
@@ -105,6 +107,9 @@ public class PTIFConverter extends MagickTiler {
         if (!tempFile.delete())
           log.error("Failed to delete temp file:" + tempFile);
       }
+      
+      if (emptyDir != null)
+    	  emptyDir.delete();
     } catch (Exception e) {
       throw new TilingException(e.getMessage());
     }
