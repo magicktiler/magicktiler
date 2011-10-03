@@ -63,7 +63,8 @@ public class ImageInfo {
         throw new TilingException(IDENTIFY_ERROR);
 
       // Parse console output
-      String[] params = result.toString().split(" ");
+      int index = result.toString().indexOf(image.getAbsolutePath());
+      String[] params = result.toString().substring(index + image.getAbsolutePath().length()).split(" ");
       String size = params[2];
       if (size.indexOf('+') > -1)
         size = size.substring(0, size.indexOf('+'));

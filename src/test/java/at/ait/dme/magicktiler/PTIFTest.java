@@ -10,28 +10,40 @@ import junit.framework.TestCase;
 
 /**
  * PTIF tiling tests
- * 
+ *
  * @author Rainer Simon <magicktiler@gmail.com>
  * @author Christian Sadilek <christian.sadilek@gmail.com>
  */
 public class PTIFTest extends TestCase {
 
-  @Test
-  public void testPTIFTiling() throws TilingException {
-    // Generate a Pyramid TIF from the test image
-    File result = new File("test/pyramid-tif.ptif");
+    @Test
+    public void testPTIFTiling() throws TilingException {
+        // Generate a Pyramid TIF from the test image
+        File result = new File("test/pyramid-tif.ptif");
 
-    PTIFConverter ptiffer = new PTIFConverter();
-    TilesetInfo info = ptiffer.convert(new File("src/test/resources/Hong_Kong_Night_Skyline.jpg"), result);
+        PTIFConverter ptiffer = new PTIFConverter();
+        TilesetInfo info = ptiffer.convert(new File("src/test/resources/Hong_Kong_Night_Skyline.jpg"), result);
 
-    // Check if image metadata was read correctly
-    assertEquals("Wrong width calculated for the PTIF tileset!", 4670, info.getImageWidth());
-    assertEquals("Wrong height calculated for the PTIF tileset!", 2000, info.getImageHeight());
+        // Check if image metadata was read correctly
+        assertEquals("Wrong width calculated for the PTIF tileset!", 4670, info.getImageWidth());
+        assertEquals("Wrong height calculated for the PTIF tileset!", 2000, info.getImageHeight());
 
-    // Check if tileset properties were computed correctly
-    assertEquals("Wrong number of zoom levels calculated for the PTIF tileset!", 6, info.getZoomLevels());
+        // Check if tileset properties were computed correctly
+        assertEquals("Wrong number of zoom levels calculated for the PTIF tileset!", 6, info.getZoomLevels());
 
-    // Check if the file was created
-    assertTrue(result.exists());
-  }
+        // Check if the file was created
+        assertTrue(result.exists());
+    }
+
+    public void testPTIFTilingWithWhitespace() throws TilingException {
+        // Generate a Pyramid TIF from the test image
+        File result = new File("test/pyramid-tif-whitespace.ptif");
+
+        PTIFConverter ptiffer = new PTIFConverter();
+        TilesetInfo info = ptiffer.convert(new File("src/test/resources/Schweiz Karte Baedeker 1913.jpg"), result);
+
+        // Check if the file was created
+        assertTrue(result.exists());
+    }
+
 }
