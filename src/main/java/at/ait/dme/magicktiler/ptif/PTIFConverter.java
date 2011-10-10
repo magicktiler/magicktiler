@@ -93,6 +93,9 @@ public class PTIFConverter extends MagickTiler {
     	  emptyDir = new File(tilesetRootDir.getAbsolutePath());
     	  tilesetRootDir = new File(tilesetRootDir.getAbsolutePath() + ".tif");
       }
+      
+      if (emptyDir != null)
+    	  emptyDir.delete();
     	  
       if (tilesetRootDir.exists()) {
         if (!tilesetRootDir.delete())
@@ -107,9 +110,6 @@ public class PTIFConverter extends MagickTiler {
         if (!tempFile.delete())
           log.error("Failed to delete temp file:" + tempFile);
       }
-      
-      if (emptyDir != null)
-    	  emptyDir.delete();
     } catch (Exception e) {
       throw new TilingException(e.getMessage());
     }
