@@ -115,6 +115,7 @@
 				<formatter type="xml" />
 				<fileset dir="${test.dir}">
 					<include name="**/*Test*.java"/>
+                    <exclude name="**/BaseTest.java" />
 				</fileset>
 			</batchtest>
 		</junit>
